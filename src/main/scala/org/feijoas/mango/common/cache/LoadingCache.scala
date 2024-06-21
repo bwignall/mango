@@ -22,14 +22,14 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
 import scala.collection.immutable
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.cache.{ LoadingCache => GuavaLoadingCache }
+import com.google.common.cache.{LoadingCache => GuavaLoadingCache}
 import com.google.common.util.concurrent.UncheckedExecutionException
 
 /** A semi-persistent mapping from keys to values. Values are automatically loaded by the cache,

@@ -109,10 +109,7 @@ final object Preconditions {
    *     errorMessageTemplate} or {@code errorMessageArgs} is null (don't let
    *     this happen)
    */
-  def checkArgument(expression: Boolean,
-                    errorMessageTemplate: String,
-                    errorMessageArg: Any,
-                    moreArgs: Any*) = {
+  def checkArgument(expression: Boolean, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*) = {
     if (!expression)
       throw new IllegalArgumentException(format(errorMessageTemplate, errorMessageArg +: moreArgs: _*))
   }
@@ -161,10 +158,7 @@ final object Preconditions {
    *     errorMessageTemplate} or {@code errorMessageArgs} is null (don't let
    *     this happen)
    */
-  def checkState(expression: Boolean,
-                 errorMessageTemplate: String,
-                 errorMessageArg: Any,
-                 moreArgs: Any*) = {
+  def checkState(expression: Boolean, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*) = {
     if (!expression)
       throw new IllegalStateException(format(errorMessageTemplate, errorMessageArg +: moreArgs: _*))
   }
@@ -217,10 +211,7 @@ final object Preconditions {
    *  @return the non-null reference that was validated
    *  @throws NullPointerException if {@code reference} is null
    */
-  def checkNotNull[T](reference: T,
-                      errorMessageTemplate: String,
-                      errorMessageArg: Any,
-                      moreArgs: Any*): T = {
+  def checkNotNull[T](reference: T, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*): T = {
     if (reference == null) {
       throw new NullPointerException(format(errorMessageTemplate, errorMessageArg +: moreArgs: _*))
     }
@@ -256,8 +247,7 @@ final object Preconditions {
    *     less than {@code size}
    *  @throws IllegalArgumentException if {@code size} is negative
    */
-  def checkElementIndex(
-    index: Int, size: Int, @Nullable desc: String): Int = {
+  def checkElementIndex(index: Int, size: Int, @Nullable desc: String): Int = {
     if (index < 0 || index >= size) {
       throw new IndexOutOfBoundsException(badElementIndex(index, size, desc))
     }
@@ -316,8 +306,7 @@ final object Preconditions {
     } else if (size < 0) {
       throw new IllegalArgumentException("negative size: " + size)
     } else { // index > size
-      return format("%s (%s) must not be greater than size (%s)",
-        desc, index, size)
+      return format("%s (%s) must not be greater than size (%s)", desc, index, size)
     }
   }
 
@@ -348,8 +337,7 @@ final object Preconditions {
       return badPositionIndex(end, size, "end index")
     }
     // end < start
-    return format("end index (%s) must not be less than start index (%s)",
-      end, start)
+    return format("end index (%s) must not be less than start index (%s)", end, start)
   }
 
   /** Substitutes each {@code %s} in {@code template} with an argument. These

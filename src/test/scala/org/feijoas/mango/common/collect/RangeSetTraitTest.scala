@@ -59,7 +59,7 @@ class RangeSetTraitTest extends FreeSpec with RangeSetBehaviors {
   }
 
   "trait RangeSet" - {
-    behave like rangeSet(newBuilder[Int, Int.type])
+    behave.like(rangeSet(newBuilder[Int, Int.type]))
   }
 
   "object RangeSet" - {
@@ -79,7 +79,10 @@ class RangeSetTraitTest extends FreeSpec with RangeSetBehaviors {
   }
 }
 
-private[mango] class DummyRangeSet[C, O <: Ordering[C]] private[mango] (private val rset: ImmutableRangeSet[AsOrdered[C]])(implicit protected val ord: O) extends RangeSet[C, O] {
+private[mango] class DummyRangeSet[C, O <: Ordering[C]] private[mango] (
+  private val rset: ImmutableRangeSet[AsOrdered[C]]
+)(implicit protected val ord: O)
+    extends RangeSet[C, O] {
 
   override def span(): Option[Range[C, O]] = rset.isEmpty match {
     case true  => None
@@ -94,4 +97,3 @@ private[mango] class DummyRangeSet[C, O <: Ordering[C]] private[mango] (private 
   override def subRangeSet(view: Range[C, O]) = new DummyRangeSet[C, O](rset.subRangeSet(view.asJava))
   override def newBuilder = throw new NotImplementedError
 }
-

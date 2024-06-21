@@ -85,7 +85,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
    *  primitive conversion from {@code Long} to {@code Float}, and correctly rounded.
    */
   def toFloat(): Float = {
-    val fValue: Float = (value & unsigned_mask)
+    val fValue: Float = value & unsigned_mask
     if (value < 0)
       fValue + maxLongAsFloat
     else
@@ -96,7 +96,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
    *  primitive conversion from {@code Long} to {@code Double}, and correctly rounded.
    */
   def toDouble(): Double = {
-    val dValue: Double = (value & unsigned_mask)
+    val dValue: Double = value & unsigned_mask
     if (value < 0)
       dValue + maxLongAsFloat
     else
@@ -199,7 +199,9 @@ final object ULong {
   def valueOf(value: BigInt): ULong = {
     checkNotNull(value)
     checkArgument(value.signum >= 0 && value.bitLength <= java.lang.Long.SIZE,
-      "value (%s) is outside the range for an unsigned long value", value)
+                  "value (%s) is outside the range for an unsigned long value",
+                  value
+    )
     fromLongBits(value.longValue())
   }
 

@@ -33,55 +33,49 @@ trait CacheStatsMatcher {
 
   def hitCount(expectedValue: Long) =
     new HavePropertyMatcher[CacheStats, Long] {
-      def apply(stats: CacheStats) = HavePropertyMatchResult(
-        stats.hitCount == expectedValue,
-        "hitCount",
-        expectedValue,
-        stats.hitCount)
+      def apply(stats: CacheStats) =
+        HavePropertyMatchResult(stats.hitCount == expectedValue, "hitCount", expectedValue, stats.hitCount)
     }
 
   def missCount(expectedValue: Long) =
     new HavePropertyMatcher[CacheStats, Long] {
-      def apply(stats: CacheStats) = HavePropertyMatchResult(
-        stats.missCount == expectedValue,
-        "missCount",
-        expectedValue,
-        stats.missCount)
+      def apply(stats: CacheStats) =
+        HavePropertyMatchResult(stats.missCount == expectedValue, "missCount", expectedValue, stats.missCount)
     }
 
   def loadSuccessCount(expectedValue: Long) =
     new HavePropertyMatcher[CacheStats, Long] {
-      def apply(stats: CacheStats) = HavePropertyMatchResult(
-        stats.loadSuccessCount == expectedValue,
-        "loadSuccessCount",
-        expectedValue,
-        stats.loadSuccessCount)
+      def apply(stats: CacheStats) = HavePropertyMatchResult(stats.loadSuccessCount == expectedValue,
+                                                             "loadSuccessCount",
+                                                             expectedValue,
+                                                             stats.loadSuccessCount
+      )
     }
 
   def loadExceptionCount(expectedValue: Long) =
     new HavePropertyMatcher[CacheStats, Long] {
-      def apply(stats: CacheStats) = HavePropertyMatchResult(
-        stats.loadExceptionCount == expectedValue,
-        "loadExceptionCount",
-        expectedValue,
-        stats.loadExceptionCount)
+      def apply(stats: CacheStats) = HavePropertyMatchResult(stats.loadExceptionCount == expectedValue,
+                                                             "loadExceptionCount",
+                                                             expectedValue,
+                                                             stats.loadExceptionCount
+      )
     }
 
   def totalLoadTime(expectedValue: Long) =
     new HavePropertyMatcher[CacheStats, Long] {
-      def apply(stats: CacheStats) = HavePropertyMatchResult(
-        stats.totalLoadTime == expectedValue,
-        "totalLoadTime",
-        expectedValue,
-        stats.totalLoadTime)
+      def apply(stats: CacheStats) = HavePropertyMatchResult(stats.totalLoadTime == expectedValue,
+                                                             "totalLoadTime",
+                                                             expectedValue,
+                                                             stats.totalLoadTime
+      )
     }
 
   def evictionCount(expectedValue: Long) =
     new HavePropertyMatcher[CacheStats, Long] {
-      def apply(stats: CacheStats) = HavePropertyMatchResult(
-        stats.evictionCount == expectedValue,
-        "evictionCount",
-        expectedValue,
-        stats.evictionCount)
+      def apply(stats: CacheStats) = HavePropertyMatchResult(stats.evictionCount == expectedValue,
+                                                             "evictionCount",
+                                                             expectedValue,
+                                                             stats.evictionCount
+      )
     }
 }

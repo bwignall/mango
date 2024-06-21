@@ -27,9 +27,9 @@ import scala.collection.Traversable
 import scala.concurrent.Future
 import org.feijoas.mango.common.cache.CacheLoader._
 import org.scalatest._
-import com.google.common.{ cache => cgcc }
-import com.google.common.cache.{ CacheLoader => GuavaCacheLoader }
-import com.google.common.collect.{ ImmutableMap, Lists }
+import com.google.common.{cache => cgcc}
+import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
+import com.google.common.collect.{ImmutableMap, Lists}
 import org.junit.Assert._
 import com.google.common.util.concurrent.ListenableFuture
 import org.feijoas.mango.common.util.concurrent.Futures._

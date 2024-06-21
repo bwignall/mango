@@ -23,26 +23,26 @@
 package org.feijoas.mango.common.cache
 
 import java.util.concurrent.ExecutionException
-import java.util.logging.{ Level, Logger }
-import java.lang.{ Iterable => jIterable }
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
+import java.util.logging.{Level, Logger}
+import java.lang.{Iterable => jIterable}
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
 import scala.concurrent.duration.MILLISECONDS
 import scala.concurrent.Future._
 import scala.collection.mutable
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.base.Ticker.asMangoTickerConverter
 import org.feijoas.mango.common.cache.LoadingCache.asMangoLoadingCacheConverter
 import org.feijoas.mango.common.util.concurrent.Futures.asScalaFutureConverter
-import org.junit.Assert.{ assertSame, assertEquals, assertTrue }
+import org.junit.Assert.{assertEquals, assertSame, assertTrue}
 import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito.{ times, verify, when }
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatest._
 import org.scalatest.mockito.MockitoSugar
 import com.google.common.cache.CacheLoader.InvalidCacheLoadException
-import com.google.common.cache.{ LoadingCache => GuavaLoadingCache }
+import com.google.common.cache.{LoadingCache => GuavaLoadingCache}
 import com.google.common.testing.FakeTicker
-import com.google.common.util.concurrent.{ ExecutionError }
+import com.google.common.util.concurrent.ExecutionError
 import scala.concurrent.Future
 import scala.util.Failure
 import org.scalatest.BeforeAndAfter
@@ -60,7 +60,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray
  *  @author Markus Schneider
  *  @since 0.7
  */
-class LoadingCacheWrapperTest extends FlatSpec
+class LoadingCacheWrapperTest
+    extends FlatSpec
     with CacheWrapperBehaviour
     with Matchers
     with MockitoSugar
@@ -80,7 +81,7 @@ class LoadingCacheWrapperTest extends FlatSpec
     (wrapped, cache)
   }
 
-  "LoadingCacheWrapper" should behave like forwardingWrapper(wrappedCacheFixture)
+  ("LoadingCacheWrapper" should behave).like(forwardingWrapper(wrappedCacheFixture))
 
   behavior of "LoadingCacheWrapper"
 
@@ -196,7 +197,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def reload(key: Any, oldValue: Any) = Future.successful(two)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
@@ -230,7 +232,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def reload(key: Any, oldValue: Any) = Future.successful(two)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
@@ -298,12 +301,11 @@ class LoadingCacheWrapperTest extends FlatSpec
     val result = cache.getAll(lookupKeys).get
     result.keySet should be(lookupKeys.toSet)
 
-    result.foreach {
-      case (key: Any, value: Any) =>
-        assertSame(value, result.get(key).get)
-        result.get(value) should be(None)
-        assertSame(value, cache.asMap().get(key).get)
-        assertSame(key, cache.asMap().get(value).get)
+    result.foreach { case (key: Any, value: Any) =>
+      assertSame(value, result.get(key).get)
+      result.get(value) should be(None)
+      assertSame(value, cache.asMap().get(key).get)
+      assertSame(key, cache.asMap().get(value).get)
     }
   }
 
@@ -326,10 +328,9 @@ class LoadingCacheWrapperTest extends FlatSpec
     val result = cache.getAll(lookupKeys).get
     result.keySet should be(lookupKeys.toSet)
 
-    result.foreach {
-      case (key: Any, value: Any) =>
-        assertSame(value, result.get(key).get)
-        assertSame(value, cache.asMap().get(key).get)
+    result.foreach { case (key: Any, value: Any) =>
+      assertSame(value, result.get(key).get)
+      assertSame(value, cache.asMap().get(key).get)
     }
 
     result.get(extraKey) should be(None)
@@ -440,7 +441,8 @@ class LoadingCacheWrapperTest extends FlatSpec
   }
 
   it should "fail if the loader returns null" in {
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .build((any: Any) => null)
     cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
@@ -523,7 +525,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def reload(key: Any, oldValue: Any) = Future.successful(null)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
@@ -553,7 +556,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def load(key: Any) = fail
       override def loadAll(keys: Traversable[Any]) = keys.map { case key => (key, null) }.toMap
     }
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .build(loader)
     cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
@@ -570,7 +574,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def load(key: Any) = fail
       override def loadAll(keys: Traversable[Any]) = null
     }
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .build(loader)
     cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
@@ -677,7 +682,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def reload(key: Any, oldValue: Any) = Future.failed(e)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
@@ -816,9 +822,12 @@ class LoadingCacheWrapperTest extends FlatSpec
       override def reload(key: Any, oldValue: Any) = Future.failed(e)
     }
 
-    val cache = CacheBuilder.newBuilder()
-      .recordStats().ticker(ticker.asScala)
-      .refreshAfterWrite(1, MILLISECONDS).build(loader)
+    val cache = CacheBuilder
+      .newBuilder()
+      .recordStats()
+      .ticker(ticker.asScala)
+      .refreshAfterWrite(1, MILLISECONDS)
+      .build(loader)
     cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
@@ -864,7 +873,7 @@ class LoadingCacheWrapperTest extends FlatSpec
 
     cache.get(new Object) match {
       case Failure(expected: UncheckedExecutionException) => assertSame(e, expected.getCause())
-      case _ => fail
+      case _                                              => fail
     }
     cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
 
@@ -890,7 +899,7 @@ class LoadingCacheWrapperTest extends FlatSpec
 
     cache.getAll(List(new Object)) match {
       case Failure(expected: UncheckedExecutionException) => assertSame(e, expected.getCause())
-      case _ => fail
+      case _                                              => fail
     }
     cache.stats should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
@@ -946,9 +955,12 @@ class LoadingCacheWrapperTest extends FlatSpec
     }
     val ticker = new FakeTicker
 
-    val cache = CacheBuilder.newBuilder()
-      .recordStats().ticker(ticker.asScala)
-      .refreshAfterWrite(1, MILLISECONDS).build(loader)
+    val cache = CacheBuilder
+      .newBuilder()
+      .recordStats()
+      .ticker(ticker.asScala)
+      .refreshAfterWrite(1, MILLISECONDS)
+      .build(loader)
     cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
@@ -1002,8 +1014,10 @@ class LoadingCacheWrapperTest extends FlatSpec
 
   it should "reaload after value reclamation" in {
     val countingLoader = new CountingLoader
-    val cache = CacheBuilder.newBuilder()
-      .weakValues().build(countingLoader)
+    val cache = CacheBuilder
+      .newBuilder()
+      .weakValues()
+      .build(countingLoader)
     val map = cache.asMap()
 
     val iterations = 10
@@ -1235,7 +1249,11 @@ class LoadingCacheWrapperTest extends FlatSpec
    *  call {@code get}. If the cache throws exceptions, this difference may be
    *  visible in the returned List.
    */
-  private def doConcurrentGet[K](cache: LoadingCache[K, AnyRef], key: K, nThreads: Int, gettersStartedSignal: CountDownLatch): List[AnyRef] = {
+  private def doConcurrentGet[K](cache: LoadingCache[K, AnyRef],
+                                 key: K,
+                                 nThreads: Int,
+                                 gettersStartedSignal: CountDownLatch
+  ): List[AnyRef] = {
     val result = new AtomicReferenceArray[AnyRef](nThreads)
     val gettersComplete = new CountDownLatch(nThreads)
     for (i <- 0 until nThreads) {
@@ -1274,7 +1292,7 @@ class LoadingCacheWrapperTest extends FlatSpec
     gettersComplete.await()
 
     var resultList = mutable.MutableList[AnyRef]()
-    for (i <- (0 until nThreads)) {
+    for (i <- 0 until nThreads) {
       resultList = resultList ++ mutable.MutableList(result.get(i))
     }
     return List.empty ++ resultList

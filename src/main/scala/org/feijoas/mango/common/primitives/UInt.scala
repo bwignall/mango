@@ -100,7 +100,10 @@ final object UInt {
    */
   def valueOf(value: BigInt): UInt = {
     checkNotNull(value)
-    checkArgument(value.signum >= 0 && value.bitLength <= Integer.SIZE, "value (%s) is outside the range for an unsigned integer value", value)
+    checkArgument(value.signum >= 0 && value.bitLength <= Integer.SIZE,
+                  "value (%s) is outside the range for an unsigned integer value",
+                  value
+    )
     fromIntBits(value.intValue)
   }
 

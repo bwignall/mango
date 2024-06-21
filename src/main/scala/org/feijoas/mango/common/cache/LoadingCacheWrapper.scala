@@ -22,14 +22,14 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
-import scala.collection.convert.decorateAll.{ asJavaIterableConverter, mapAsScalaMapConverter }
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
+import scala.collection.convert.decorateAll.{asJavaIterableConverter, mapAsScalaMapConverter}
 import scala.collection.immutable
 import scala.util.Try
 
 import org.feijoas.mango.common.annotations.Beta
 
-import com.google.common.cache.{ LoadingCache => GuavaLoadingCache }
+import com.google.common.cache.{LoadingCache => GuavaLoadingCache}
 
 /** An adapter that wraps a Guava-`LoadingCache` in a [[LoadingCache]] and forwards all
  *  method calls to the underlying Guava-`LoadingCache`.
@@ -55,7 +55,7 @@ protected[mango] trait LoadingCacheWrapper[K, V] extends CacheWrapper[K, V] with
   override def getIfPresent(key: K) = Option(cache.getIfPresent(key))
 }
 
-private[mango] final object LoadingCacheWrapper {
+final private[mango] object LoadingCacheWrapper {
 
   /** Factory method to create a `LoadingCache[K, V]` from a Guava `LoadingCache[K, V]`
    */

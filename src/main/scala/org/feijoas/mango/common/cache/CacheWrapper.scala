@@ -22,17 +22,21 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
-import scala.collection.{ immutable, mutable }
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
+import scala.collection.{immutable, mutable}
 import scala.collection.concurrent
 import scala.collection.convert.WrapAsScala.mapAsScalaMap
-import scala.collection.convert.decorateAll.{ asJavaIterableConverter, mapAsScalaConcurrentMapConverter, mutableMapAsJavaMapConverter }
+import scala.collection.convert.decorateAll.{
+  asJavaIterableConverter,
+  mapAsScalaConcurrentMapConverter,
+  mutableMapAsJavaMapConverter
+}
 
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.base.Functions.asCallableConverter
 import org.feijoas.mango.common.cache.CacheStats.asMangoCacheStatsConverter
 
-import com.google.common.cache.{ Cache => GuavaCache }
+import com.google.common.cache.{Cache => GuavaCache}
 
 /** An adapter that wraps a Guava-Cache in a Mango-Cache and forwards all
  *  method calls to the underlying Guava-Cache.
@@ -54,7 +58,7 @@ protected[mango] trait CacheWrapper[K, V] extends Cache[K, V] {
   override def getAllPresent(keys: Traversable[K]): immutable.Map[K, V] = {
     val guavaMap = cache.getAllPresent(keys.toIterable.asJava)
 
-    // TODO: The whole Guava map is copied to a new map. Since both maps are 
+    // TODO: The whole Guava map is copied to a new map. Since both maps are
     // immutable this can be replaced as soon as we have light-weight wrappers
     // around Guavas immutable collections
     import scala.collection.convert.WrapAsScala._
@@ -77,7 +81,7 @@ protected[mango] trait CacheWrapper[K, V] extends Cache[K, V] {
   override def asMap(): concurrent.Map[K, V] = cache.asMap().asScala
 }
 
-private[mango] final object CacheWrapper {
+final private[mango] object CacheWrapper {
 
   /** Factory method to create a `CacheWrapper[K, V]` from a Guava `Cache[K, V]`
    */

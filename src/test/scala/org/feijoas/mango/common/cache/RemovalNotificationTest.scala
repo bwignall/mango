@@ -27,7 +27,7 @@ import org.scalatest.matchers._
 
 import org.feijoas.mango.common.cache.RemovalNotification._
 import org.feijoas.mango.common.cache.RemovalCause._
-import com.google.common.cache.{ RemovalNotification => GuavaRemovalNotification }
+import com.google.common.cache.{RemovalNotification => GuavaRemovalNotification}
 import org.scalatest.Matchers._
 
 /**

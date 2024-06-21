@@ -25,9 +25,9 @@ package org.feijoas.mango.common.cache
 import org.feijoas.mango.common.cache.RemovalListener._
 import org.scalatest.FlatSpec
 import org.scalatest.matchers._
-import com.google.common.cache.{ RemovalListener => GuavaRemovalListener }
-import com.google.common.cache.{ RemovalNotification => GuavaRemovalNotification }
-import com.google.common.cache.{ RemovalCause => GuavaRemovalCause }
+import com.google.common.cache.{RemovalListener => GuavaRemovalListener}
+import com.google.common.cache.{RemovalNotification => GuavaRemovalNotification}
+import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
 import org.feijoas.mango.common.cache.RemovalCause._
 import org.scalatest.Matchers._
 
@@ -83,6 +83,8 @@ class RemovalListenerTest extends FlatSpec {
     ctors.length should be(1)
     val ctor = ctors(0)
     ctor.setAccessible(true)
-    ctor.newInstance(key.asInstanceOf[Object], value.asInstanceOf[Object], cause).asInstanceOf[GuavaRemovalNotification[K, V]]
+    ctor
+      .newInstance(key.asInstanceOf[Object], value.asInstanceOf[Object], cause)
+      .asInstanceOf[GuavaRemovalNotification[K, V]]
   }
 }

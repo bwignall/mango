@@ -22,13 +22,13 @@
  */
 package org.feijoas.mango.common.util.concurrent
 
-import java.util.concurrent.{ Executor, TimeUnit }
-import scala.concurrent.{ Await, CanAwait, ExecutionContext, Future, TimeoutException }
-import scala.concurrent.duration.{ Duration, FiniteDuration }
-import scala.util.{ Failure, Success, Try }
-import com.google.common.util.concurrent.{ FutureCallback, Futures => GuavaFutures, ListenableFuture, AbstractFuture }
-import com.google.common.base.{ Function => GuavaFunction }
-import concurrent.{ ExecutionException, TimeoutException }
+import java.util.concurrent.{Executor, TimeUnit}
+import scala.concurrent.{Await, CanAwait, ExecutionContext, Future, TimeoutException}
+import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.util.{Failure, Success, Try}
+import com.google.common.util.concurrent.{AbstractFuture, FutureCallback, Futures => GuavaFutures, ListenableFuture}
+import com.google.common.base.{Function => GuavaFunction}
+import concurrent.{ExecutionException, TimeoutException}
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert._
 import org.feijoas.mango.common.base.Functions._
@@ -139,12 +139,15 @@ private[mango] case class AsGuavaFuture[T](delegate: Future[T]) extends Listenab
   override def isCancelled: Boolean = false
   override def get(): T = tryGet(Await.result(delegate, Duration.Inf))
   override def get(timeout: Long, unit: TimeUnit): T = tryGet(Await.result(delegate, Duration.create(timeout, unit)))
-  override def cancel(mayInterruptIfRunning: Boolean): Boolean = throw new UnsupportedOperationException("cancel is not supported")
+  override def cancel(mayInterruptIfRunning: Boolean): Boolean = throw new UnsupportedOperationException(
+    "cancel is not supported"
+  )
   override def isDone: Boolean = delegate.isCompleted
 
-  private def tryGet(f: => T) = try (f) catch {
-    case e: ExecutionException => throw (e)
-    case e: TimeoutException   => throw (e)
+  private def tryGet(f: => T) = try f
+  catch {
+    case e: ExecutionException => throw e
+    case e: TimeoutException   => throw e
     case t: Throwable          => throw new ExecutionException(t)
   }
 }

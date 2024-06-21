@@ -104,7 +104,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet is empty" - {
         val rangeSet = newBuilder.result
         "it should not enclose any range" in {
-          QUERY_RANGES foreach { range => rangeSet.encloses(range) should be(false) }
+          QUERY_RANGES.foreach { range => rangeSet.encloses(range) should be(false) }
         }
       }
       "given the RangeSet contains a single range" - {
@@ -114,14 +114,14 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
             rangeSet.add(range)
 
             // test range Set
-            QUERY_RANGES foreach { queryRange =>
+            QUERY_RANGES.foreach { queryRange =>
               val shouldEnclose = rangeSet.asRanges.find(_.encloses(queryRange)).isDefined
               rangeSet.encloses(queryRange) should be(shouldEnclose)
             }
 
             // test complement
             val complement = rangeSet.complement
-            QUERY_RANGES foreach { queryRange =>
+            QUERY_RANGES.foreach { queryRange =>
               val shouldEnclose = complement.asRanges.find(_.encloses(queryRange)).isDefined
               complement.encloses(queryRange) should be(shouldEnclose)
             }
@@ -137,14 +137,14 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
               rangeSet.add(range2)
 
               // test range Set
-              QUERY_RANGES foreach { queryRange =>
+              QUERY_RANGES.foreach { queryRange =>
                 val shouldEnclose = rangeSet.asRanges.find(_.encloses(queryRange)).isDefined
                 rangeSet.encloses(queryRange) should be(shouldEnclose)
               }
 
               // test complement
               val complement = rangeSet.complement
-              QUERY_RANGES foreach { queryRange =>
+              QUERY_RANGES.foreach { queryRange =>
                 val shouldEnclose = complement.asRanges.find(_.encloses(queryRange)).isDefined
                 complement.encloses(queryRange) should be(shouldEnclose)
               }
@@ -444,14 +444,14 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
 
   private def testCoalesced[T, O <: Ordering[T]](rangeSet: RangeSet[T, O]): Unit = {
     val asRanges = rangeSet.asRanges
-    (asRanges.drop(1) zip asRanges.dropRight(1)).foreach {
+    asRanges.drop(1).zip(asRanges.dropRight(1)).foreach {
       case (a: Range[T, O], b: Range[T, O]) => { a.isConnected(b) should be(false) }
     }
   }
 
   def rangeSet(newBuilder: => Builder[Range[Int, Int.type], RangeSet[Int, Int.type]]) = {
-    val build: Iterable[Range[Int, Int.type]] => RangeSet[Int, Int.type] = {
-      ranges: Iterable[Range[Int, Int.type]] => (newBuilder ++= ranges).result
+    val build: Iterable[Range[Int, Int.type]] => RangeSet[Int, Int.type] = { ranges: Iterable[Range[Int, Int.type]] =>
+      (newBuilder ++= ranges).result
     }
 
     /*
@@ -462,7 +462,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set())
         "when #contains(Int) is called it should be false" in {
           forAll { i: Int =>
-            rangeSet contains (i) should be(false)
+            rangeSet contains i should be(false)
           }
         }
       }
@@ -533,92 +533,92 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set())
         "when #encloses is called with a singleton Range it should be false" in {
           forAll { i: Int =>
-            rangeSet encloses Range.singleton(i) should be(false)
+            rangeSet.encloses(Range.singleton(i)) should be(false)
           }
         }
       }
       "given the RangeSet contains the Range [1,5)" - {
         val rangeSet = build(Set(Range.closedOpen(1, 5)))
         "then #encloses [3,4] should be true" in {
-          rangeSet encloses Range.closed(3, 4) should be(true)
+          rangeSet.encloses(Range.closed(3, 4)) should be(true)
         }
         "then #encloses [1,4) should be true" in {
-          rangeSet encloses Range.closedOpen(1, 4) should be(true)
+          rangeSet.encloses(Range.closedOpen(1, 4)) should be(true)
         }
         "then #encloses [1,5) should be true" in {
-          rangeSet encloses Range.closedOpen(1, 5) should be(true)
+          rangeSet.encloses(Range.closedOpen(1, 5)) should be(true)
         }
         "then #encloses (2,inf) should be false" in {
-          rangeSet encloses Range.greaterThan(2) should be(false)
+          rangeSet.encloses(Range.greaterThan(2)) should be(false)
         }
       }
       "given the RangeSet contains the Range (2,inf)" - {
         val rangeSet = build(Set(Range.greaterThan(2)))
         "then #encloses [3,4] should be true" in {
-          rangeSet encloses Range.closed(3, 4) should be(true)
+          rangeSet.encloses(Range.closed(3, 4)) should be(true)
         }
         "then #encloses (3,inf] should be true" in {
-          rangeSet encloses Range.greaterThan(3) should be(true)
+          rangeSet.encloses(Range.greaterThan(3)) should be(true)
         }
         "then #encloses [1,5) should be false" in {
-          rangeSet encloses Range.closedOpen(1, 5) should be(false)
+          rangeSet.encloses(Range.closedOpen(1, 5)) should be(false)
         }
       }
       "given the RangeSet contains the Range (-inf,3]" - {
         val rangeSet = build(Set(Range.atMost(3)))
         "then #encloses [2,3] should be true" in {
-          rangeSet encloses Range.closed(2, 3) should be(true)
+          rangeSet.encloses(Range.closed(2, 3)) should be(true)
         }
         "then #encloses (-inf,1) should be true" in {
-          rangeSet encloses Range.lessThan(1) should be(true)
+          rangeSet.encloses(Range.lessThan(1)) should be(true)
         }
         "then #encloses [1,5) should be false" in {
-          rangeSet encloses Range.closedOpen(1, 5) should be(false)
+          rangeSet.encloses(Range.closedOpen(1, 5)) should be(false)
         }
       }
       "given the RangeSet contains the Ranges {[5,8],[1,3)}" - {
         val rangeSet = build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
         "then #encloses [1,2] should be true" in {
-          rangeSet encloses Range.closed(1, 2) should be(true)
+          rangeSet.encloses(Range.closed(1, 2)) should be(true)
         }
         "then #encloses (5,8) should be true" in {
-          rangeSet encloses Range.open(5, 8) should be(true)
+          rangeSet.encloses(Range.open(5, 8)) should be(true)
         }
         "then #encloses [1,8] should be false" in {
-          rangeSet encloses Range.closed(1, 8) should be(false)
+          rangeSet.encloses(Range.closed(1, 8)) should be(false)
         }
         "then #encloses (5,inf) should be false" in {
-          rangeSet encloses Range.greaterThan(5) should be(false)
+          rangeSet.encloses(Range.greaterThan(5)) should be(false)
         }
       }
       "given the RangeSet contains the Ranges {(6,inf),[1,3)}" - {
         val rangeSet = build(Set(Range.greaterThan(6), Range.closedOpen(1, 3)))
         "then #encloses [1,2] should be true" in {
-          rangeSet encloses Range.closed(1, 2) should be(true)
+          rangeSet.encloses(Range.closed(1, 2)) should be(true)
         }
         "then #encloses (6,8) should be true" in {
-          rangeSet encloses Range.open(6, 8) should be(true)
+          rangeSet.encloses(Range.open(6, 8)) should be(true)
         }
         "then #encloses [1,8] should be false" in {
-          rangeSet encloses Range.closed(1, 8) should be(false)
+          rangeSet.encloses(Range.closed(1, 8)) should be(false)
         }
         "then #encloses (5,inf) should be false" in {
-          rangeSet encloses Range.greaterThan(5) should be(false)
+          rangeSet.encloses(Range.greaterThan(5)) should be(false)
         }
       }
       "given the RangeSet contains the Ranges {(-inf,0],[2,5)}" - {
         val rangeSet = build(Set(Range.atMost(0), Range.closedOpen(2, 5)))
         "then #encloses [2,4] should be true" in {
-          rangeSet encloses Range.closed(2, 4) should be(true)
+          rangeSet.encloses(Range.closed(2, 4)) should be(true)
         }
         "then #encloses (-5,-2) should be true" in {
-          rangeSet encloses Range.open(-5, -2) should be(true)
+          rangeSet.encloses(Range.open(-5, -2)) should be(true)
         }
         "then #encloses [1,8] should be false" in {
-          rangeSet encloses Range.closed(1, 8) should be(false)
+          rangeSet.encloses(Range.closed(1, 8)) should be(false)
         }
         "then #encloses (5,inf) should be false" in {
-          rangeSet encloses Range.greaterThan(5) should be(false)
+          rangeSet.encloses(Range.greaterThan(5)) should be(false)
         }
       }
     }
@@ -630,29 +630,29 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "when #enclosesAll is called with the empty RangeSet itself it should be true" in {
-          rangeSet enclosesAll rangeSet should be(true)
+          rangeSet.enclosesAll(rangeSet) should be(true)
         }
       }
       "given the RangeSet contains the Ranges {[5,8],[1,3)}" - {
         val rangeSet = build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
         "#enclosesAll {[5,8],[1,3)} should be true" in {
-          rangeSet enclosesAll rangeSet should be(true)
-          rangeSet enclosesAll build(Set(Range.closed(5, 8), Range.closedOpen(1, 3))) should be(true)
+          rangeSet.enclosesAll(rangeSet) should be(true)
+          rangeSet.enclosesAll(build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))) should be(true)
         }
         "#enclosesAll {[1,3)} should be true" in {
-          rangeSet enclosesAll build(Set(Range.closedOpen(1, 3))) should be(true)
+          rangeSet.enclosesAll(build(Set(Range.closedOpen(1, 3)))) should be(true)
         }
         "#enclosesAll {[5,8]} should be true" in {
-          rangeSet enclosesAll build(Set(Range.closed(5, 8))) should be(true)
+          rangeSet.enclosesAll(build(Set(Range.closed(5, 8)))) should be(true)
         }
         "#enclosesAll {[4,8]} should be false" in {
-          rangeSet enclosesAll build(Set(Range.closed(4, 8))) should be(false)
+          rangeSet.enclosesAll(build(Set(Range.closed(4, 8)))) should be(false)
         }
         "#enclosesAll {[5,5],[1,2)} should be true" in {
-          rangeSet enclosesAll build(Set(Range.closed(5, 5), Range.closedOpen(1, 2))) should be(true)
+          rangeSet.enclosesAll(build(Set(Range.closed(5, 5), Range.closedOpen(1, 2)))) should be(true)
         }
         "#enclosesAll {[5,8],[1,4)} should be false" in {
-          rangeSet enclosesAll build(Set(Range.closed(5, 8), Range.closedOpen(1, 4))) should be(false)
+          rangeSet.enclosesAll(build(Set(Range.closed(5, 8), Range.closedOpen(1, 4)))) should be(false)
         }
       }
     }
@@ -1026,7 +1026,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         "if the other RangeSet contains the ranges {[1,8],[1,3]} it should not be equal" in {
           val mocked = mock[RangeSet[Int, Int.type]]
           when(mocked.asRanges).thenReturn(Set(Range.closed(1, 8), Range.closed(1, 3)))
-          rangeSet should not be (mocked)
+          rangeSet should not be mocked
         }
       }
       "given the RangeSet contains the ranges {[5,8],[1,3)}" - {
@@ -1039,7 +1039,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         "if the other RangeSet contains the ranges {[1,8],[1,3]} it should not be equal" in {
           val mocked = mock[RangeSet[Int, Int.type]]
           when(mocked.asRanges).thenReturn(Set(Range.closed(1, 8), Range.closed(1, 3)))
-          rangeSet should not be (mocked)
+          rangeSet should not be mocked
         }
       }
     }

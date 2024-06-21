@@ -22,7 +22,7 @@
  */
 package org.feijoas.mango.common.cache
 
-import com.google.common.cache.{ Weigher => GuavaWeigher }
+import com.google.common.cache.{Weigher => GuavaWeigher}
 import org.feijoas.mango.common.convert.AsJava
 
 /** Calculates the weights of cache entries.
@@ -47,6 +47,6 @@ final object Weigher {
   }
 
   private def asGuavaWeigher[K, V](weigher: (K, V) => Int): GuavaWeigher[K, V] = new GuavaWeigher[K, V] {
-    override final def weigh(key: K, value: V): Int = weigher(key, value)
+    final override def weigh(key: K, value: V): Int = weigher(key, value)
   }
 }

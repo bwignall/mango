@@ -49,6 +49,7 @@ sealed trait Bound[+T] extends Serializable {
  *  @since 0.8
  */
 final object Bound {
+
   /** A `FiniteBound[T]` is a bound with a value of type `T` and a [[BoundType]].
    */
   case class FiniteBound[T](value: T, bt: BoundType) extends Bound[T] {

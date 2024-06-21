@@ -22,12 +22,12 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
 import scala.collection.concurrent
 import scala.collection.concurrent.TrieMap
 
 import org.feijoas.mango.common.annotations.Beta
-import org.scalatest.{ FlatSpec, GivenWhenThen, MustMatchers }
+import org.scalatest.{FlatSpec, GivenWhenThen, MustMatchers}
 import org.scalatest.mockito.MockitoSugar
 
 /**

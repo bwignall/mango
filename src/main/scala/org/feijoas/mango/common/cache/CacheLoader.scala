@@ -23,10 +23,10 @@
 package org.feijoas.mango.common.cache
 
 import scala.collection.immutable
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
-import com.google.common.cache.{ CacheLoader => GuavaCacheLoader }
+import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
 
 /**
  * Computes or retrieves values, based on a key, for use in populating a [[LoadingCache]].
@@ -90,7 +90,7 @@ trait CacheLoader[K, V] {
   def reload(key: K, oldValue: V): Future[V] = {
     checkNotNull(key)
     checkNotNull(oldValue)
-    Promise successful (load(key)) future
+    Promise.successful(load(key)) future
   }
 
   /**

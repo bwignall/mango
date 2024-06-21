@@ -22,7 +22,14 @@
  */
 package org.feijoas.mango.common.base
 
-import org.feijoas.mango.common.base.Preconditions.{ checkArgument, checkElementIndex, checkNotNull, checkPositionIndex, checkPositionIndexes, checkState }
+import org.feijoas.mango.common.base.Preconditions.{
+  checkArgument,
+  checkElementIndex,
+  checkNotNull,
+  checkPositionIndex,
+  checkPositionIndexes,
+  checkState
+}
 import org.scalatest._
 
 /**
@@ -46,15 +53,15 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkArgument" should "put the msg into exception" in {
-    the[IllegalArgumentException] thrownBy {
+    (the[IllegalArgumentException] thrownBy {
       checkArgument(false, new Message())
-    } should have message "A message"
+    } should have).message("A message")
   }
 
   "checkArgument" should "put 'null' into exception if called with null" in {
-    the[IllegalArgumentException] thrownBy {
+    (the[IllegalArgumentException] thrownBy {
       checkArgument(false, null)
-    } should have message "null"
+    } should have).message("null")
   }
 
   "checkArgument called with true" should "ignore the third arg" in {
@@ -63,9 +70,9 @@ class PreconditionsTest extends FlatSpec with Matchers {
 
   "checkArgument" should "format message" in {
     val format = "I ate %s pies."
-    the[IllegalArgumentException] thrownBy {
+    (the[IllegalArgumentException] thrownBy {
       checkArgument(false, format, 5)
-    } should have message "I ate 5 pies."
+    } should have).message("I ate 5 pies.")
   }
 
   "checkState called with true" should "success" in {
@@ -81,15 +88,15 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkState" should "put the msg into exception" in {
-    the[IllegalStateException] thrownBy {
+    (the[IllegalStateException] thrownBy {
       checkState(false, new Message())
-    } should have message "A message"
+    } should have).message("A message")
   }
 
   "checkState" should "put 'null' into exception if called with null" in {
-    the[IllegalStateException] thrownBy {
+    (the[IllegalStateException] thrownBy {
       checkState(false, null)
-    } should have message "null"
+    } should have).message("null")
   }
 
   "checkState called with true" should "ignore the third arg" in {
@@ -98,9 +105,9 @@ class PreconditionsTest extends FlatSpec with Matchers {
 
   "checkState" should "format message" in {
     val format = "I ate %s pies."
-    the[IllegalStateException] thrownBy {
+    (the[IllegalStateException] thrownBy {
       checkState(false, format, 5)
-    } should have message "I ate 5 pies."
+    } should have).message("I ate 5 pies.")
   }
 
   val NON_NULL_STRING = "foo";
@@ -118,9 +125,9 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkNotNull" should "put the msg into exception" in {
-    the[NullPointerException] thrownBy {
+    (the[NullPointerException] thrownBy {
       checkNotNull(null, new Message())
-    } should have message "A message"
+    } should have).message("A message")
   }
 
   "successfull checkNotNull" should "ignore the third arg" in {
@@ -129,9 +136,9 @@ class PreconditionsTest extends FlatSpec with Matchers {
 
   "checkNotNull" should "format message" in {
     val format = "I ate %s pies."
-    the[NullPointerException] thrownBy {
+    (the[NullPointerException] thrownBy {
       checkNotNull(null, format, 5)
-    } should have message "I ate 5 pies."
+    } should have).message("I ate 5 pies.")
   }
 
   "checkElementIndex" should "return the index on success" in {
@@ -145,9 +152,9 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkElementIndex" should "fail if index is neg" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkElementIndex(-1, 1)
-    } should have message "index (-1) must not be negative"
+    } should have).message("index (-1) must not be negative")
   }
 
   "checkElementIndex" should "fail index is too high " in {
@@ -155,15 +162,15 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkElementIndex with desc" should "fail if size is neg" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkElementIndex(-1, 1, "desc")
-    } should have message "desc (-1) must not be negative"
+    } should have).message("desc (-1) must not be negative")
   }
 
   "checkElementIndex with desc" should "fail index is too high " in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkElementIndex(1, 1, "desc")
-    } should have message "desc (1) must be less than size (1)"
+    } should have).message("desc (1) must be less than size (1)")
   }
 
   "checkPositionIndex" should "return the index on success" in {
@@ -177,27 +184,27 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkPositionIndex" should "fail if index is neg" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndex(-1, 1)
-    } should have message "index (-1) must not be negative"
+    } should have).message("index (-1) must not be negative")
   }
 
   "checkPositionIndex" should "fail if index is too high" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndex(2, 1)
-    } should have message "index (2) must not be greater than size (1)"
+    } should have).message("index (2) must not be greater than size (1)")
   }
 
   "checkPositionIndex with desc" should "fail if index is neg" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndex(-1, 1, "desc")
-    } should have message "desc (-1) must not be negative"
+    } should have).message("desc (-1) must not be negative")
   }
 
   "checkPositionIndex with desc" should "fail if index is too high" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndex(2, 1, "desc")
-    } should have message "desc (2) must not be greater than size (1)"
+    } should have).message("desc (2) must not be greater than size (1)")
   }
 
   "checkPositionIndexes" should "pass with good values" in {
@@ -212,21 +219,21 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkPositionIndexes" should "fail if start is neg" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndexes(-1, 1, 1)
-    } should have message "start index (-1) must not be negative"
+    } should have).message("start index (-1) must not be negative")
   }
 
   "checkPositionIndexes" should "fail if end is too high" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndexes(0, 2, 1)
-    } should have message "end index (2) must not be greater than size (1)"
+    } should have).message("end index (2) must not be greater than size (1)")
   }
 
   "checkPositionIndexes" should "fail if start > end" in {
-    the[IndexOutOfBoundsException] thrownBy {
+    (the[IndexOutOfBoundsException] thrownBy {
       checkPositionIndexes(1, 0, 1)
-    } should have message "end index (0) must not be less than start index (1)"
+    } should have).message("end index (0) must not be less than start index (1)")
   }
 
   "vararg functions" should "work with anyval and anyref" in {

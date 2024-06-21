@@ -26,7 +26,7 @@ import org.feijoas.mango.common.base.Optional._
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 
-import com.google.common.base.{ Optional => GuavaOptional }
+import com.google.common.base.{Optional => GuavaOptional}
 import com.google.common.testing.SerializableTester
 
 /**

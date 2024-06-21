@@ -24,8 +24,8 @@ package org.feijoas.mango.common.hash
 
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
-import com.google.common.{ hash => cgch }
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
+import com.google.common.{hash => cgch}
 import com.google.common.hash.PrimitiveSink
 import java.nio.charset.Charset
 
@@ -185,14 +185,14 @@ private[mango] case class AsScalaFunnel[T](f: cgch.Funnel[T]) extends Funnel[T] 
 }
 
 @SerialVersionUID(1L)
-private[mango] final object LongFunnel extends Funnel[Long] with Serializable {
+final private[mango] object LongFunnel extends Funnel[Long] with Serializable {
   val delegate = cgch.Funnels.longFunnel()
   override def funnel(from: Long, into: PrimitiveSink) = delegate.funnel(from, into)
   override def toString = delegate.toString
 }
 
 @SerialVersionUID(1L)
-private[mango] final object IntFunnel extends Funnel[Int] with Serializable {
+final private[mango] object IntFunnel extends Funnel[Int] with Serializable {
   val delegate = cgch.Funnels.integerFunnel()
   override def funnel(from: Int, into: PrimitiveSink) = delegate.funnel(from, into)
   override def toString = delegate.toString

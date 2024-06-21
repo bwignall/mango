@@ -27,7 +27,7 @@ import scala.math.BigInt.long2bigInt
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.AsOrdered.asOrdered
 
-import com.google.common.collect.{ DiscreteDomain => GuavaDiscreteDomain }
+import com.google.common.collect.{DiscreteDomain => GuavaDiscreteDomain}
 
 /** A descriptor for a <i>discrete</i> domain such as all
  *  `Int` instances. A discrete domain is one that supports the three basic
@@ -165,7 +165,7 @@ object DiscreteDomain {
    */
   // Note: This class is package private in Guava so we don't publish it at the moment
   @SerialVersionUID(1L)
-  private[mango] implicit final object BigIntDomain extends DiscreteDomain[BigInt] with Serializable {
+  implicit final private[mango] object BigIntDomain extends DiscreteDomain[BigInt] with Serializable {
     override def next(value: BigInt): Option[BigInt] = Some(value + BigInt(1))
     override def previous(value: BigInt): Option[BigInt] = Some(value - BigInt(1))
 

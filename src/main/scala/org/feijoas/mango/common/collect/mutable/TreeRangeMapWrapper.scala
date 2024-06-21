@@ -31,7 +31,7 @@ import org.feijoas.mango.common.collect.Range
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 import org.feijoas.mango.common.collect.RangeMapFactory
 
-import com.google.common.{ collect => gcc }
+import com.google.common.{collect => gcc}
 
 /** An mutable implementation of RangeMap that delegates to Guava TreeRangeMap
  *
@@ -39,8 +39,10 @@ import com.google.common.{ collect => gcc }
  *  @since 0.9
  */
 @Beta
-private[mango] class TreeRangeMapWrapper[K, V, O <: Ordering[K]] private (guava: gcc.RangeMap[AsOrdered[K], V])(override implicit val ordering: O)
-  extends RangeMap[K, V, O] with RangeMapWrapperLike[K, V, O, TreeRangeMapWrapper[K, V, O]] {
+private[mango] class TreeRangeMapWrapper[K, V, O <: Ordering[K]] private (guava: gcc.RangeMap[AsOrdered[K], V])(implicit
+  override val ordering: O
+) extends RangeMap[K, V, O]
+    with RangeMapWrapperLike[K, V, O, TreeRangeMapWrapper[K, V, O]] {
 
   override def delegate = guava
   override def factory = TreeRangeMapWrapper(_)(ordering)
@@ -49,20 +51,22 @@ private[mango] class TreeRangeMapWrapper[K, V, O <: Ordering[K]] private (guava:
 
 /** Factory for TreeRangeMapWrapper
  */
-private[mango] final object TreeRangeMapWrapper extends RangeMapFactory[TreeRangeMapWrapper] {
+final private[mango] object TreeRangeMapWrapper extends RangeMapFactory[TreeRangeMapWrapper] {
 
   /** Factory method */
-  private[mango] def apply[K, V, O <: Ordering[K]](guava: gcc.RangeMap[AsOrdered[K], V])(implicit ord: O) = new TreeRangeMapWrapper(guava)(ord)
+  private[mango] def apply[K, V, O <: Ordering[K]](guava: gcc.RangeMap[AsOrdered[K], V])(implicit ord: O) =
+    new TreeRangeMapWrapper(guava)(ord)
 
   /** Returns a new builder for [[RangeMap]].
    */
-  def newBuilder[K, V, O <: Ordering[K]](implicit ord: O) = new Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]]() {
-    val builder = gcc.TreeRangeMap.create[AsOrdered[K], V]()
-    override def +=(entry: (Range[K, O], V)): this.type = {
-      builder.put(entry._1.asJava, entry._2)
-      this
+  def newBuilder[K, V, O <: Ordering[K]](implicit ord: O) =
+    new Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]]() {
+      val builder = gcc.TreeRangeMap.create[AsOrdered[K], V]()
+      override def +=(entry: (Range[K, O], V)): this.type = {
+        builder.put(entry._1.asJava, entry._2)
+        this
+      }
+      override def clear() = builder.clear()
+      override def result() = new TreeRangeMapWrapper(builder)
     }
-    override def clear() = builder.clear()
-    override def result() = new TreeRangeMapWrapper(builder)
-  }
 }

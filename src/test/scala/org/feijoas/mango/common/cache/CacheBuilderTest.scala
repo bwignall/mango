@@ -41,7 +41,7 @@ import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatest.Matchers.not
 import org.scalatest.PrivateMethodTester
 
-import com.google.common.cache.{ CacheBuilder => GuavaCacheBuilder }
+import com.google.common.cache.{CacheBuilder => GuavaCacheBuilder}
 
 /**
  * Tests for [[CacheBuilder]]
@@ -55,7 +55,8 @@ class CacheBuilderTest extends FlatSpec with PrivateMethodTester {
 
   it should "create a new LoadingCache if build is called with a loader" in {
     val loader = (any: String) => 1
-    val cache: LoadingCache[String, Int] = CacheBuilder.newBuilder()
+    val cache: LoadingCache[String, Int] = CacheBuilder
+      .newBuilder()
       .removalListener(CountingRemovalListener())
       .build(loader)
 
@@ -72,7 +73,8 @@ class CacheBuilderTest extends FlatSpec with PrivateMethodTester {
 
   it should "be able to create a 'Null'-cache" in {
     val listener = CountingRemovalListener[Any, Any]()
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .maximumSize(0)
       .removalListener(listener)
       .build((any: Any) => any)
@@ -287,7 +289,8 @@ class CacheBuilderTest extends FlatSpec with PrivateMethodTester {
   }
 
   it should "be possible to call it with #expireAfterWrite" in {
-    CacheBuilder().expireAfterWrite(1, NANOSECONDS)
+    CacheBuilder()
+      .expireAfterWrite(1, NANOSECONDS)
       .expireAfterAccess(1, NANOSECONDS)
       .build((any: String) => 0)
     // must not blow up
@@ -331,7 +334,7 @@ class CacheBuilderTest extends FlatSpec with PrivateMethodTester {
 
   // check that all method calls are properly forwarded
   // unfortunately we cannot mock Guava CacheBuilder
-  import scala.reflect.runtime.{ universe => ru }
+  import scala.reflect.runtime.{universe => ru}
 
   behavior of "CacheBuilder#createGuavaBuilder"
 
@@ -351,7 +354,7 @@ class CacheBuilderTest extends FlatSpec with PrivateMethodTester {
 
   def testNotNull[T](method: String, cacheBuilder: CacheBuilder[Any, Any]) {
     val initBuilder = CacheBuilder.createGuavaBuilder(CacheBuilder())
-    getMember[T](initBuilder, method) should be (null.asInstanceOf[T])
+    getMember[T](initBuilder, method) should be(null.asInstanceOf[T])
     val builder = CacheBuilder.createGuavaBuilder(cacheBuilder)
     getMember[T](builder, method) should not be (null.asInstanceOf[T])
   }

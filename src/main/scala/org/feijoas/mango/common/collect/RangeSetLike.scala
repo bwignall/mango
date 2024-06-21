@@ -159,7 +159,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
   override def toString(): String = {
     val builder = new StringBuilder()
     builder.append('{')
-    asRanges foreach { builder.append(_) }
+    asRanges.foreach { builder.append(_) }
     builder.append('}')
     builder.toString()
   }

@@ -26,7 +26,7 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.{ base => gcm }
+import com.google.common.{base => gcm}
 
 /** Utility functions to convert from Scala `Equiv[T]` to Guava `Equivalence[T]` and vice versa.
  *
@@ -58,11 +58,10 @@ final object Equivalence {
    *  @return An object with an `asScala` method that returns a Scala `Equiv[T]`
    *   view of the argument
    */
-  implicit def asMangoEquiv[T](equiv: gcm.Equivalence[T]): AsScala[Equiv[T]] = new AsScala(
-    equiv match {
-      case AsGuavaEquiv(delegate) => delegate
-      case _                      => AsMangoEquiv(equiv)
-    })
+  implicit def asMangoEquiv[T](equiv: gcm.Equivalence[T]): AsScala[Equiv[T]] = new AsScala(equiv match {
+    case AsGuavaEquiv(delegate) => delegate
+    case _                      => AsMangoEquiv(equiv)
+  })
 
   /** Adds an `asJava` method that wraps a Scala `Equiv[T]` in
    *  a Guava `Equivalence[T]`.
@@ -74,11 +73,10 @@ final object Equivalence {
    *  @return An object with an `asJava` method that returns a Guava `Equivalence[T]`
    *   view of the argument
    */
-  implicit def asGuavaEquiv[T](equiv: Equiv[T]): AsJava[gcm.Equivalence[T]] = new AsJava(
-    equiv match {
-      case AsMangoEquiv(delegate) => delegate
-      case _                      => AsGuavaEquiv(equiv)
-    })
+  implicit def asGuavaEquiv[T](equiv: Equiv[T]): AsJava[gcm.Equivalence[T]] = new AsJava(equiv match {
+    case AsMangoEquiv(delegate) => delegate
+    case _                      => AsGuavaEquiv(equiv)
+  })
 }
 
 /** Wraps a Guava `Equivalence` in a Scala `Equiv`

@@ -65,7 +65,7 @@ import org.feijoas.mango.common.annotations.Beta
  */
 @Beta
 trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] with RangeMap[K, V, O]]
-  extends HasNewBuilder[(Range[K, O], V), Repr] {
+    extends HasNewBuilder[(Range[K, O], V), Repr] {
   self =>
 
   /** Returns the value associated with the specified key in a `Some`, or `None` if there is no

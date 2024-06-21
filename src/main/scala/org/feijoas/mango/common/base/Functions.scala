@@ -25,9 +25,9 @@ package org.feijoas.mango.common.base
 import java.util.concurrent.Callable
 
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.base.{ Function => GuavaFunction }
+import com.google.common.base.{Function => GuavaFunction}
 
 /** Utility functions for the work with Guava `Function[T, R]`
  *
@@ -60,10 +60,10 @@ final object Functions {
    *          `T => R` view of the argument.
    */
   implicit def asMangoFunctionConverter[T, R](fnc: GuavaFunction[T, R]): AsScala[T => R] = {
-      def convert(fnc: GuavaFunction[T, R]): (T => R) = fnc match {
-        case gf: AsGuavaFunction[T, R] => gf.delegate
-        case _                         => AsMangoFunction(fnc)
-      }
+    def convert(fnc: GuavaFunction[T, R]): (T => R) = fnc match {
+      case gf: AsGuavaFunction[T, R] => gf.delegate
+      case _                         => AsMangoFunction(fnc)
+    }
     new AsScala(convert(fnc))
   }
 
@@ -76,10 +76,10 @@ final object Functions {
    *   view of the argument.
    */
   implicit def asGuavaFunctionConverter[T, R](fnc: T => R): AsJava[GuavaFunction[T, R]] = {
-      def convert(fnc: T => R) = fnc match {
-        case cf: AsMangoFunction[T, R] => cf.delegate
-        case _                         => AsGuavaFunction(fnc)
-      }
+    def convert(fnc: T => R) = fnc match {
+      case cf: AsMangoFunction[T, R] => cf.delegate
+      case _                         => AsGuavaFunction(fnc)
+    }
     new AsJava(convert(fnc))
   }
 
@@ -91,10 +91,9 @@ final object Functions {
    *  @return An object with an `asJava` method that returns a Java `Runnable`
    *   view of the argument.
    */
-  implicit def asRunnableConverter(fnc: () => Unit): AsJava[Runnable] = new AsJava(
-    new Runnable() {
-      override def run() = fnc()
-    })
+  implicit def asRunnableConverter(fnc: () => Unit): AsJava[Runnable] = new AsJava(new Runnable() {
+    override def run() = fnc()
+  })
 
   /** Adds an `asJava` method that wraps a Scala function `() => R`  in
    *  a Java `Callable`.
@@ -104,15 +103,16 @@ final object Functions {
    *  @return An object with an `asJava` method that returns a Java `Callable`
    *   view of the argument.
    */
-  implicit def asCallableConverter[R](fnc: () => R): AsJava[Callable[R]] = new AsJava(
-    new Callable[R]() {
-      def call() = fnc()
-    })
+  implicit def asCallableConverter[R](fnc: () => R): AsJava[Callable[R]] = new AsJava(new Callable[R]() {
+    def call() = fnc()
+  })
 }
 
 /** Wraps a Guava `Function` in a Scala function */
 @SerialVersionUID(1L)
-private[mango] case class AsMangoFunction[R, T](delegate: GuavaFunction[R, T]) extends Function1[R, T] with Serializable {
+private[mango] case class AsMangoFunction[R, T](delegate: GuavaFunction[R, T])
+    extends Function1[R, T]
+    with Serializable {
   checkNotNull(delegate)
   override def apply(input: R) = delegate.apply(input)
 }

@@ -31,7 +31,7 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.{ collect => cgcc }
+import com.google.common.{collect => cgcc}
 
 /**
  * A variant of {@link TreeTraverser} for binary trees, providing additional traversals specific to
@@ -77,14 +77,14 @@ object BinaryTreeTraverser {
     final override def leftChild = (root: T) => left(root)
     final override def rightChild = (root: T) => right(root)
   }
-  
+
   /**
    * Creates a new `BinaryTreeTraverser` using a function that returns the left child and the right child as a Tuple
    */
-  final def apply[T](childs: T => (Option[T],Option[T])): BinaryTreeTraverser[T] = new BinaryTreeTraverser[T] {
+  final def apply[T](childs: T => (Option[T], Option[T])): BinaryTreeTraverser[T] = new BinaryTreeTraverser[T] {
     final override def leftChild = (root: T) => childs(root)._1
     final override def rightChild = (root: T) => childs(root)._2
-  }  
+  }
 
   /**
    * Adds an `asJava` method that wraps a Scala `BinaryTreeTraverser` in
@@ -97,10 +97,12 @@ object BinaryTreeTraverser {
    *  @return An object with an `asJava` method that returns a Guava `BinaryTreeTraverser`
    *   view of the argument
    */
-  implicit final def asGuavaBinaryTreeTraverserConverter[T](traverser: BinaryTreeTraverser[T]): AsJava[cgcc.BinaryTreeTraverser[T]] = {
+  implicit final def asGuavaBinaryTreeTraverserConverter[T](
+    traverser: BinaryTreeTraverser[T]
+  ): AsJava[cgcc.BinaryTreeTraverser[T]] = {
     def convert(traverser: BinaryTreeTraverser[T]): cgcc.BinaryTreeTraverser[T] = traverser match {
       case t: AsMangoBinaryTreeTraverser[T] => t.delegate
-      case _ => AsGuavaBinaryTreeTraverser(traverser)
+      case _                                => AsGuavaBinaryTreeTraverser(traverser)
     }
     new AsJava(convert(traverser))
   }
@@ -116,10 +118,12 @@ object BinaryTreeTraverser {
    *  @return An object with an `asScala` method that returns a Scala `BinaryTreeTraverser`
    *   view of the argument
    */
-  implicit final def asMangoBinaryTreeTraverserConverter[T](traverser: cgcc.BinaryTreeTraverser[T]): AsScala[BinaryTreeTraverser[T]] = {
+  implicit final def asMangoBinaryTreeTraverserConverter[T](
+    traverser: cgcc.BinaryTreeTraverser[T]
+  ): AsScala[BinaryTreeTraverser[T]] = {
     def convert(traverser: cgcc.BinaryTreeTraverser[T]) = traverser match {
       case AsGuavaBinaryTreeTraverser(delegate) => delegate
-      case _ => AsMangoBinaryTreeTraverser(traverser)
+      case _                                    => AsMangoBinaryTreeTraverser(traverser)
     }
     new AsScala(convert(traverser))
   }
@@ -130,7 +134,9 @@ object BinaryTreeTraverser {
  * Wraps a Scala `BinaryTreeTraverser` in a Guava `BinaryTreeTraverser`
  */
 @SerialVersionUID(1L)
-private[mango] case class AsGuavaBinaryTreeTraverser[T](delegate: BinaryTreeTraverser[T]) extends cgcc.BinaryTreeTraverser[T] with Serializable {
+private[mango] case class AsGuavaBinaryTreeTraverser[T](delegate: BinaryTreeTraverser[T])
+    extends cgcc.BinaryTreeTraverser[T]
+    with Serializable {
   checkNotNull(delegate)
   final override def leftChild(root: T) = delegate.leftChild(root).asJava
   final override def rightChild(root: T) = delegate.rightChild(root).asJava
@@ -140,7 +146,9 @@ private[mango] case class AsGuavaBinaryTreeTraverser[T](delegate: BinaryTreeTrav
  * Wraps a Guava `BinaryTreeTraverser` in a Scala `BinaryTreeTraverser`
  */
 @SerialVersionUID(1L)
-private[mango] case class AsMangoBinaryTreeTraverser[T](delegate: cgcc.BinaryTreeTraverser[T]) extends BinaryTreeTraverser[T] with Serializable {
+private[mango] case class AsMangoBinaryTreeTraverser[T](delegate: cgcc.BinaryTreeTraverser[T])
+    extends BinaryTreeTraverser[T]
+    with Serializable {
   checkNotNull(delegate)
   final override def leftChild = (root: T) => delegate.leftChild(root).asScala
   final override def rightChild = (root: T) => delegate.rightChild(root).asScala

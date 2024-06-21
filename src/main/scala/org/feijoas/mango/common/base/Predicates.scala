@@ -28,9 +28,9 @@ import javax.annotation.Nullable
 import scala.collection.immutable
 
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.base.{ Predicate => GuavaPredicate }
+import com.google.common.base.{Predicate => GuavaPredicate}
 
 /**
  * Utility functions for the work with Guava `Predicate[T]`
@@ -136,7 +136,7 @@ final object Predicates {
    */
   private[mango] case class XorPredicate[T](px: Seq[(T => Boolean)]) extends (T => Boolean) {
     checkNotNull(px)
-    private val xor = px.reduceLeft[T => Boolean]((acc, fnc) => ((arg: T) => fnc(arg) != acc(arg)))
+    private val xor = px.reduceLeft[T => Boolean]((acc, fnc) => (arg: T) => fnc(arg) != acc(arg))
     override def apply(arg: T) = xor(arg)
     override def toString = px.mkString("Xor(", ",", ")")
     override def hashCode = px.hashCode + 0x75bcf4d
@@ -384,4 +384,3 @@ final object Predicates {
     new AsScala((arg: T) => pred.apply(arg))
   }
 }
-

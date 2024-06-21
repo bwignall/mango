@@ -39,7 +39,7 @@ import org.scalatest.FreeSpec
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 
-import com.google.common.{ collect => gcc }
+import com.google.common.{collect => gcc}
 
 /**
  * Behavior which all [[RangeMapWrappers]] have in common
@@ -47,7 +47,9 @@ import com.google.common.{ collect => gcc }
 private[mango] trait RangeMapWrapperBehaviours extends FreeSpec with PropertyChecks with MockitoSugar {
   this: FreeSpec =>
 
-  def immutableWrapper[Repr <: RangeMapWrapperLike[Int, String, Int.type, Repr] with RangeMap[Int, String, Int.type]](constructor: (gcc.RangeMap[AsOrdered[Int], String]) => Repr) = {
+  def immutableWrapper[Repr <: RangeMapWrapperLike[Int, String, Int.type, Repr] with RangeMap[Int, String, Int.type]](
+    constructor: (gcc.RangeMap[AsOrdered[Int], String]) => Repr
+  ) = {
     val mocked = mock[gcc.RangeMap[AsOrdered[Int], String]]
     val withMock = constructor(mocked)
     "it should forward all immutable methods to guava " - {
@@ -77,7 +79,9 @@ private[mango] trait RangeMapWrapperBehaviours extends FreeSpec with PropertyChe
     }
   }
 
-  def mutableWrapper[Repr <: mutable.RangeMapWrapperLike[Int, String, Int.type, Repr] with mutable.RangeMap[Int, String, Int.type]](constructor: (gcc.RangeMap[AsOrdered[Int], String]) => Repr) = {
+  def mutableWrapper[
+    Repr <: mutable.RangeMapWrapperLike[Int, String, Int.type, Repr] with mutable.RangeMap[Int, String, Int.type]
+  ](constructor: (gcc.RangeMap[AsOrdered[Int], String]) => Repr) = {
     // forward all methods like immutable RangeMapWrapperLike
     immutableWrapper(constructor)
 

@@ -28,7 +28,7 @@ import org.feijoas.mango.common.base.Functions._
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 
-import com.google.common.base.{ Function => GuavaFunction }
+import com.google.common.base.{Function => GuavaFunction}
 import com.google.common.testing.SerializableTester
 
 /**
@@ -62,7 +62,7 @@ class FunctionsTest extends FlatSpec with Matchers with PropertyChecks {
     val gf: GuavaFunction[Int, String] = cf.asJava
 
     val wrappedTwice: Int => String = gf.asScala
-    wrappedTwice should be theSameInstanceAs cf
+    (wrappedTwice should be).theSameInstanceAs(cf)
   }
 
   it should "not wrap Guava function twice" in {
@@ -70,7 +70,7 @@ class FunctionsTest extends FlatSpec with Matchers with PropertyChecks {
     val cf: Int => String = gf.asScala
 
     val wrappedTwice: GuavaFunction[Int, String] = cf.asJava
-    wrappedTwice should be theSameInstanceAs gf
+    (wrappedTwice should be).theSameInstanceAs(gf)
   }
 
   it should "be serializeable" in {

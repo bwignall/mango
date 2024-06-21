@@ -22,18 +22,18 @@
  */
 package org.feijoas.mango.common.util.concurrent
 
-import java.util.concurrent.{ Callable, CountDownLatch, Executors, TimeUnit }
+import java.util.concurrent.{Callable, CountDownLatch, Executors, TimeUnit}
 import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.MILLISECONDS
-import scala.util.{ Try, Success, Failure }
+import scala.util.{Failure, Success, Try}
 import org.feijoas.mango.common.util.concurrent.Futures._
 import org.junit.Assert.assertEquals
 import org.scalatest._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.PropertyChecks
-import com.google.common.util.concurrent.{ ListenableFuture, ListenableFutureTask }
-import com.google.common.util.concurrent.{ Futures => GuavaFutures }
+import com.google.common.util.concurrent.{ListenableFuture, ListenableFutureTask}
+import com.google.common.util.concurrent.{Futures => GuavaFutures}
 import scala.concurrent.duration.Duration
 
 /**
@@ -160,7 +160,7 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
     }
 
     future.onSuccess(successCallback)
-    future.onFailure({ case _ => fail() })
+    future.onFailure { case _ => fail() }
     future.onComplete(completeCallback)
 
     // wait until the future is ready
@@ -185,7 +185,7 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
       case Failure(v) => failureCallback(v)
     }
 
-    future.onSuccess({ case _ => fail() })
+    future.onSuccess { case _ => fail() }
     future.onFailure(failureCallback)
     future.onComplete(completeCallback)
 

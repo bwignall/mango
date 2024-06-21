@@ -23,9 +23,9 @@
 package org.feijoas.mango.common.cache
 
 import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.cache.{ RemovalCause => GuavaRemovalCause }
+import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
 
 /** The reason why a cached entry was removed. See the companion object for
  *  the individual RemovalCause cases.
@@ -35,6 +35,7 @@ import com.google.common.cache.{ RemovalCause => GuavaRemovalCause }
  */
 @Beta
 sealed trait RemovalCause extends Serializable {
+
   /** Returns {@code true} if there was an automatic removal due to eviction
    *  (the cause is neither [[RemovalCause.Explicit]] nor [[RemovalCause.Replaced]] ).
    */
@@ -98,7 +99,8 @@ final object RemovalCause {
       case RemovalCause.Collected => GuavaRemovalCause.COLLECTED
       case RemovalCause.Expired   => GuavaRemovalCause.EXPIRED
       case RemovalCause.Size      => GuavaRemovalCause.SIZE
-    })
+    }
+  )
 
   /** Adds an `asScala` method that converts a Guava `RemovalCause` to a
    *  Mango `RemovalCause`.
@@ -117,5 +119,6 @@ final object RemovalCause {
       case GuavaRemovalCause.COLLECTED => Collected
       case GuavaRemovalCause.EXPIRED   => Expired
       case GuavaRemovalCause.SIZE      => Size
-    })
+    }
+  )
 }

@@ -43,18 +43,22 @@ import com.google.common.primitives.UnsignedLongs
 class ULongTest extends FreeSpec with PropertyChecks {
   val least: Long = 0L
   val greatest: Long = 0xffffffffffffffffL
-  val testLongs = (for (i <- -3 to 3) yield List[Long](i,
-    Int.MaxValue.toLong + i,
-    Int.MinValue.toLong + i,
-    Long.MaxValue.toLong + i,
-    Long.MinValue.toLong + i)).flatten
-  val testBigInts = (for (i <- -3 to 3) yield List[BigInt](BigInt(i),
-    BigInt(Long.MaxValue) + i,
-    BigInt(Long.MinValue) + i,
-    BigInt(Int.MaxValue) + i,
-    BigInt(Int.MinValue) + i,
-    (BigInt(1) << 63) + i,
-    (BigInt(1) << 64) + i)).flatten
+  val testLongs = (for (i <- -3 to 3)
+    yield List[Long](i,
+                     Int.MaxValue.toLong + i,
+                     Int.MinValue.toLong + i,
+                     Long.MaxValue.toLong + i,
+                     Long.MinValue.toLong + i
+    )).flatten
+  val testBigInts = (for (i <- -3 to 3)
+    yield List[BigInt](BigInt(i),
+                       BigInt(Long.MaxValue) + i,
+                       BigInt(Long.MinValue) + i,
+                       BigInt(Int.MaxValue) + i,
+                       BigInt(Int.MinValue) + i,
+                       (BigInt(1) << 63) + i,
+                       (BigInt(1) << 64) + i
+    )).flatten
 
   "An ULong " - {
     "should implement +" in {
@@ -90,11 +94,11 @@ class ULongTest extends FreeSpec with PropertyChecks {
       forAll { (a: Long, b: Long) =>
         whenever(b != 0) {
           val expected = UnsignedLong.fromLongBits(a).mod(UnsignedLong.fromLongBits(b))
-          (ULong.fromLongBits(a) mod ULong.fromLongBits(b)).toLong should be(expected.longValue)
+          ULong.fromLongBits(a).mod(ULong.fromLongBits(b)).toLong should be(expected.longValue)
         }
       }
       intercept[ArithmeticException] {
-        ULong.fromLongBits(1) mod ULong.fromLongBits(0)
+        ULong.fromLongBits(1).mod(ULong.fromLongBits(0))
       }
     }
     "should implement #toString" in {
@@ -144,7 +148,7 @@ class ULongTest extends FreeSpec with PropertyChecks {
     "should implement #compare" in {
       forAll { (a: Long, b: Long) =>
         val expected = UnsignedLongs.compare(a, b)
-        (ULong.fromLongBits(a) compare ULong.fromLongBits(b)) should be(expected)
+        (ULong.fromLongBits(a).compare(ULong.fromLongBits(b))) should be(expected)
       }
     }
     "should implement #asScala" in {
@@ -276,13 +280,15 @@ class ULongTest extends FreeSpec with PropertyChecks {
       }
       ULong.min(ULong.fromLongBits(least)) should be(ULong.fromLongBits(least))
       ULong.min(ULong.fromLongBits(greatest)) should be(ULong.fromLongBits(greatest))
-      ULong.min(ULong.fromLongBits(0L),
+      ULong.min(
+        ULong.fromLongBits(0L),
         ULong.fromLongBits(0x5a4316b8c153ac4dL),
         ULong.fromLongBits(8L),
         ULong.fromLongBits(100L),
         ULong.fromLongBits(0x6cf78a4b139a4e2aL),
         ULong.fromLongBits(0L),
-        ULong.fromLongBits(0xff1a618b7f65ea12L)) should be(ULong.fromLongBits(0L))
+        ULong.fromLongBits(0xff1a618b7f65ea12L)
+      ) should be(ULong.fromLongBits(0L))
     }
     "should implement #max" in {
       intercept[IllegalArgumentException] {
@@ -290,20 +296,24 @@ class ULongTest extends FreeSpec with PropertyChecks {
       }
       ULong.max(ULong.fromLongBits(least)) should be(ULong.fromLongBits(least))
       ULong.max(ULong.fromLongBits(greatest)) should be(ULong.fromLongBits(greatest))
-      ULong.max(ULong.fromLongBits(0L),
+      ULong.max(
+        ULong.fromLongBits(0L),
         ULong.fromLongBits(0x5a4316b8c153ac4dL),
         ULong.fromLongBits(8L),
         ULong.fromLongBits(100L),
         ULong.fromLongBits(0x6cf78a4b139a4e2aL),
         ULong.fromLongBits(0L),
-        ULong.fromLongBits(0xff1a618b7f65ea12L)) should be(ULong.fromLongBits(0xff1a618b7f65ea12L))
+        ULong.fromLongBits(0xff1a618b7f65ea12L)
+      ) should be(ULong.fromLongBits(0xff1a618b7f65ea12L))
     }
     "should implement #join" in {
       import ULong._
       join(",") should be("")
       join(",", ULong.fromLongBits(1)) should be("1")
       join(",", ULong.fromLongBits(1), ULong.fromLongBits(2)) should be("1,2")
-      join(",", ULong.fromLongBits(-1), ULong.fromLongBits(Long.MinValue)) should be("18446744073709551615,9223372036854775808")
+      join(",", ULong.fromLongBits(-1), ULong.fromLongBits(Long.MinValue)) should be(
+        "18446744073709551615,9223372036854775808"
+      )
       join(",", ULong.fromLongBits(1), ULong.fromLongBits(2), ULong.fromLongBits(3)) should be("1,2,3")
     }
 
@@ -317,7 +327,8 @@ class ULongTest extends FreeSpec with PropertyChecks {
         Array[ULong](ULong.valueOf(1L), ULong.fromLongBits(least)),
         Array[ULong](ULong.fromLongBits(greatest), ULong.fromLongBits(greatest - 1L.toLong)),
         Array[ULong](ULong.fromLongBits(greatest), ULong.fromLongBits(greatest)),
-        Array[ULong](ULong.fromLongBits(greatest), ULong.fromLongBits(greatest), ULong.fromLongBits(greatest)))
+        Array[ULong](ULong.fromLongBits(greatest), ULong.fromLongBits(greatest), ULong.fromLongBits(greatest))
+      )
 
       val comparator = ULong.lexicographicalComparator
 

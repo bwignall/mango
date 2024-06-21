@@ -33,8 +33,10 @@ import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
  *  @since 0.8
  */
 @Beta
-private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetWrapperLike[C, O, Repr] with RangeSet[C, O]]
-  extends collect.RangeSetWrapperLike[C, O, Repr] with RangeSet[C, O] {
+private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetWrapperLike[C, O, Repr] with RangeSet[C,
+                                                                                                                     O
+]] extends collect.RangeSetWrapperLike[C, O, Repr]
+    with RangeSet[C, O] {
   self =>
 
   override def add(range: Range[C, O]) = delegate.add(range.asJava)

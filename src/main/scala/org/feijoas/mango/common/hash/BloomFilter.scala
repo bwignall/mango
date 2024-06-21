@@ -27,7 +27,7 @@ import scala.annotation.implicitNotFound
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.hash.Funnel.asGuavaFunnel
 
-import com.google.common.hash.{ BloomFilter => GuavaBloomFilter }
+import com.google.common.hash.{BloomFilter => GuavaBloomFilter}
 
 /**
  * A Bloom filter for instances of `T`. A Bloom filter offers an approximate containment test
@@ -60,7 +60,9 @@ import com.google.common.hash.{ BloomFilter => GuavaBloomFilter }
  */
 @Beta
 @SerialVersionUID(1L)
-final case class BloomFilter[T] private (private val delegate: GuavaBloomFilter[T]) extends (T => Boolean) with Serializable {
+final case class BloomFilter[T] private (private val delegate: GuavaBloomFilter[T])
+    extends (T => Boolean)
+    with Serializable {
 
   /**
    * Creates a new {@code BloomFilter} that's a copy of this instance. The new instance is equal to

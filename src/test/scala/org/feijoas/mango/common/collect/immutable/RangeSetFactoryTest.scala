@@ -47,8 +47,7 @@ class RangeSetFactoryTest extends FreeSpec with RangeSetBehaviors {
     "it should not create a copy if RangeSet(same type of immutable range set) is called" in {
       val fst = RangeSet(Range.open(3, 4))
       val snd = RangeSet(fst)
-      fst should be theSameInstanceAs (snd)
+      (fst should be).theSameInstanceAs(snd)
     }
   }
 }
-

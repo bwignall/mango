@@ -28,6 +28,4 @@ package org.feijoas.mango.common
  *  @author Markus Schneider
  *  @since 0.8
  */
-package object collect {
-
-}
+package object collect {}

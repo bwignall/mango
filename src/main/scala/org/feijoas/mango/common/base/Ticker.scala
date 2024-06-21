@@ -23,8 +23,8 @@
 package org.feijoas.mango.common.base
 
 import org.feijoas.mango.common.annotations.Beta
-import com.google.common.base.{ Ticker => GuavaTicker }
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
+import com.google.common.base.{Ticker => GuavaTicker}
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
 /** A time source; returns a time value representing the number of nanoseconds elapsed since some
  *  fixed but arbitrary point in time. Note that most users should use `Stopwatch` instead of
@@ -62,9 +62,9 @@ object Ticker {
    *   view of the argument
    */
   implicit final def asGuavaTickerConverter[T](ticker: Ticker): AsJava[GuavaTicker] = {
-      def convert(ticker: Ticker): GuavaTicker = new GuavaTicker {
-        override def read() = ticker.read()
-      }
+    def convert(ticker: Ticker): GuavaTicker = new GuavaTicker {
+      override def read() = ticker.read()
+    }
     new AsJava(convert(ticker))
   }
 
@@ -79,9 +79,9 @@ object Ticker {
    *   view of the argument
    */
   implicit final def asMangoTickerConverter[T](ticker: GuavaTicker): AsScala[Ticker] = {
-      def convert(ticker: GuavaTicker): Ticker = new Ticker {
-        override def read() = ticker.read()
-      }
+    def convert(ticker: GuavaTicker): Ticker = new Ticker {
+      override def read() = ticker.read()
+    }
     new AsScala(convert(ticker))
   }
 }

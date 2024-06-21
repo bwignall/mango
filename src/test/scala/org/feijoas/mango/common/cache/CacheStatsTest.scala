@@ -27,7 +27,7 @@ import org.scalacheck.Gen
 import org.scalatest._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
-import com.google.common.cache.{ CacheStats => GuavaCacheStats }
+import com.google.common.cache.{CacheStats => GuavaCacheStats}
 
 /**
  * Tests for [[CacheStats]]
@@ -40,9 +40,7 @@ class CacheStatsTest extends FlatSpec with GeneratorDrivenPropertyChecks with Ma
   behavior of "CacheStats"
 
   // a non-negative generator
-  val nonNegGen: Gen[Long] = Gen.frequency(
-    1 -> 0,
-    2 -> Gen.choose(0, Long.MaxValue / 2))
+  val nonNegGen: Gen[Long] = Gen.frequency(1 -> 0, 2 -> Gen.choose(0, Long.MaxValue / 2))
 
   // a CacheStats generator
   val cacheStatsGen: Gen[GuavaCacheStats] = for {
@@ -78,26 +76,24 @@ class CacheStatsTest extends FlatSpec with GeneratorDrivenPropertyChecks with Ma
   }
 
   it should "be able to add values" in {
-    forAll(cacheStatsGen, cacheStatsGen) {
-      (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
-        val mangoA: CacheStats = guavaA.asScala
-        val mangoB: CacheStats = guavaB.asScala
+    forAll(cacheStatsGen, cacheStatsGen) { (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
+      val mangoA: CacheStats = guavaA.asScala
+      val mangoB: CacheStats = guavaB.asScala
 
-        // if the first test passes we can safely convert a Guava-CacheStats
-        // to a mango implementation
-        (mangoA + mangoB) should be(guavaA.plus(guavaB).asScala)
+      // if the first test passes we can safely convert a Guava-CacheStats
+      // to a mango implementation
+      (mangoA + mangoB) should be(guavaA.plus(guavaB).asScala)
     }
   }
 
   it should "be able to subtract values" in {
-    forAll(cacheStatsGen, cacheStatsGen) {
-      (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
-        val mangoA: CacheStats = guavaA.asScala
-        val mangoB: CacheStats = guavaB.asScala
+    forAll(cacheStatsGen, cacheStatsGen) { (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
+      val mangoA: CacheStats = guavaA.asScala
+      val mangoB: CacheStats = guavaB.asScala
 
-        // if the first test passes we can safely convert a Guava-CacheStats
-        // to a mango implementation
-        (mangoA - mangoB) should be(guavaA.minus(guavaB).asScala)
+      // if the first test passes we can safely convert a Guava-CacheStats
+      // to a mango implementation
+      (mangoA - mangoB) should be(guavaA.minus(guavaB).asScala)
     }
   }
 

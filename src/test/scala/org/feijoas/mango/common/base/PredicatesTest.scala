@@ -25,8 +25,8 @@ package org.feijoas.mango.common.base
 import org.feijoas.mango.common.base.Predicates._
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
-import com.google.common.base.{ Predicates => GuavaPredicates }
-import com.google.common.base.{ Predicate => GuavaPredicate }
+import com.google.common.base.{Predicates => GuavaPredicates}
+import com.google.common.base.{Predicate => GuavaPredicate}
 
 /**
  * Tests for [[Predicates]]
@@ -58,19 +58,19 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
   }
 
   "not alwaysTrue" should "be the same instance as alwaysFalse" in {
-    Predicates.not(alwaysTrue) should be theSameInstanceAs (alwaysFalse)
+    (Predicates.not(alwaysTrue) should be).theSameInstanceAs(alwaysFalse)
   }
 
   "not alwaysFalse" should "be the same instance as alwaysTrue" in {
-    Predicates.not(alwaysFalse) should be theSameInstanceAs (alwaysTrue)
+    (Predicates.not(alwaysFalse) should be).theSameInstanceAs(alwaysTrue)
   }
 
   "double neg. with not" should "return the orig instance" in {
-    Predicates.not(Predicates.not(isEven)) should be theSameInstanceAs (isEven)
+    (Predicates.not(Predicates.not(isEven)) should be).theSameInstanceAs(isEven)
   }
 
   "and" should "with empy arg should return always false" in {
-    and(List[Int => Boolean]()) should be theSameInstanceAs (alwaysFalse)
+    (and(List[Int => Boolean]()) should be).theSameInstanceAs(alwaysFalse)
   }
 
   "and with one arg" should "be the same as the arg itself" in {
@@ -109,13 +109,13 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     val list = List[Any => Boolean](alwaysFalse)
     val predicate = and(list)
     predicate match {
-      case a: AndPredicate[Any] => a.px should be theSameInstanceAs list
+      case a: AndPredicate[Any] => (a.px should be).theSameInstanceAs(list)
       case _                    => fail("expected an AndPredicate")
     }
   }
 
   "or" should "with empy arg should return always false" in {
-    or(List[Int => Boolean]()) should be theSameInstanceAs (alwaysFalse)
+    (or(List[Int => Boolean]()) should be).theSameInstanceAs(alwaysFalse)
   }
 
   "or with one arg" should "be the same as the arg itself" in {
@@ -154,13 +154,13 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     val list = List[Any => Boolean](alwaysFalse)
     val predicate = or(list)
     predicate match {
-      case a: OrPredicate[Any] => a.px should be theSameInstanceAs list
+      case a: OrPredicate[Any] => (a.px should be).theSameInstanceAs(list)
       case _                   => fail("expected an orPredicate")
     }
   }
 
   "xor" should "with empy arg should return always false" in {
-    xor(List[Int => Boolean]()) should be theSameInstanceAs (alwaysFalse)
+    (xor(List[Int => Boolean]()) should be).theSameInstanceAs(alwaysFalse)
   }
 
   "xor with one arg" should "be the same as the arg itself" in {
@@ -196,7 +196,7 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     val list = List[Any => Boolean](alwaysFalse)
     val predicate = xor(list)
     predicate match {
-      case a: XorPredicate[Any] => a.px should be theSameInstanceAs list
+      case a: XorPredicate[Any] => (a.px should be).theSameInstanceAs(list)
       case _                    => fail("expected an xorPredicate")
     }
   }

@@ -99,7 +99,7 @@ class BloomFilterTest extends FlatSpec with MockitoSugar {
 
     bf1 should be(bf2)
     bf2.put("3")
-    bf1 should not be (bf2)
+    bf1 should not be bf2
   }
 
   it should "be equal to another instance even if the Funnels are different instances" in {

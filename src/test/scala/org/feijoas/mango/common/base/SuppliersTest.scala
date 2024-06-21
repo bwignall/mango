@@ -22,17 +22,17 @@
  */
 package org.feijoas.mango.common.base
 
-import java.lang.Thread.State.{ BLOCKED, TIMED_WAITING, WAITING }
-import java.util.concurrent.{ TimeUnit, TimeoutException }
-import java.util.concurrent.atomic.{ AtomicInteger, AtomicReference }
+import java.lang.Thread.State.{BLOCKED, TIMED_WAITING, WAITING}
+import java.util.concurrent.{TimeUnit, TimeoutException}
+import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
 
-import scala.util.control.Breaks.{ break, breakable }
+import scala.util.control.Breaks.{break, breakable}
 
 import org.feijoas.mango.common.base.Suppliers._
 import org.scalatest._
 import org.scalatest.prop.PropertyChecks
 
-import com.google.common.base.{ Supplier => GuavaSupplier }
+import com.google.common.base.{Supplier => GuavaSupplier}
 import com.google.common.testing.SerializableTester
 
 /**
@@ -52,7 +52,7 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
   it should "return the same instance if already memoized" in {
     val count = new CountingSupplier()
     val mem = memoize(count)
-    mem should be theSameInstanceAs memoize(mem)
+    (mem should be).theSameInstanceAs(memoize(mem))
   }
 
   it should "be serializeable" in {
@@ -110,8 +110,8 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
   }
 
   it should "be thread-safe" in {
-    val memoizer = (supplier: () => Boolean) =>
-      memoizeWithExpiration(supplier, java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+    val memoizer =
+      (supplier: () => Boolean) => memoizeWithExpiration(supplier, java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
     testSupplierThreadSafe(memoizer)
   }
 
@@ -222,9 +222,12 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
         breakable {
           while (waitingThreads() != numThreads - 1) {
             if (System.nanoTime() - t0 > timeout) {
-              thrown.set(new TimeoutException(
-                "timed out waiting for other threads to block" +
-                  " synchronizing on supplier"));
+              thrown.set(
+                new TimeoutException(
+                  "timed out waiting for other threads to block" +
+                    " synchronizing on supplier"
+                )
+              );
               break
             }
             Thread.`yield`

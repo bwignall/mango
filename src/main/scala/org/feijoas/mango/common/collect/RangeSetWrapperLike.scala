@@ -28,7 +28,7 @@ import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.AsOrdered.asOrdered
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 
-import com.google.common.collect.{ RangeSet => GuavaRangeSet }
+import com.google.common.collect.{RangeSet => GuavaRangeSet}
 
 /** Implementation trait for [[RangeSet]] that delegates to Guava
  *
@@ -36,15 +36,16 @@ import com.google.common.collect.{ RangeSet => GuavaRangeSet }
  *  @since 0.8
  */
 @Beta
-private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetWrapperLike[C, O, Repr] with RangeSet[C, O]]
-  extends RangeSetLike[C, O, Repr] {
+private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetWrapperLike[C, O, Repr] with RangeSet[C,
+                                                                                                                     O
+]] extends RangeSetLike[C, O, Repr] {
   self =>
 
   /** The Guava RangeSet to use internally */
   protected def delegate: GuavaRangeSet[AsOrdered[C]]
 
   /** The Ordering[C] used for Ranges is needed */
-  protected implicit def ordering: O
+  implicit protected def ordering: O
 
   /** Creates a new Repr from a Guava RangeSet */
   protected[this] def factory: (GuavaRangeSet[AsOrdered[C]]) => Repr

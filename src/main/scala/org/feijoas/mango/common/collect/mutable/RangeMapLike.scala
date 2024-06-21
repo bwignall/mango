@@ -36,9 +36,9 @@ import scala.collection.generic.Shrinkable
  */
 @Beta
 trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] with RangeMap[K, V, O]]
-  extends collect.RangeMapLike[K, V, O, Repr]
-  with Growable[(Range[K, O], V)]
-  with Shrinkable[Range[K, O]] {
+    extends collect.RangeMapLike[K, V, O, Repr]
+    with Growable[(Range[K, O], V)]
+    with Shrinkable[Range[K, O]] {
 
   /** Maps a range to a specified value.
    *
@@ -52,7 +52,9 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
 
   /** Puts all the associations from `rangeMap` into this range map.
    */
-  def putAll(rangeMap: collect.RangeMap[K, V, O]) = rangeMap.asMapOfRanges foreach { case (range, value) => put(range, value) }
+  def putAll(rangeMap: collect.RangeMap[K, V, O]) = rangeMap.asMapOfRanges.foreach { case (range, value) =>
+    put(range, value)
+  }
 
   /** Removes all associations from this range map.
    */

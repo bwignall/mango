@@ -45,7 +45,7 @@ import org.scalatest.Matchers.not
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 
-import com.google.common.{ collect => gcc }
+import com.google.common.{collect => gcc}
 
 /**
  * Behavior which all [[RangeMap]] have in common
@@ -174,7 +174,7 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
       "removing an overlapping range should retain parts of the other" in {
         forAll { (rangeToPut: Range[Int, Int.type], rangeToRemove: Range[Int, Int.type]) =>
           val model = gcc.TreeRangeMap.create[AsOrdered[Int], String]
-          whenever(rangeToPut isConnected rangeToRemove) {
+          whenever(rangeToPut.isConnected(rangeToRemove)) {
             // create the model
             model.put(rangeToPut.asJava, "1")
             model.remove(rangeToRemove.asJava)
@@ -189,20 +189,21 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
         }
       }
       "put two and remove one should retain parts" in {
-        forAll { (rangeToPut1: Range[Int, Int.type], rangeToPut2: Range[Int, Int.type], rangeToRemove: Range[Int, Int.type]) =>
-          val model = gcc.TreeRangeMap.create[AsOrdered[Int], String]
-          // create the model
-          model.put(rangeToPut1.asJava, "1")
-          model.put(rangeToPut2.asJava, "2")
-          model.remove(rangeToRemove.asJava)
+        forAll {
+          (rangeToPut1: Range[Int, Int.type], rangeToPut2: Range[Int, Int.type], rangeToRemove: Range[Int, Int.type]) =>
+            val model = gcc.TreeRangeMap.create[AsOrdered[Int], String]
+            // create the model
+            model.put(rangeToPut1.asJava, "1")
+            model.put(rangeToPut2.asJava, "2")
+            model.remove(rangeToRemove.asJava)
 
-          // put & remove
-          val rangeMap = (newBuilder += rangeToPut1 -> "1").result
-          rangeMap.put(rangeToPut2, "2")
-          rangeMap.remove(rangeToRemove)
+            // put & remove
+            val rangeMap = (newBuilder += rangeToPut1 -> "1").result
+            rangeMap.put(rangeToPut2, "2")
+            rangeMap.remove(rangeToRemove)
 
-          // compare
-          verify(rangeMap, model)
+            // compare
+            verify(rangeMap, model)
         }
       }
     }
@@ -334,7 +335,7 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
         "if the other RangeMap contains {[1,8]->'a',[1,3]->'b'} it should not be equal" in {
           val mocked = mock[TIntRangeMap]
           when(mocked.asMapOfRanges).thenReturn(Map(Range.closed(1, 8) -> "a", Range.closed(1, 3) -> "b"))
-          rangeMap should not be (mocked)
+          rangeMap should not be mocked
         }
       }
       "given the RangeMap contains {[5,8]->'a',[1,3)->'b'}" - {
@@ -347,7 +348,7 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
         "if the other RangeMap contains {[1,8]->'a',[1,3]->'b'} it should not be equal" in {
           val mocked = mock[TIntRangeMap]
           when(mocked.asMapOfRanges).thenReturn(Map(Range.closed(1, 8) -> "a", Range.closed(1, 3) -> "b"))
-          rangeMap should not be (mocked)
+          rangeMap should not be mocked
         }
       }
     }
@@ -405,7 +406,7 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
           forAll { t: (Range[Int, Int.type], Range[Int, Int.type]) =>
             val (range1, range2) = t
             val rangeMap = (newBuilder += range1 -> "a" += range2 -> "b").result
-            rangeMap.span should be(Some(range1 span range2))
+            rangeMap.span should be(Some(range1.span(range2)))
           }
         }
       }
@@ -428,12 +429,12 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
             val rangeMap = (newBuilder += range1 -> "a" += range2 -> "b").result
             val expected = {
               val builder = newBuilder
-              rangeMap.asMapOfRanges foreach ({
+              rangeMap.asMapOfRanges.foreach {
                 case (key, value) => {
                   if (key.isConnected(subRange) && !key.intersection(subRange).isEmpty)
                     builder += key.intersection(subRange) -> value
                 }
-              })
+              }
               builder.result
             }
             rangeMap.subRangeMap(subRange) should be(expected)
@@ -448,7 +449,8 @@ private[mango] trait RangeMapBehaviors extends FreeSpec with PropertyChecks with
         val modelSub1 = model.subRangeMap(Range.closed(5, 11).asJava)
         val modelSub2 = modelSub1.subRangeMap(Range.open(6, 15).asJava)
 
-        val rangeMap = (newBuilder += Range.open(3, 7) -> "1" += Range.closed(9, 10) -> "2" += Range.closed(12, 16) -> "3").result
+        val rangeMap =
+          (newBuilder += Range.open(3, 7) -> "1" += Range.closed(9, 10) -> "2" += Range.closed(12, 16) -> "3").result
         val sub1 = rangeMap.subRangeMap(Range.closed(5, 11))
         val sub2 = sub1.subRangeMap(Range.open(6, 15))
         verify(rangeMap, model)

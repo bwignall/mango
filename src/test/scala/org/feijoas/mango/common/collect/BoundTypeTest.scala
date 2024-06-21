@@ -47,8 +47,8 @@ class BoundTypeTest extends FunSuite {
     val gClosed: GuavaBoundType = GuavaBoundType.CLOSED
     val mClosed: BoundType = gClosed.asScala
 
-    mOpen should be theSameInstanceAs (Open)
-    mClosed should be theSameInstanceAs (Closed)
+    (mOpen should be).theSameInstanceAs(Open)
+    (mClosed should be).theSameInstanceAs(Closed)
   }
 
   test("convert from Mango to Guava") {
@@ -58,8 +58,8 @@ class BoundTypeTest extends FunSuite {
     val mClosed: BoundType = Closed
     val gClosed: GuavaBoundType = mClosed.asJava
 
-    gOpen should be theSameInstanceAs (GuavaBoundType.OPEN)
-    gClosed should be theSameInstanceAs (GuavaBoundType.CLOSED)
+    (gOpen should be).theSameInstanceAs(GuavaBoundType.OPEN)
+    (gClosed should be).theSameInstanceAs(GuavaBoundType.CLOSED)
   }
 
   test("throws exeption if attemp to convert null") {

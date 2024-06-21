@@ -22,9 +22,9 @@
  */
 package org.feijoas.mango.common.cache
 
-import java.util.concurrent.{ Callable => Callable, ConcurrentHashMap, ConcurrentMap, ExecutionException }
+import java.util.concurrent.{Callable => Callable, ConcurrentHashMap, ConcurrentMap, ExecutionException}
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
 import scala.collection.convert.WrapAsJava.mapAsJavaMap
 import scala.collection.convert.WrapAsScala.asScalaIterator
 
@@ -37,7 +37,7 @@ import org.mockito.ArgumentMatcher
 import org.mockito.Mockito._
 import org.scalatest._
 
-import com.google.common.cache.{ Cache => GuavaCache, CacheStats => GuavaCacheStats }
+import com.google.common.cache.{Cache => GuavaCache, CacheStats => GuavaCacheStats}
 import com.google.common.collect.ImmutableMap
 
 /**
@@ -68,7 +68,8 @@ trait CacheWrapperBehaviour extends Matchers { this: FlatSpec =>
 
     it should "forward #getAllPresent to the underlying LoadingCache" in {
       val (wrapped, cache) = mockedFixture
-      when(wrapped.getAllPresent(isA(classOf[java.lang.Iterable[String]]))).thenReturn(jImmutableMap("a" -> 1, "b" -> 2))
+      when(wrapped.getAllPresent(isA(classOf[java.lang.Iterable[String]])))
+        .thenReturn(jImmutableMap("a" -> 1, "b" -> 2))
       cache.getAllPresent(List("a", "b")) should be(Map("a" -> 1, "b" -> 2))
       verify(wrapped).getAllPresent(anyIterableWith("a", "b"))
     }
@@ -138,7 +139,7 @@ trait CacheWrapperBehaviour extends Matchers { this: FlatSpec =>
   def anyIterableWith[T](elements: Any*) = argThat(new ArgumentMatcher[java.lang.Iterable[T]] {
     val expected = List(elements.seq: _*)
     override def matches(arg: java.lang.Iterable[T]) = arg match {
-      case it: java.lang.Iterable[_] => expected sameElements it.iterator().toList
+      case it: java.lang.Iterable[_] => expected.sameElements(it.iterator().toList)
       case _                         => false
     }
   })

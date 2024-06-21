@@ -42,7 +42,8 @@ import com.google.common.testing.SerializableTester
 class UIntTest extends FreeSpec with PropertyChecks {
 
   val testInts = (for (i <- -3 to 3) yield List(i, Int.MaxValue + i, Int.MinValue + i)).flatten
-  val testLongs = (for (i <- -3 to 3) yield List[Long](i, Int.MaxValue.toLong + i.toLong, Int.MinValue.toLong + i.toLong)).flatten
+  val testLongs =
+    (for (i <- -3 to 3) yield List[Long](i, Int.MaxValue.toLong + i.toLong, Int.MinValue.toLong + i.toLong)).flatten
   val least: Int = 0L.toInt
   val greatest: Int = 0xffffffffL.toInt
 
@@ -80,11 +81,11 @@ class UIntTest extends FreeSpec with PropertyChecks {
       forAll { (a: Int, b: Int) =>
         whenever(b != 0) {
           val expected = UnsignedInteger.fromIntBits(a).mod(UnsignedInteger.fromIntBits(b))
-          (UInt.fromIntBits(a) mod UInt.fromIntBits(b)).toInt should be(expected.intValue)
+          UInt.fromIntBits(a).mod(UInt.fromIntBits(b)).toInt should be(expected.intValue)
         }
       }
       intercept[ArithmeticException] {
-        UInt.fromIntBits(1) mod UInt.fromIntBits(0)
+        UInt.fromIntBits(1).mod(UInt.fromIntBits(0))
       }
     }
     "should implement #toString" in {
@@ -142,7 +143,7 @@ class UIntTest extends FreeSpec with PropertyChecks {
     "should implement #compare" in {
       forAll { (a: Int, b: Int) =>
         val expected = UnsignedInts.compare(a, b)
-        (UInt.fromIntBits(a) compare UInt.fromIntBits(b)) should be(expected)
+        (UInt.fromIntBits(a).compare(UInt.fromIntBits(b))) should be(expected)
       }
     }
     "should implement #asJava" in {
@@ -209,14 +210,14 @@ class UIntTest extends FreeSpec with PropertyChecks {
     }
     "should implement #valueOf(String,Int)" in {
       forAll(posNum[Long]) { (a: Long) =>
-        for (radix <- (Character.MIN_RADIX to Character.MAX_RADIX)) {
+        for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
           val str = java.lang.Long.toString(a, radix)
           val expected = UnsignedInts.parseUnsignedInt(str, radix)
           UInt.valueOf(str, radix).toInt should be(expected)
         }
 
         // loops through all legal radix values.
-        for (radix <- (Character.MIN_RADIX to Character.MAX_RADIX)) {
+        for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
           // tests can successfully parse a number string with this radix.
           val maxAsString = java.lang.Long.toString((1L << 32) - 1, radix)
           val expected = UnsignedInts.parseUnsignedInt(maxAsString, radix)
@@ -269,13 +270,15 @@ class UIntTest extends FreeSpec with PropertyChecks {
       }
       UInt.min(UInt.fromIntBits(least)) should be(UInt.fromIntBits(least))
       UInt.min(UInt.fromIntBits(greatest)) should be(UInt.fromIntBits(greatest))
-      UInt.min(UInt.fromIntBits(8L.toInt),
+      UInt.min(
+        UInt.fromIntBits(8L.toInt),
         UInt.fromIntBits(6L.toInt),
         UInt.fromIntBits(7L.toInt),
         UInt.fromIntBits(0x12345678L.toInt),
         UInt.fromIntBits(0x5a4316b8L.toInt),
         UInt.fromIntBits(0xff1a618bL.toInt),
-        UInt.fromIntBits(0L.toInt)) should be(UInt.fromIntBits(0L.toInt))
+        UInt.fromIntBits(0L.toInt)
+      ) should be(UInt.fromIntBits(0L.toInt))
     }
     "should implement #max" in {
       intercept[IllegalArgumentException] {
@@ -283,13 +286,15 @@ class UIntTest extends FreeSpec with PropertyChecks {
       }
       UInt.max(UInt.fromIntBits(least)) should be(UInt.fromIntBits(least))
       UInt.max(UInt.fromIntBits(greatest)) should be(UInt.fromIntBits(greatest))
-      UInt.max(UInt.fromIntBits(8L.toInt),
+      UInt.max(
+        UInt.fromIntBits(8L.toInt),
         UInt.fromIntBits(6L.toInt),
         UInt.fromIntBits(7L.toInt),
         UInt.fromIntBits(0x12345678L.toInt),
         UInt.fromIntBits(0x5a4316b8L.toInt),
         UInt.fromIntBits(0xff1a618bL.toInt),
-        UInt.fromIntBits(0L.toInt)) should be(UInt.fromIntBits(0xff1a618bLtoInt))
+        UInt.fromIntBits(0L.toInt)
+      ) should be(UInt.fromIntBits(0xff1a618bL toInt))
     }
     "should implement #join" in {
       import UInt._
@@ -310,7 +315,8 @@ class UIntTest extends FreeSpec with PropertyChecks {
         Array[UInt](UInt.valueOf(1L), UInt.fromIntBits(least)),
         Array[UInt](UInt.fromIntBits(greatest), UInt.fromIntBits(greatest - 1L.toInt)),
         Array[UInt](UInt.fromIntBits(greatest), UInt.fromIntBits(greatest)),
-        Array[UInt](UInt.fromIntBits(greatest), UInt.fromIntBits(greatest), UInt.fromIntBits(greatest)))
+        Array[UInt](UInt.fromIntBits(greatest), UInt.fromIntBits(greatest), UInt.fromIntBits(greatest))
+      )
 
       val comparator = UInt.lexicographicalComparator
 

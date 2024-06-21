@@ -101,7 +101,7 @@ final object UByte {
 
   /** The largest value that fits into an unsigned Byte.
    */
-  val MaxValue = 0xFF.toByte
+  val MaxValue = 0xff.toByte
 
   /** Returns an {@code UByte} corresponding to a given bit representation.
    *  The argument is interpreted as an unsigned byte value. Specifically, the sign bit
@@ -255,7 +255,7 @@ final object UByte {
    */
   def lexicographicalComparator(): Ordering[Array[UByte]] = UByteArrayOrdering
 
-  private[this] final object UByteArrayOrdering extends Ordering[Array[UByte]] {
+  final private[this] object UByteArrayOrdering extends Ordering[Array[UByte]] {
     override def compare(left: Array[UByte], right: Array[UByte]): Int = {
       val minLength = Math.min(left.length, right.length)
       var i = 0

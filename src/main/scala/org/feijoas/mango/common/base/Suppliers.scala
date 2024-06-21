@@ -24,8 +24,8 @@ package org.feijoas.mango.common.base
 
 import java.util.concurrent.TimeUnit
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
-import com.google.common.base.{ Supplier => GuavaSupplier, Suppliers => GuavaSuppliers }
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
+import com.google.common.base.{Supplier => GuavaSupplier, Suppliers => GuavaSuppliers}
 
 /** Utility functions for the work with suppliers which are functions of
  *  the type `() => T`
@@ -102,10 +102,10 @@ final object Suppliers {
    *   view of the argument
    */
   implicit final def asGuavaSupplierConverter[T](fnc: () => T): AsJava[GuavaSupplier[T]] = {
-      def convert(fnc: () => T): GuavaSupplier[T] = fnc match {
-        case s: AsMangoSupplier[T] => s.delegate
-        case _                     => AsGuavaSupplier(fnc)
-      }
+    def convert(fnc: () => T): GuavaSupplier[T] = fnc match {
+      case s: AsMangoSupplier[T] => s.delegate
+      case _                     => AsGuavaSupplier(fnc)
+    }
     new AsJava(convert(fnc))
   }
 
@@ -120,10 +120,10 @@ final object Suppliers {
    *   view of the argument
    */
   implicit final def asMangoSupplierConverter[T](fnc: GuavaSupplier[T]): AsScala[() => T] = {
-      def convert(fnc: GuavaSupplier[T]) = fnc match {
-        case AsGuavaSupplier(delegate) => delegate
-        case _                         => AsMangoSupplier(fnc)
-      }
+    def convert(fnc: GuavaSupplier[T]) = fnc match {
+      case AsGuavaSupplier(delegate) => delegate
+      case _                         => AsMangoSupplier(fnc)
+    }
     new AsScala(convert(fnc))
   }
 }
@@ -139,7 +139,9 @@ private[mango] case class MemoizingSupplier[T](f: () => T) extends (() => T) wit
 
 // visible for testing
 @SerialVersionUID(1L)
-private[mango] case class ExpiringMemoizingSupplier[T](f: () => T, duration: Long, unit: TimeUnit) extends (() => T) with Serializable {
+private[mango] case class ExpiringMemoizingSupplier[T](f: () => T, duration: Long, unit: TimeUnit)
+    extends (() => T)
+    with Serializable {
   import org.feijoas.mango.common.base.Suppliers._
   private val delegate = GuavaSuppliers.memoizeWithExpiration(f.asJava, duration, unit)
   override def apply(): T = delegate.get()
@@ -156,8 +158,7 @@ private[mango] case class ThreadSafeSupplier[T](f: () => T) extends (() => T) wi
 /** Wraps a Scala function in a Guava `Supplier`
  */
 @SerialVersionUID(1L)
-private[mango] case class AsGuavaSupplier[T](delegate: () => T)
-    extends GuavaSupplier[T] with Serializable {
+private[mango] case class AsGuavaSupplier[T](delegate: () => T) extends GuavaSupplier[T] with Serializable {
   checkNotNull(delegate)
   override def get() = delegate()
 }
@@ -165,8 +166,7 @@ private[mango] case class AsGuavaSupplier[T](delegate: () => T)
 /** Wraps a Guava `Supplier` in a Scala function
  */
 @SerialVersionUID(1L)
-private[mango] case class AsMangoSupplier[T](delegate: GuavaSupplier[T])
-    extends (() => T) with Serializable {
+private[mango] case class AsMangoSupplier[T](delegate: GuavaSupplier[T]) extends (() => T) with Serializable {
   checkNotNull(delegate)
   override def apply() = delegate.get()
 }

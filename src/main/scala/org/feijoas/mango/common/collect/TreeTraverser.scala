@@ -30,7 +30,7 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.{ collect => cgcc }
+import com.google.common.{collect => cgcc}
 
 /**
  * Views elements of a type {@code T} as nodes in a tree, and provides methods to traverse the trees
@@ -99,7 +99,7 @@ object TreeTraverser {
    */
   final def apply[T](childs: T => Iterable[T]): TreeTraverser[T] = new TreeTraverser[T] {
     checkNotNull(childs)
-    override final def children: T => Iterable[T] = childs
+    final override def children: T => Iterable[T] = childs
   }
 
   /**
@@ -116,7 +116,7 @@ object TreeTraverser {
   implicit final def asGuavaTreeTraverserConverter[T](traverser: TreeTraverser[T]): AsJava[cgcc.TreeTraverser[T]] = {
     def convert(traverser: TreeTraverser[T]): cgcc.TreeTraverser[T] = traverser match {
       case t: AsMangoTreeTraverser[T] => t.delegate
-      case _ => AsGuavaTreeTraverser(traverser)
+      case _                          => AsGuavaTreeTraverser(traverser)
     }
     new AsJava(convert(traverser))
   }
@@ -135,7 +135,7 @@ object TreeTraverser {
   implicit final def asMangoTreeTraverserConverter[T](traverser: cgcc.TreeTraverser[T]): AsScala[TreeTraverser[T]] = {
     def convert(traverser: cgcc.TreeTraverser[T]) = traverser match {
       case AsGuavaTreeTraverser(delegate) => delegate
-      case _ => AsMangoTreeTraverser(traverser)
+      case _                              => AsMangoTreeTraverser(traverser)
     }
     new AsScala(convert(traverser))
   }
@@ -146,7 +146,9 @@ object TreeTraverser {
  * Wraps a Scala `TreeTraverser` in a Guava `TreeTraverser`
  */
 @SerialVersionUID(1L)
-private[mango] case class AsGuavaTreeTraverser[T](delegate: TreeTraverser[T]) extends cgcc.TreeTraverser[T] with Serializable {
+private[mango] case class AsGuavaTreeTraverser[T](delegate: TreeTraverser[T])
+    extends cgcc.TreeTraverser[T]
+    with Serializable {
   checkNotNull(delegate)
   final override def children(root: T) = delegate.children(root).asJava
 }
@@ -155,7 +157,9 @@ private[mango] case class AsGuavaTreeTraverser[T](delegate: TreeTraverser[T]) ex
  * Wraps a Guava `TreeTraverser` in a Scala `TreeTraverser`
  */
 @SerialVersionUID(1L)
-private[mango] case class AsMangoTreeTraverser[T](delegate: cgcc.TreeTraverser[T]) extends TreeTraverser[T] with Serializable {
+private[mango] case class AsMangoTreeTraverser[T](delegate: cgcc.TreeTraverser[T])
+    extends TreeTraverser[T]
+    with Serializable {
   checkNotNull(delegate)
   final override def children = (root: T) => delegate.children(root).asScala
 }

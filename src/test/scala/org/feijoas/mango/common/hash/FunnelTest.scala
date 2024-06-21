@@ -23,15 +23,22 @@
 package org.feijoas.mango.common.hash
 
 import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.hash.Funnel.{ asGuavaFunnel, asScalaFunnel, byteArrayFunnel, intFunnel, longFunnel, stringFunnel }
+import org.feijoas.mango.common.hash.Funnel.{
+  asGuavaFunnel,
+  asScalaFunnel,
+  byteArrayFunnel,
+  intFunnel,
+  longFunnel,
+  stringFunnel
+}
 import org.mockito.Mockito.verify
-import org.scalatest.{ FlatSpec, PrivateMethodTester }
+import org.scalatest.{FlatSpec, PrivateMethodTester}
 import org.scalatest.matchers._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.Matchers._
 
-import com.google.common.hash.{ Funnel => GuavaFunnel, Funnels => GuavaFunnels, PrimitiveSink }
+import com.google.common.hash.{Funnel => GuavaFunnel, Funnels => GuavaFunnels, PrimitiveSink}
 
 /**
  * Tests for [[Funnel]]
@@ -56,13 +63,13 @@ class FunnelTest extends FlatSpec with PrivateMethodTester with MockitoSugar {
   it should "not wrap a Guava Funnel twice" in {
     val guava: GuavaFunnel[Integer] = GuavaFunnels.integerFunnel
     val mango: Funnel[Integer] = guava.asScala
-    mango.asJava should be theSameInstanceAs (guava)
+    (mango.asJava should be).theSameInstanceAs(guava)
   }
 
   it should "not wrap a Mango Funnel twice" in {
     val mango: Funnel[Int] = implicitly[Funnel[Int]]
     val guava: GuavaFunnel[Int] = mango.asJava
-    guava.asScala should be theSameInstanceAs (mango)
+    (guava.asScala should be).theSameInstanceAs(mango)
   }
 
   it should "implement Funnel[Array[Byte]]" in {

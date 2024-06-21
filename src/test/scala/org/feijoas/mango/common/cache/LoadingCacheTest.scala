@@ -22,12 +22,12 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
-import scala.util.{ Failure, Success, Try }
+import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
+import scala.util.{Failure, Success, Try}
 
 import org.feijoas.mango.common.annotations.Beta
-import org.mockito.Mockito.{ spy, times, verify }
-import org.scalatest.{ FlatSpec, MustMatchers }
+import org.mockito.Mockito.{spy, times, verify}
+import org.scalatest.{FlatSpec, MustMatchers}
 import org.scalatest.mockito.MockitoSugar
 
 /**

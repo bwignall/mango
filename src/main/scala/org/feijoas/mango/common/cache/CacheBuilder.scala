@@ -23,7 +23,7 @@
 package org.feijoas.mango.common.cache
 
 import scala.concurrent.duration._
-import com.google.common.cache.{ CacheBuilder => GuavaCacheBuilder }
+import com.google.common.cache.{CacheBuilder => GuavaCacheBuilder}
 import org.feijoas.mango.common.base.Ticker
 import org.feijoas.mango.common.base.Preconditions._
 import org.feijoas.mango.common.cache._
@@ -127,20 +127,21 @@ import org.feijoas.mango.common.cache.RemovalListener._
  *  @tparam V the value of the cache
  */
 final case class CacheBuilder[-K, -V] private (
-    private val withWeigher: Option[(K, V) => Int],
-    private val withRemovalListener: Option[RemovalNotification[K, V] => Unit],
-    private val withInitialCapacity: Option[Int],
-    private val withConcurrencyLevel: Option[Int],
-    private val withMaximumSize: Option[Long],
-    private val withMaximumWeight: Option[Long],
-    private val withWeakKeys: Option[Boolean],
-    private val withWeakValues: Option[Boolean],
-    private val withSoftValues: Option[Boolean],
-    private val withExpireAfterWrite: Option[(Long, TimeUnit)],
-    private val withExpireAfterAccess: Option[(Long, TimeUnit)],
-    private val withRefreshAfterWrite: Option[(Long, TimeUnit)],
-    private val withTicker: Option[Ticker],
-    private val withRecordStats: Option[Boolean]) {
+  private val withWeigher: Option[(K, V) => Int],
+  private val withRemovalListener: Option[RemovalNotification[K, V] => Unit],
+  private val withInitialCapacity: Option[Int],
+  private val withConcurrencyLevel: Option[Int],
+  private val withMaximumSize: Option[Long],
+  private val withMaximumWeight: Option[Long],
+  private val withWeakKeys: Option[Boolean],
+  private val withWeakValues: Option[Boolean],
+  private val withSoftValues: Option[Boolean],
+  private val withExpireAfterWrite: Option[(Long, TimeUnit)],
+  private val withExpireAfterAccess: Option[(Long, TimeUnit)],
+  private val withRefreshAfterWrite: Option[(Long, TimeUnit)],
+  private val withTicker: Option[Ticker],
+  private val withRecordStats: Option[Boolean]
+) {
 
   /** Builds a cache which does not automatically load values when keys are requested.
    *
@@ -503,7 +504,8 @@ final object CacheBuilder {
   /** Constructs a new [[CacheBuilder]] instance with default settings, including strong keys,
    *  strong values, and no automatic eviction of any kind.
    */
-  def newBuilder() = new CacheBuilder[Any, Any](None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+  def newBuilder() =
+    new CacheBuilder[Any, Any](None, None, None, None, None, None, None, None, None, None, None, None, None, None)
 
   /** Creates a Guava CacheBuilder and sets the all properties from this
    *  CacheBuilder that are not `None`
@@ -512,20 +514,20 @@ final object CacheBuilder {
    */
   private[mango] def createGuavaBuilder[K, V](builder: CacheBuilder[K, V]): GuavaCacheBuilder[K, V] = {
     var gb = GuavaCacheBuilder.newBuilder().asInstanceOf[GuavaCacheBuilder[K, V]]
-    builder.withWeigher foreach { weigher => gb = gb.weigher(weigher.asJava) }
-    builder.withRemovalListener foreach { listener => gb = gb.removalListener(listener.asJava) }
-    builder.withInitialCapacity foreach { cap => gb = gb.initialCapacity(cap) }
-    builder.withConcurrencyLevel foreach { level => gb = gb.concurrencyLevel(level) }
-    builder.withMaximumSize foreach { size => gb = gb.maximumSize(size) }
-    builder.withMaximumWeight foreach { weight => gb = gb.maximumWeight(weight) }
-    builder.withWeakKeys foreach { _ => gb = gb.weakKeys() }
-    builder.withWeakValues foreach { _ => gb = gb.weakValues() }
-    builder.withSoftValues foreach { _ => gb = gb.softValues() }
-    builder.withExpireAfterWrite foreach { case (duration, unit) => gb = gb.expireAfterWrite(duration, unit) }
-    builder.withExpireAfterAccess foreach { case (duration, unit) => gb = gb.expireAfterAccess(duration, unit) }
-    builder.withRefreshAfterWrite foreach { case (duration, unit) => gb = gb.refreshAfterWrite(duration, unit) }
-    builder.withTicker foreach { ticker => gb = gb.ticker(ticker.asJava) }
-    builder.withRecordStats foreach { _ => gb = gb.recordStats() }
+    builder.withWeigher.foreach { weigher => gb = gb.weigher(weigher.asJava) }
+    builder.withRemovalListener.foreach { listener => gb = gb.removalListener(listener.asJava) }
+    builder.withInitialCapacity.foreach { cap => gb = gb.initialCapacity(cap) }
+    builder.withConcurrencyLevel.foreach { level => gb = gb.concurrencyLevel(level) }
+    builder.withMaximumSize.foreach { size => gb = gb.maximumSize(size) }
+    builder.withMaximumWeight.foreach { weight => gb = gb.maximumWeight(weight) }
+    builder.withWeakKeys.foreach { _ => gb = gb.weakKeys() }
+    builder.withWeakValues.foreach { _ => gb = gb.weakValues() }
+    builder.withSoftValues.foreach { _ => gb = gb.softValues() }
+    builder.withExpireAfterWrite.foreach { case (duration, unit) => gb = gb.expireAfterWrite(duration, unit) }
+    builder.withExpireAfterAccess.foreach { case (duration, unit) => gb = gb.expireAfterAccess(duration, unit) }
+    builder.withRefreshAfterWrite.foreach { case (duration, unit) => gb = gb.refreshAfterWrite(duration, unit) }
+    builder.withTicker.foreach { ticker => gb = gb.ticker(ticker.asJava) }
+    builder.withRecordStats.foreach { _ => gb = gb.recordStats() }
     return gb
   }
 }

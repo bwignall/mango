@@ -79,8 +79,8 @@ class TreeTraverserTest extends FunSpec with Matchers {
   val be_ = BinaryTree('e', null, bf_)
   val bd_ = BinaryTree('d', bb_, be_)
 
-  def treeAsString(tree: Iterable[Tree]): String = tree.foldLeft(""){ case (str, tree) => str + tree.value }
-  def bTreeAsString(tree: Iterable[BinaryTree]): String = tree.foldLeft(""){ case (str, tree) => str + tree.value }
+  def treeAsString(tree: Iterable[Tree]): String = tree.foldLeft("") { case (str, tree) => str + tree.value }
+  def bTreeAsString(tree: Iterable[BinaryTree]): String = tree.foldLeft("") { case (str, tree) => str + tree.value }
 
   describe("A TreeTraverser") {
     it("should be able traverse the tree in preOrder") {

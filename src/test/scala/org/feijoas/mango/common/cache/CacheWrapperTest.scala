@@ -27,7 +27,7 @@ import org.feijoas.mango.common.cache.Cache._
 import org.scalatest._
 import org.scalatest.mockito.MockitoSugar
 import org.junit.Assert._
-import com.google.common.cache.{ Cache => GuavaCache }
+import com.google.common.cache.{Cache => GuavaCache}
 
 /**
  * Tests for [[CacheWrapper]]
@@ -35,7 +35,12 @@ import com.google.common.cache.{ Cache => GuavaCache }
  *  @author Markus Schneider
  *  @since 0.7
  */
-class CacheWrapperTest extends FlatSpec with CacheWrapperBehaviour with Matchers with MockitoSugar with CacheStatsMatcher {
+class CacheWrapperTest
+    extends FlatSpec
+    with CacheWrapperBehaviour
+    with Matchers
+    with MockitoSugar
+    with CacheStatsMatcher {
 
   def wrappedCacheFixture = {
     val wrapped = mock[GuavaCache[String, Int]]
@@ -45,7 +50,7 @@ class CacheWrapperTest extends FlatSpec with CacheWrapperBehaviour with Matchers
 
   behavior of "CacheWrapper"
 
-  "LoadingCacheWrapper" should behave like forwardingWrapper(wrappedCacheFixture)
+  ("LoadingCacheWrapper" should behave).like(forwardingWrapper(wrappedCacheFixture))
 
   it should "implement getIfPresent" in {
 
@@ -55,13 +60,13 @@ class CacheWrapperTest extends FlatSpec with CacheWrapperBehaviour with Matchers
     val one = new Object()
     val two = new Object()
 
-    cache getIfPresent (one) should be(None)
+    cache.getIfPresent(one) should be(None)
     cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(0), hitCount(0))
     cache.asMap.get(one) should be(None)
     cache.asMap.contains(one) should be(false)
     cache.asMap.values.toSet.contains(two) should be(false)
 
-    cache getIfPresent (two) should be(None)
+    cache.getIfPresent(two) should be(None)
     cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(0), hitCount(0))
     cache.asMap.get(one) should be(None)
     cache.asMap.contains(one) should be(false)
@@ -74,7 +79,7 @@ class CacheWrapperTest extends FlatSpec with CacheWrapperBehaviour with Matchers
     cache.asMap.contains(one) should be(true)
     cache.asMap.values.toSet.contains(two) should be(true)
 
-    cache getIfPresent (two) should be(None)
+    cache.getIfPresent(two) should be(None)
     cache.stats should have(missCount(3), loadSuccessCount(0), loadExceptionCount(0), hitCount(1))
     cache.asMap.get(two) should be(None)
     cache.asMap.contains(two) should be(false)
