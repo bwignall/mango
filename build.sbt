@@ -22,6 +22,10 @@ ThisBuild / tlCiDocCheck := true
 // Not currently bothering to generate/check headers
 ThisBuild / tlCiHeaderCheck := false
 
+// scalac
+
+ThisBuild / tlFatalWarnings := false
+
 /** Scala */
 val Scala212 = "2.12.19"
 val Scala213 = "2.13.13"
