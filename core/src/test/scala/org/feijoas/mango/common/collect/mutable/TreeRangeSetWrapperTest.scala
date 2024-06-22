@@ -41,6 +41,6 @@ class TreeRangeSetWrapperTest extends AnyFreeSpec with RangeSetBehaviors with Ra
     behave.like(rangeSet(TreeRangeSetWrapper.newBuilder[Int, Int.type]))
     behave.like(mutableRangeSet(TreeRangeSetWrapper.newBuilder[Int, Int.type]))
     behave.like(rangeSetWithBuilder(TreeRangeSetWrapper.newBuilder[Int, Int.type]))
-    behave.like(mutableWrapper(((guava: GuavaRangeSet[AsOrdered[Int]])) => TreeRangeSetWrapper[Int, Int.type](guava)))
+    behave.like(mutableWrapper((guava: GuavaRangeSet[AsOrdered[Int]]) => TreeRangeSetWrapper[Int, Int.type](guava)))
   }
 }

@@ -61,8 +61,8 @@ private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetW
   }
 
   override def enclosesAll(other: org.feijoas.mango.common.collect.RangeSet[C, O]): Boolean = other match {
-    case wrapper: RangeSetWrapperLike[C, O, _] => delegate.enclosesAll(wrapper.delegate)
-    case _                                     => super.enclosesAll(other)
+    case wrapper: RangeSetWrapperLike[C, O, Repr] => delegate.enclosesAll(wrapper.delegate)
+    case _                                        => super.enclosesAll(other)
   }
 
   override def span(): Option[Range[C, O]] = if (delegate.isEmpty) {

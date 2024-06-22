@@ -24,8 +24,6 @@ package org.feijoas.mango.common.collect
 
 import org.feijoas.mango.common.annotations.Beta
 
-import scala.collection.mutable
-
 /** Implementation trait for [[RangeMap]]
  *
  *  $rangeMapNote
@@ -113,7 +111,7 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
    *  `#asMapOfRanges()`.
    */
   override def equals(obj: Any): Boolean = obj match {
-    case other: RangeMap[_, _, _] => asMapOfRanges() == other.asMapOfRanges()
+    case other: RangeMap[K, V, O] => asMapOfRanges() == other.asMapOfRanges()
     case _                        => false
   }
 
@@ -125,5 +123,5 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
    */
   override def toString: String = asMapOfRanges().toString()
 
-  def newBuilder: mutable.Builder[(Range[K, O], V), Repr]
+  def newBuilder: scala.collection.mutable.Builder[(Range[K, O], V), Repr]
 }

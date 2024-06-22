@@ -28,9 +28,9 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
+import java.lang
 import scala.jdk.CollectionConverters.IterableHasAsJava
 import scala.jdk.CollectionConverters.IterableHasAsScala
-import java.lang
 
 /**
  * Views elements of a type {@code T} as nodes in a tree, and provides methods to traverse the trees
@@ -161,5 +161,5 @@ private[mango] case class AsMangoTreeTraverser[T](delegate: cgcc.TreeTraverser[T
     extends TreeTraverser[T]
     with Serializable {
   checkNotNull(delegate)
-  final override def children: T => Iterable[T] = { ((root: T)) => delegate.children(root).asScala }
+  final override def children: T => Iterable[T] = { (root: T) => delegate.children(root).asScala }
 }

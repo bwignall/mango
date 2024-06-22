@@ -37,7 +37,7 @@ import scala.math.Ordering.Int
 /** Tests for [[ImmutableRangeSetWrapperTest]]
  *
  *  @author Markus Schneider
- *  @since 0.8
+ *  @since 0.8 
  */
 class ImmutableRangeSetWrapperTest extends AnyFreeSpec with RangeSetBehaviors with RangeSetWrapperBehaviours {
 
@@ -58,7 +58,7 @@ class ImmutableRangeSetWrapperTest extends AnyFreeSpec with RangeSetBehaviors wi
       (fst should be).theSameInstanceAs(snd)
     }
     behave.like(
-      immutableWrapper(((guava: GuavaRangeSet[AsOrdered[Int]])) => ImmutableRangeSetWrapper[Int, Int.type](guava))
+      immutableWrapper((guava: GuavaRangeSet[AsOrdered[Int]]) => ImmutableRangeSetWrapper[Int, Int.type](guava))
     )
   }
 }

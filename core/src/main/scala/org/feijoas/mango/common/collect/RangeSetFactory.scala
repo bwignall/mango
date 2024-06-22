@@ -61,5 +61,5 @@ trait RangeSetFactory[Repr[C, O <: Ordering[C]] <: RangeSet[C, O] with RangeSetL
 
   /** Returns a new builder for a range set.
    */
-  def newBuilder[C, O <: Ordering[C]](implicit ord: O): mutable.Builder[Range[C, O], Repr[C, O]]
+  def newBuilder[C, O <: Ordering[C]](implicit ord: O): scala.collection.mutable.Builder[Range[C, O], Repr[C, O]]
 }

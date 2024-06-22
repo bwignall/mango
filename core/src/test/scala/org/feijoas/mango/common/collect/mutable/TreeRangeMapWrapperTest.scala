@@ -44,7 +44,7 @@ class TreeRangeMapWrapperTest extends AnyFreeSpec with RangeMapBehaviors with Ra
   "A ImmutableRangeMapWrapper" - {
     behave.like(aMutableRangeMapLike(TreeRangeMapWrapper.newBuilder[Int, String, Int.type]))
     behave.like(
-      mutableWrapper(((guava: gcc.RangeMap[AsOrdered[Int], String])) => TreeRangeMapWrapper[Int, String, Int.type](guava))
+      mutableWrapper((guava: gcc.RangeMap[AsOrdered[Int], String]) => TreeRangeMapWrapper[Int, String, Int.type](guava))
     )
     "it should create a copy if RangeMap(same type of immutable range map) is called" in {
       val fst = TreeRangeMapWrapper(Range.open(3, 4) -> "a")

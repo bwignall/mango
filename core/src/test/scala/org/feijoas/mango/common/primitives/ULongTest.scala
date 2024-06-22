@@ -106,13 +106,13 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #toString" in {
-      forAll { ((a: Long)) =>
+      forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).toString
         ULong.fromLongBits(a).toString should be(expected)
       }
     }
     "should implement #toString(radix)" in {
-      forAll { ((a: Long)) =>
+      forAll { (a: Long) =>
         for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
           val expected = UnsignedLong.fromLongBits(a).toString(radix)
           ULong.fromLongBits(a).toString(radix) should be(expected)
@@ -120,31 +120,31 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #toInt" in {
-      forAll { ((a: Long)) =>
+      forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).intValue()
         ULong.fromLongBits(a).toInt should be(expected)
       }
     }
     "should implement #toLong" in {
-      forAll { ((a: Long)) =>
+      forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).longValue()
         ULong.fromLongBits(a).toLong should be(expected)
       }
     }
     "should implement #toFloat" in {
-      forAll { ((a: UnsignedLong)) =>
+      forAll { (a: UnsignedLong) =>
         val expected = UnsignedLong.fromLongBits(a.longValue()).floatValue()
         ULong.fromLongBits(a.longValue()).toFloat should be(expected)
       }
     }
     "should implement #toDouble" in {
-      forAll { ((a: UnsignedLong)) =>
+      forAll { (a: UnsignedLong) =>
         val expected = UnsignedLong.fromLongBits(a.longValue()).doubleValue()
         ULong.fromLongBits(a.longValue()).toDouble should be(expected)
       }
     }
     "should implement #toBigInt" in {
-      forAll { ((a: Long)) =>
+      forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).bigIntegerValue()
         ULong.fromLongBits(a).toBigInt.longValue should be(expected.longValue)
       }
@@ -157,7 +157,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #asScala" in {
       import ULong._
-      forAll { ((bits: Long)) =>
+      forAll { (bits: Long) =>
         val guava: UnsignedLong = UnsignedLong.fromLongBits(bits)
         val mango: ULong = guava.asScala
         mango.toLong should be(guava.longValue)
@@ -165,7 +165,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #asJava" in {
       import ULong._
-      forAll { ((bits: Long)) =>
+      forAll { (bits: Long) =>
         val mango: ULong = ULong.fromLongBits(bits)
         val guava: UnsignedLong = mango.asJava
         mango.toLong should be(guava.longValue)
@@ -173,7 +173,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
 
     "should be serializable" in {
-      forAll { ((bits: Long)) =>
+      forAll { (bits: Long) =>
         val ulong = ULong.fromLongBits(bits)
         SerializableTester.reserializeAndAssert(ulong)
         ulong should be(ULong.fromLongBits(bits))

@@ -173,8 +173,8 @@ private[mango] case class CountingCacheLoader(var loadCnt: Int = 0, var reloadCn
     reloadCnt = reloadCnt + 1
     Future { oldValue }
   }
-  override def loadAll(keys: Iterable[Int]): Map[Int,Int] = {
+  override def loadAll(keys: Iterable[Int]): Map[Int, Int] = {
     loadAllCnt = loadAllCnt + 1
-    keys.map { ((key: Int)) => (key, key * key) }.toMap
+    keys.map { (key: Int) => (key, key * key) }.toMap
   }
 }

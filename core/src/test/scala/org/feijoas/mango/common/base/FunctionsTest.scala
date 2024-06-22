@@ -47,16 +47,16 @@ class FunctionsTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
 
   it should "map a Guava Function to a Scala Function" in {
     val cf: Int => String = SomeFunction.asScala
-    forAll { ((n: Int)) => cf(n) should be(n.toString) }
+    forAll { (n: Int) => cf(n) should be(n.toString) }
   }
 
   it should "map a Scala Function to a Guava Function" in {
-    val gf: GuavaFunction[Int, String] = { ((i: Int)) => i.toString }.asJava
-    forAll { ((n: Int)) => gf(n) should be(n.toString) }
+    val gf: GuavaFunction[Int, String] = { (i: Int) => i.toString }.asJava
+    forAll { (n: Int) => gf(n) should be(n.toString) }
   }
 
   it should "not wrap Scala function twice" in {
-    val cf = ((i: Int)) => i.toString
+    val cf = (i: Int) => i.toString
     val gf: GuavaFunction[Int, String] = cf.asJava
 
     val wrappedTwice: Int => String = gf.asScala
@@ -76,7 +76,7 @@ class FunctionsTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
     val cf1: Int => String = gf1.asScala
     SerializableTester.reserialize(cf1)
 
-    val cf2 = ((i: Int)) => i.toString
+    val cf2 = (i: Int) => i.toString
     val gf2: GuavaFunction[Int, String] = cf2.asJava
     SerializableTester.reserialize(gf2)
   }
@@ -87,7 +87,7 @@ class FunctionsTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
     import java.util.concurrent.Callable
     import org.feijoas.mango.common.base.Functions._
 
-    forAll { ((n: Int)) =>
+    forAll { (n: Int) =>
       val callable: Callable[Int] = { () => n }.asJava
       callable.call() should be(n)
     }
@@ -98,7 +98,7 @@ class FunctionsTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
   it should "wrap a function in a Runnable" in {
     import org.feijoas.mango.common.base.Functions._
 
-    forAll { ((n: Int)) =>
+    forAll { (n: Int) =>
       var result = 0 // the runnable will write this variable
 
       val runnable: Runnable = { () => { result = n; } }.asJava

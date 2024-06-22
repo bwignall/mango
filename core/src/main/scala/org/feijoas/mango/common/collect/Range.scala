@@ -157,7 +157,7 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
    *  this range.
    */
   def containsAll(values: Iterable[T]): Boolean = {
-    val it = values.view.map { ((v: T)) => AsOrdered(v) }
+    val it = values.view.map { (v: T) => AsOrdered(v) }
     range.containsAll(it.asJava)
   }
 
@@ -500,7 +500,7 @@ object Range {
   @throws[NoSuchElementException]
   @throws[NullPointerException]
   def encloseAll[T, O <: Ordering[T]](values: Iterable[T])(implicit ord: O): Range[T, O] = {
-    val it = values.view.map { ((v: T)) => AsOrdered(v) }
+    val it = values.view.map { (v: T) => AsOrdered(v) }
     Range(GuavaRange.encloseAll(it.asJava))
   }
 

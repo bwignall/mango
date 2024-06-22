@@ -490,12 +490,12 @@ object CacheBuilder {
    *  with default settings, including strong keys, strong values,
    *  and no automatic eviction of any kind.
    */
-  def cache[K, V](f: K => V): LoadingCache[K,V] = newBuilder().build(f)
+  def cache[K, V](f: K => V): LoadingCache[K, V] = newBuilder().build(f)
 
   /** Constructs a new [[CacheBuilder]] instance with default settings, including strong keys,
    *  strong values, and no automatic eviction of any kind.
    */
-  def apply(): CacheBuilder[Any,Any] = newBuilder()
+  def apply(): CacheBuilder[Any, Any] = newBuilder()
 
   /** Constructs a new [[CacheBuilder]] instance with default settings, including strong keys,
    *  strong values, and no automatic eviction of any kind.

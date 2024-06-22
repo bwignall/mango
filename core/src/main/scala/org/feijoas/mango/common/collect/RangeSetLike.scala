@@ -140,7 +140,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    *  according to `Range#equals(Any)`.
    */
   override def equals(obj: Any): Boolean = obj match {
-    case other: RangeSet[_, _] => asRanges() == other.asRanges()
+    case other: RangeSet[C, O] => asRanges() == other.asRanges()
     case _                     => false
   }
 
@@ -162,5 +162,5 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
     builder.toString()
   }
 
-  def newBuilder: mutable.Builder[Range[C, O], Repr]
+  def newBuilder: scala.collection.mutable.Builder[Range[C, O], Repr]
 }

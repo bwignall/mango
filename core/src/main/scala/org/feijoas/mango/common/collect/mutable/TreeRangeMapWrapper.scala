@@ -43,7 +43,7 @@ private[mango] class TreeRangeMapWrapper[K, V, O <: Ordering[K]] private (guava:
     with RangeMapWrapperLike[K, V, O, TreeRangeMapWrapper[K, V, O]] {
 
   override def delegate = guava
-  override def factory: gcc.RangeMap[AsOrdered[K],V] => TreeRangeMapWrapper[K,V,O] = TreeRangeMapWrapper(_)(ordering)
+  override def factory: gcc.RangeMap[AsOrdered[K], V] => TreeRangeMapWrapper[K, V, O] = TreeRangeMapWrapper(_)(ordering)
   override def newBuilder: mutable.Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]] =
     TreeRangeMapWrapper.newBuilder(ordering)
 }

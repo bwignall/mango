@@ -56,7 +56,7 @@ private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeM
   override def isEmpty: Boolean = delegate.asMapOfRanges().isEmpty
   override def subRangeMap(range: Range[K, O]): Repr = factory(delegate.subRangeMap(range.asJava))
 
-  override def getEntry(key: K): Option[(Range[K,O], V)] = {
+  override def getEntry(key: K): Option[(Range[K, O], V)] = {
     val entry = delegate.getEntry(key)
     if (entry == null)
       None
@@ -64,14 +64,14 @@ private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeM
       Some((Range(entry.getKey), entry.getValue))
   }
 
-  override def span(): Option[Range[K,O]] = {
+  override def span(): Option[Range[K, O]] = {
     if (isEmpty)
       None
     else
       Some(Range(delegate.span()))
   }
 
-  override def asMapOfRanges(): Map[Range[K,O],V] = {
+  override def asMapOfRanges(): Map[Range[K, O], V] = {
     // TODO: Change this as soon as we have wrappers for immutable collections
     val gmap = delegate.asMapOfRanges().asScala
     val builder = Map.newBuilder[Range[K, O], V]

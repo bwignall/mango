@@ -31,19 +31,19 @@ import org.scalatest.matchers._
  */
 trait CacheStatsMatcher {
 
-  def hitCount(expectedValue: Long): HavePropertyMatcher[CacheStats,Long] =
+  def hitCount(expectedValue: Long): HavePropertyMatcher[CacheStats, Long] =
     new HavePropertyMatcher[CacheStats, Long] {
       def apply(stats: CacheStats) =
         HavePropertyMatchResult(stats.hitCount == expectedValue, "hitCount", expectedValue, stats.hitCount)
     }
 
-  def missCount(expectedValue: Long): HavePropertyMatcher[CacheStats,Long] =
+  def missCount(expectedValue: Long): HavePropertyMatcher[CacheStats, Long] =
     new HavePropertyMatcher[CacheStats, Long] {
       def apply(stats: CacheStats) =
         HavePropertyMatchResult(stats.missCount == expectedValue, "missCount", expectedValue, stats.missCount)
     }
 
-  def loadSuccessCount(expectedValue: Long): HavePropertyMatcher[CacheStats,Long] =
+  def loadSuccessCount(expectedValue: Long): HavePropertyMatcher[CacheStats, Long] =
     new HavePropertyMatcher[CacheStats, Long] {
       def apply(stats: CacheStats) = HavePropertyMatchResult(stats.loadSuccessCount == expectedValue,
                                                              "loadSuccessCount",
@@ -52,7 +52,7 @@ trait CacheStatsMatcher {
       )
     }
 
-  def loadExceptionCount(expectedValue: Long): HavePropertyMatcher[CacheStats,Long] =
+  def loadExceptionCount(expectedValue: Long): HavePropertyMatcher[CacheStats, Long] =
     new HavePropertyMatcher[CacheStats, Long] {
       def apply(stats: CacheStats) = HavePropertyMatchResult(stats.loadExceptionCount == expectedValue,
                                                              "loadExceptionCount",
@@ -61,7 +61,7 @@ trait CacheStatsMatcher {
       )
     }
 
-  def totalLoadTime(expectedValue: Long): HavePropertyMatcher[CacheStats,Long] =
+  def totalLoadTime(expectedValue: Long): HavePropertyMatcher[CacheStats, Long] =
     new HavePropertyMatcher[CacheStats, Long] {
       def apply(stats: CacheStats) = HavePropertyMatchResult(stats.totalLoadTime == expectedValue,
                                                              "totalLoadTime",
@@ -70,7 +70,7 @@ trait CacheStatsMatcher {
       )
     }
 
-  def evictionCount(expectedValue: Long): HavePropertyMatcher[CacheStats,Long] =
+  def evictionCount(expectedValue: Long): HavePropertyMatcher[CacheStats, Long] =
     new HavePropertyMatcher[CacheStats, Long] {
       def apply(stats: CacheStats) = HavePropertyMatchResult(stats.evictionCount == expectedValue,
                                                              "evictionCount",

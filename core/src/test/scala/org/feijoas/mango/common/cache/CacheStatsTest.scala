@@ -54,7 +54,7 @@ class CacheStatsTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks wit
 
   it should "have the same members and function values as Guava-CacheStats" in {
 
-    forAll(cacheStatsGen) { ((guava: GuavaCacheStats)) =>
+    forAll(cacheStatsGen) { (guava: GuavaCacheStats) =>
       val mango: CacheStats = guava.asScala
 
       // check members

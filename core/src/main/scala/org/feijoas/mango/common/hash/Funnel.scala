@@ -29,8 +29,8 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
-import java.nio.charset.Charset
 import java.lang
+import java.nio.charset.Charset
 
 /**
  * A `Funnel` is a type class for an object which can send data from an object

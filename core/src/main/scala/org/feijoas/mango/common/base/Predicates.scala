@@ -135,7 +135,7 @@ object Predicates {
    */
   private[mango] case class XorPredicate[T](px: Seq[T => Boolean]) extends (T => Boolean) {
     checkNotNull(px)
-    private val xor = px.reduceLeft[T => Boolean]((acc, fnc) => ((arg: T)) => fnc(arg) != acc(arg))
+    private val xor = px.reduceLeft[T => Boolean]((acc, fnc) => (arg: T) => fnc(arg) != acc(arg))
     override def apply(arg: T): Boolean = xor(arg)
     override def toString: String = px.mkString("Xor(", ",", ")")
     override def hashCode: Int = px.hashCode + 0x75bcf4d
@@ -194,7 +194,7 @@ object Predicates {
       return alwaysFalse
 
     predicates match {
-      case s: immutable.Seq[_] => AndPredicate(s)
+      case s: immutable.Seq[T] => AndPredicate[T](s)
       case _                   => AndPredicate(immutable.Seq() ++ predicates)
     }
   }
@@ -230,7 +230,7 @@ object Predicates {
       return alwaysFalse
 
     predicates match {
-      case s: immutable.Seq[_] => OrPredicate(s)
+      case s: immutable.Seq[T] => OrPredicate[T](s)
       case _                   => OrPredicate(immutable.Seq() ++ predicates)
     }
   }
@@ -264,7 +264,7 @@ object Predicates {
       return alwaysFalse
 
     predicates match {
-      case s: immutable.Seq[_] => XorPredicate(s)
+      case s: immutable.Seq[T] => XorPredicate[T](s)
       case _                   => XorPredicate(immutable.Seq() ++ predicates)
     }
   }
@@ -309,7 +309,7 @@ object Predicates {
    */
   def subtypeOf(clazz: Class[?]): Class[?] => Boolean = {
     checkNotNull(clazz)
-    ((arg: Class[?])) => arg != null && clazz.isAssignableFrom(arg)
+    (arg: Class[?]) => arg != null && clazz.isAssignableFrom(arg)
   }
 
   /**
@@ -324,7 +324,7 @@ object Predicates {
    */
   def in[T](coll: Seq[T]): T => Boolean = {
     checkNotNull(coll)
-    ((arg: T)) => coll.contains(arg)
+    (arg: T) => coll.contains(arg)
   }
 
   /**
@@ -380,6 +380,6 @@ object Predicates {
    */
   implicit def asMangoPredicateConverter[T](pred: GuavaPredicate[T]): AsScala[T => Boolean] = {
     checkNotNull(pred)
-    new AsScala(((arg: T)) => pred.apply(arg))
+    new AsScala((arg: T) => pred.apply(arg))
   }
 }

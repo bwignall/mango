@@ -30,7 +30,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 import scala.math.Ordering.Int
 
-/** Tests for [[RangeSetFactoryTest]]
+/** Tests for [[RangeSetFactoryTest]] 
  *
  *  @author Markus Schneider
  *  @since 0.8

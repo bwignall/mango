@@ -88,13 +88,13 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #toString" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).toString
         UInt.fromIntBits(a).toString should be(expected)
       }
     }
     "should implement #toString(radix)" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
           val expected = UnsignedInteger.fromIntBits(a).toString(radix)
           UInt.fromIntBits(a).toString(radix) should be(expected)
@@ -102,38 +102,38 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #toLong" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).longValue()
         UInt.fromIntBits(a).toLong should be(expected)
       }
     }
     "should implement #toInt" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).intValue()
         UInt.fromIntBits(a).toInt should be(expected)
       }
     }
     "should implement #toFloat" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).floatValue()
         UInt.fromIntBits(a).toFloat should be(expected)
       }
     }
     "should implement #toDouble" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).doubleValue()
         UInt.fromIntBits(a).toDouble should be(expected)
       }
     }
     "should implement #toBigInt" in {
-      forAll { ((a: Int)) =>
+      forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).bigIntegerValue()
         UInt.fromIntBits(a).toBigInt.longValue should be(expected.longValue)
       }
     }
     "should implement #asScala" in {
       import UInt._
-      forAll { ((bits: Int)) =>
+      forAll { (bits: Int) =>
         val guava: UnsignedInteger = UnsignedInteger.fromIntBits(bits)
         val mango: UInt = guava.asScala
         mango.toLong should be(guava.longValue)
@@ -147,7 +147,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #asJava" in {
       import UInt._
-      forAll { ((bits: Int)) =>
+      forAll { (bits: Int) =>
         val mango: UInt = UInt.fromIntBits(bits)
         val guava: UnsignedInteger = mango.asJava
         mango.toLong should be(guava.longValue)
@@ -198,7 +198,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #valueOf(String)" in {
-      forAll(posNum[Long]) { ((a: Long)) =>
+      forAll(posNum[Long]) { (a: Long) =>
         val str = a.toString
         val expected = UnsignedInteger.valueOf(str).intValue()
         UInt.valueOf(str).toInt should be(expected)
@@ -208,7 +208,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #valueOf(String,Int)" in {
-      forAll(posNum[Long]) { ((a: Long)) =>
+      forAll(posNum[Long]) { (a: Long) =>
         for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
           val str = java.lang.Long.toString(a, radix)
           val expected = UnsignedInts.parseUnsignedInt(str, radix)
@@ -293,7 +293,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
         UInt.fromIntBits(0x5a4316b8L.toInt),
         UInt.fromIntBits(0xff1a618bL.toInt),
         UInt.fromIntBits(0L.toInt)
-      ) should be(UInt.fromIntBits(0xff1a618bL toInt))
+      ) should be(UInt.fromIntBits(0xff1a618bL.toInt))
     }
     "should implement #join" in {
       import UInt._

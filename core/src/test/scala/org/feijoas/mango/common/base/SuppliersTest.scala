@@ -85,7 +85,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
   }
 
   it should "be thread-safe" in {
-    val memoizer = ((supplier: () => Boolean)) => memoize(supplier)
+    val memoizer = (supplier: () => Boolean) => memoize(supplier)
     testSupplierThreadSafe(memoizer)
   }
 
@@ -112,7 +112,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
 
   it should "be thread-safe" in {
     val memoizer =
-      ((supplier: () => Boolean)) => memoizeWithExpiration(supplier, java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+      (supplier: () => Boolean) => memoizeWithExpiration(supplier, java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
     testSupplierThreadSafe(memoizer)
   }
 
@@ -121,7 +121,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
   it should "be serializable" in {
     import org.feijoas.mango.common.base.Suppliers._
 
-    val gs: GuavaSupplier[Int] = { () => 1 } asJava
+    val gs: GuavaSupplier[Int] = { () => 1 }.asJava
     val cs: () => Int = {
       new GuavaSupplier[Int] with Serializable {
         override def get() = 1
