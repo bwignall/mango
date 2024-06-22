@@ -151,13 +151,13 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
   /** Equivalent to `#contains`; provided only to satisfy the Predicate (`T => Boolean`) interface. When
    *  using a reference of type {@code Range}, always invoke `#contains` directly instead.
    */
-  override def apply(input: T) = contains(input)
+  override def apply(input: T): Boolean = contains(input)
 
   /** Returns {@code true} if every element in {@code values} is contained in
    *  this range.
    */
   def containsAll(values: Iterable[T]): Boolean = {
-    val it = values.view.map { (v: T) => AsOrdered(v) }
+    val it = values.view.map { ((v: T)) => AsOrdered(v) }
     range.containsAll(it.asJava)
   }
 
@@ -279,8 +279,8 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
    *  listed in the class documentation).
    */
   override def toString = range.toString
-  override def hashCode = 31 * range.hashCode + ord.hashCode
-  override def equals(that: Any) = that match {
+  override def hashCode: Int = 31 * range.hashCode + ord.hashCode
+  override def equals(that: Any): Boolean = that match {
     case other: Range[T, O] => range.equals(other.range) && ord.equals(other.ord)
     case _                  => false
   }
@@ -500,7 +500,7 @@ object Range {
   @throws[NoSuchElementException]
   @throws[NullPointerException]
   def encloseAll[T, O <: Ordering[T]](values: Iterable[T])(implicit ord: O): Range[T, O] = {
-    val it = values.view.map { (v: T) => AsOrdered(v) }
+    val it = values.view.map { ((v: T)) => AsOrdered(v) }
     Range(GuavaRange.encloseAll(it.asJava))
   }
 

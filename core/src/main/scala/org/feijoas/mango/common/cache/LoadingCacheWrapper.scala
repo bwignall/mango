@@ -50,7 +50,7 @@ protected[mango] trait LoadingCacheWrapper[K, V] extends CacheWrapper[K, V] with
     // TODO: Change this as soon as we have wrappers for Guavas ImmutableMap
     immutable.Map.empty ++ map
   }
-  override def getIfPresent(key: K) = Option(cache.getIfPresent(key))
+  override def getIfPresent(key: K): Option[V] = Option(cache.getIfPresent(key))
 }
 
 private[mango] object LoadingCacheWrapper {

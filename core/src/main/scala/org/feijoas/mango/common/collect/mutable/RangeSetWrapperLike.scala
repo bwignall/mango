@@ -39,16 +39,16 @@ private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetW
     with RangeSet[C, O] {
   self =>
 
-  override def add(range: Range[C, O]) = delegate.add(range.asJava)
-  override def remove(range: Range[C, O]) = delegate.remove(range.asJava)
-  override def clear() = delegate.clear()
+  override def add(range: Range[C, O]): Unit = delegate.add(range.asJava)
+  override def remove(range: Range[C, O]): Unit = delegate.remove(range.asJava)
+  override def clear(): Unit = delegate.clear()
 
-  override def addAll(other: RangeSet[C, O]) = other match {
+  override def addAll(other: RangeSet[C, O]): Unit = other match {
     case that: RangeSetWrapperLike[C, O, _] => delegate.addAll(that.delegate)
     case _                                  => super.addAll(other)
   }
 
-  override def removeAll(other: RangeSet[C, O]) = other match {
+  override def removeAll(other: RangeSet[C, O]): Unit = other match {
     case that: RangeSetWrapperLike[C, O, _] => delegate.removeAll(that.delegate)
     case _                                  => super.removeAll(other)
   }

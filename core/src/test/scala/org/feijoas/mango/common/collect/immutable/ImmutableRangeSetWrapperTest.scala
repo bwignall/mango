@@ -58,7 +58,7 @@ class ImmutableRangeSetWrapperTest extends AnyFreeSpec with RangeSetBehaviors wi
       (fst should be).theSameInstanceAs(snd)
     }
     behave.like(
-      immutableWrapper((guava: GuavaRangeSet[AsOrdered[Int]]) => ImmutableRangeSetWrapper[Int, Int.type](guava))
+      immutableWrapper(((guava: GuavaRangeSet[AsOrdered[Int]])) => ImmutableRangeSetWrapper[Int, Int.type](guava))
     )
   }
 }

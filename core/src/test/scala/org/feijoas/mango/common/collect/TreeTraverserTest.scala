@@ -35,7 +35,7 @@ class TreeTraverserTest extends AnyFunSpec with Matchers {
   case class Tree(value: Char, children: Tree*)
   case class BinaryTree(value: Char, left: BinaryTree, right: BinaryTree)
 
-  val traverser: TreeTraverser[Tree] = TreeTraverser((node: Tree) => node.children)
+  val traverser: TreeTraverser[Tree] = TreeTraverser(((node: Tree)) => node.children)
 
   //        h
   //      / | \

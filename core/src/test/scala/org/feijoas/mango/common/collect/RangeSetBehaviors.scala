@@ -444,7 +444,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
   }
 
   def rangeSet(newBuilder: => Builder[Range[Int, Int.type], RangeSet[Int, Int.type]]): Unit = {
-    val build: Iterable[Range[Int, Int.type]] => RangeSet[Int, Int.type] = { ranges: Iterable[Range[Int, Int.type]] =>
+    val build: Iterable[Range[Int, Int.type]] => RangeSet[Int, Int.type] = { (ranges: Iterable[Range[Int, Int.type]]) =>
       (newBuilder ++= ranges).result()
     }
 
@@ -455,7 +455,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "when #contains(Int) is called it should be false" in {
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet contains i should be(false)
           }
         }
@@ -526,7 +526,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "when #encloses is called with a singleton Range it should be false" in {
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.encloses(Range.singleton(i)) should be(false)
           }
         }
@@ -662,7 +662,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             complement.contains(i) should be(true)
           }
         }
@@ -674,7 +674,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.contains(i) should be(!complement.contains(i))
           }
         }
@@ -686,7 +686,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.contains(i) should be(!complement.contains(i))
           }
         }
@@ -698,7 +698,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.contains(i) should be(!complement.contains(i))
           }
         }
@@ -710,7 +710,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.contains(i) should be(!complement.contains(i))
           }
         }
@@ -722,7 +722,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.contains(i) should be(!complement.contains(i))
           }
         }
@@ -734,7 +734,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           val complement = rangeSet.complement()
           complement should be(expected)
 
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.contains(i) should be(!complement.contains(i))
           }
         }
@@ -796,7 +796,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "#rangeContaining should return no range" in {
-          forAll { i: Int =>
+          forAll { (i: Int) =>
             rangeSet.rangeContaining(i) should be(None)
           }
         }

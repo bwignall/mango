@@ -137,7 +137,7 @@ private[mango] case class MemoizingSupplier[T](f: () => T) extends (() => T) wit
   import org.feijoas.mango.common.base.Suppliers._
   private val delegate = GuavaSuppliers.memoize(f.asJava)
   override def apply(): T = delegate.get()
-  override def toString = "Suppliers.memoize(" + f + ")"
+  override def toString: String = "Suppliers.memoize(" + f + ")"
 }
 
 // visible for testing
@@ -148,14 +148,14 @@ private[mango] case class ExpiringMemoizingSupplier[T](f: () => T, duration: Lon
   import org.feijoas.mango.common.base.Suppliers._
   private val delegate = GuavaSuppliers.memoizeWithExpiration(f.asJava, duration, unit)
   override def apply(): T = delegate.get()
-  override def toString = "Suppliers.memoizeWithExpiration(" + f + ", " + duration + ", " + unit + ")"
+  override def toString: String = "Suppliers.memoizeWithExpiration(" + f + ", " + duration + ", " + unit + ")"
 }
 
 // visible for testing
 @SerialVersionUID(1L)
 private[mango] case class ThreadSafeSupplier[T](f: () => T) extends (() => T) with Serializable {
   override def apply(): T = f.synchronized { f() }
-  override def toString = "Suppliers.synchronizedSupplier(" + f + ")"
+  override def toString: String = "Suppliers.synchronizedSupplier(" + f + ")"
 }
 
 /** Wraps a Scala function in a Guava `Supplier`
@@ -163,7 +163,7 @@ private[mango] case class ThreadSafeSupplier[T](f: () => T) extends (() => T) wi
 @SerialVersionUID(1L)
 private[mango] case class AsGuavaSupplier[T](delegate: () => T) extends GuavaSupplier[T] with Serializable {
   checkNotNull(delegate)
-  override def get() = delegate()
+  override def get(): T = delegate()
 }
 
 /** Wraps a Guava `Supplier` in a Scala function
@@ -171,5 +171,5 @@ private[mango] case class AsGuavaSupplier[T](delegate: () => T) extends GuavaSup
 @SerialVersionUID(1L)
 private[mango] case class AsMangoSupplier[T](delegate: GuavaSupplier[T]) extends (() => T) with Serializable {
   checkNotNull(delegate)
-  override def apply() = delegate.get()
+  override def apply(): T = delegate.get()
 }

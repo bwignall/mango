@@ -50,7 +50,7 @@ object Ticker {
 
   /** A ticker that reads the current time using `System#nanoTime`.
    */
-  def systemTicker() = GuavaTicker.systemTicker().asScala
+  def systemTicker(): Ticker = GuavaTicker.systemTicker().asScala
 
   /** Adds an `asJava` method that wraps a Mango `Ticker` in
    *  a Guava `Ticker`.

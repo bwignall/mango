@@ -46,7 +46,7 @@ object UInt {
 
   /** Maximum value an UInt can represent
    */
-  val MaxValue = fromIntBits(-1)
+  val MaxValue: UInt = fromIntBits(-1)
 
   /** Returns an {@code UInt} that is equal to {@code value},
    *  if possible. The inverse operation of {@code #toLong}.
@@ -230,7 +230,7 @@ object UInt {
   /** Ordering that compares the two specified {@code UInt} values.
    */
   implicit object UIntOrdering extends Ordering[UInt] {
-    def compare(x: UInt, y: UInt) = UnsignedInts.compare(x.value, y.value)
+    def compare(x: UInt, y: UInt): Int = UnsignedInts.compare(x.value, y.value)
   }
 
   /** Adds an `asJava` method that converts a Mango `UInt` to a
@@ -323,7 +323,7 @@ final class UInt private (val value: Int) extends AnyVal with Ordered[UInt] with
    *  If {@code radix < Character.MIN_RADIX} or {@code radix > Character.MAX_RADIX}, the radix
    *  {@code 10} is used.
    */
-  def toString(radix: Int) = UnsignedInts.toString(value, radix)
+  def toString(radix: Int): String = UnsignedInts.toString(value, radix)
 
   /** Returns the value of this {@code UInt} as a {@code Long}, when treated as unsigned.
    */

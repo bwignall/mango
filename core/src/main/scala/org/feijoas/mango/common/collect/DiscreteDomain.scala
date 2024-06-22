@@ -123,8 +123,8 @@ object DiscreteDomain {
     }
 
     override def distance(start: Int, end: Int): Long = end.toLong - start
-    override def minValue() = Some(Int.MinValue)
-    override def maxValue() = Some(Int.MaxValue)
+    override def minValue(): Option[Int] = Some(Int.MinValue)
+    override def maxValue(): Option[Int] = Some(Int.MaxValue)
     override def toString = "DiscreteDomains.ints()"
   }
 
@@ -155,8 +155,8 @@ object DiscreteDomain {
       result
     }
 
-    override def minValue() = Some(Long.MinValue)
-    override def maxValue() = Some(Long.MaxValue)
+    override def minValue(): Option[Long] = Some(Long.MinValue)
+    override def maxValue(): Option[Long] = Some(Long.MaxValue)
     override def toString = "DiscreteDomains.longs()"
   }
 

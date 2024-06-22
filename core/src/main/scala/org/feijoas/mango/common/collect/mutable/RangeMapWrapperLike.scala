@@ -42,11 +42,11 @@ private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeM
     with RangeMap[K, V, O] {
   self =>
 
-  override def clear() = delegate.clear()
-  override def remove(range: Range[K, O]) = delegate.remove(range.asJava)
-  override def put(range: Range[K, O], value: V) = delegate.put(range.asJava, value)
+  override def clear(): Unit = delegate.clear()
+  override def remove(range: Range[K, O]): Unit = delegate.remove(range.asJava)
+  override def put(range: Range[K, O], value: V): Unit = delegate.put(range.asJava, value)
 
-  override def putAll(rangeMap: collect.RangeMap[K, V, O]) = rangeMap match {
+  override def putAll(rangeMap: collect.RangeMap[K, V, O]): Unit = rangeMap match {
     case that: RangeMapWrapperLike[K, V, O, _] => delegate.putAll(that.delegate)
     case _                                     => super.putAll(rangeMap)
   }

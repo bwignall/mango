@@ -140,7 +140,7 @@ class LoadingCacheWrapperTest
   }
 
   it should "load values if not present" in {
-    val cache = CacheBuilder.newBuilder().recordStats().build((a: Any) => a)
+    val cache = CacheBuilder.newBuilder().recordStats().build(((a: Any)) => a)
     cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key1 = new Object()
@@ -264,7 +264,7 @@ class LoadingCacheWrapperTest
     val bulkLoader = new CacheLoader[Int, Int]() {
       override def load(key: Int): Int = key
       override def loadAll(keys: Iterable[Int]): Map[Int, Int] = {
-        keys.map { (key: Int) => (key, load(key)) }.toMap
+        keys.map { ((key: Int)) => (key, load(key)) }.toMap
       }
     }
 
@@ -362,7 +362,7 @@ class LoadingCacheWrapperTest
 
   it should "fail if the loader throws an error" in {
     val e = new Error()
-    val loader = (_: Any) => throw e
+    val loader = ((_: Any)) => throw e
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
     cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
@@ -444,7 +444,7 @@ class LoadingCacheWrapperTest
     val cache = CacheBuilder
       .newBuilder()
       .recordStats()
-      .build((_: Any) => null)
+      .build(((_: Any)) => null)
     cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
@@ -589,7 +589,7 @@ class LoadingCacheWrapperTest
 
   it should "fail if the loader throws an Error" in {
     val error = new Error()
-    val cache = CacheBuilder.newBuilder().recordStats().build((_: Any) => throw error)
+    val cache = CacheBuilder.newBuilder().recordStats().build(((_: Any)) => throw error)
     cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
@@ -726,7 +726,7 @@ class LoadingCacheWrapperTest
 
   it should "throw an UncheckedExecutionException in #getUncheched if loader throws an Exception" in {
     val e = new Exception
-    val loader = (_: Any) => throw e
+    val loader = ((_: Any)) => throw e
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
     cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
@@ -864,7 +864,7 @@ class LoadingCacheWrapperTest
 
   it should "return Failure if #load throws an unchecked exception" in {
     val e = new RuntimeException()
-    val cache = CacheBuilder.newBuilder().recordStats().build((_: Any) => throw e)
+    val cache = CacheBuilder.newBuilder().recordStats().build(((_: Any)) => throw e)
     cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
@@ -1356,7 +1356,7 @@ class LoadingCacheWrapperTest
     val refreshKey = "refresh"
     val suffix = "Suffix"
 
-    val computeFunction = (key: String) => {
+    val computeFunction = ((key: String)) => {
       computationStarted.countDown()
       letGetFinishSignal.await()
       key + suffix
@@ -1406,7 +1406,7 @@ class LoadingCacheWrapperTest
     val refreshKey = "refresh"
     val suffix = "Suffix"
 
-    val computeFunction = (key: String) => {
+    val computeFunction = ((key: String)) => {
       computationStarted.countDown()
       letGetFinishSignal.await()
       key + suffix

@@ -44,8 +44,8 @@ private[mango] class TreeRangeSetWrapper[C, O <: Ordering[C]] private (guava: Gu
     with RangeSetWrapperLike[C, O, TreeRangeSetWrapper[C, O]] {
 
   override def delegate = guava
-  override def factory = TreeRangeSetWrapper(_)(ordering)
-  override def newBuilder = TreeRangeSetWrapper.newBuilder[C, O](ordering)
+  override def factory: GuavaRangeSet[AsOrdered[C]] => TreeRangeSetWrapper[C,O] = TreeRangeSetWrapper(_)(ordering)
+  override def newBuilder: Builder[Range[C,O],TreeRangeSetWrapper[C,O]] = TreeRangeSetWrapper.newBuilder[C, O](ordering)
 }
 
 private[mango] object TreeRangeSetWrapper extends RangeSetFactory[TreeRangeSetWrapper] {
@@ -56,7 +56,7 @@ private[mango] object TreeRangeSetWrapper extends RangeSetFactory[TreeRangeSetWr
 
   /** Returns a new builder for a range set.
    */
-  def newBuilder[C, O <: Ordering[C]](implicit ord: O) = new Builder[Range[C, O], TreeRangeSetWrapper[C, O]]() {
+  def newBuilder[C, O <: Ordering[C]](implicit ord: O): Builder[Range[C,O],TreeRangeSetWrapper[C,O]] = new Builder[Range[C, O], TreeRangeSetWrapper[C, O]]() {
     var builder = TreeRangeSet.create[AsOrdered[C]]()
     override def addOne(range: Range[C, O]): this.type = {
       builder.add(range.asJava)

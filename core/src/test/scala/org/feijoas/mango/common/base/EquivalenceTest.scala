@@ -53,10 +53,10 @@ class EquivalenceTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
 }
 
 private[mango] object SignumEquiv extends Equiv[Int] {
-  def equiv(x: Int, y: Int) = x.sign == y.sign
+  def equiv(x: Int, y: Int): Boolean = x.sign == y.sign
 }
 
 private[mango] object SignumEquivalence extends gcm.Equivalence[Int] {
-  def doEquivalent(x: Int, y: Int) = x.sign == y.sign
-  def doHash(x: Int) = 2 * x
+  def doEquivalent(x: Int, y: Int): Boolean = x.sign == y.sign
+  def doHash(x: Int): Int = 2 * x
 }

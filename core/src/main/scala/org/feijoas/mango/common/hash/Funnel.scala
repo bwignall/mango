@@ -30,6 +30,7 @@ import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
 import java.nio.charset.Charset
+import java.lang
 
 /**
  * A `Funnel` is a type class for an object which can send data from an object
@@ -174,7 +175,7 @@ object Funnel {
 @SerialVersionUID(1L)
 private[mango] case class AsGuavaFunnel[T](f: Funnel[T]) extends cgch.Funnel[T] with Serializable {
   checkNotNull(f)
-  override def funnel(from: T, into: PrimitiveSink) = f.funnel(from, into)
+  override def funnel(from: T, into: PrimitiveSink): Unit = f.funnel(from, into)
 }
 
 /**
@@ -183,19 +184,19 @@ private[mango] case class AsGuavaFunnel[T](f: Funnel[T]) extends cgch.Funnel[T] 
 @SerialVersionUID(1L)
 private[mango] case class AsScalaFunnel[T](f: cgch.Funnel[T]) extends Funnel[T] with Serializable {
   checkNotNull(f)
-  override def funnel(from: T, into: PrimitiveSink) = f.funnel(from, into)
+  override def funnel(from: T, into: PrimitiveSink): Unit = f.funnel(from, into)
 }
 
 @SerialVersionUID(1L)
 private[mango] object LongFunnel extends Funnel[Long] with Serializable {
-  val delegate = cgch.Funnels.longFunnel()
-  override def funnel(from: Long, into: PrimitiveSink) = delegate.funnel(from, into)
+  val delegate: cgch.Funnel[lang.Long] = cgch.Funnels.longFunnel()
+  override def funnel(from: Long, into: PrimitiveSink): Unit = delegate.funnel(from, into)
   override def toString = delegate.toString
 }
 
 @SerialVersionUID(1L)
 private[mango] object IntFunnel extends Funnel[Int] with Serializable {
-  val delegate = cgch.Funnels.integerFunnel()
-  override def funnel(from: Int, into: PrimitiveSink) = delegate.funnel(from, into)
+  val delegate: cgch.Funnel[Integer] = cgch.Funnels.integerFunnel()
+  override def funnel(from: Int, into: PrimitiveSink): Unit = delegate.funnel(from, into)
   override def toString = delegate.toString
 }

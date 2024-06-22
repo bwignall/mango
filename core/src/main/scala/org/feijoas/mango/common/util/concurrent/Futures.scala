@@ -212,12 +212,12 @@ private[mango] case class AsMangoFuture[T](delegate: ListenableFuture[T]) extend
     }
 
   def transformWith[S](f: Try[T] => Future[S])(implicit executor: ExecutionContext): Future[S] = {
-    val fnc: Try[T] => Try[S] = (t: Try[T]) => f(t).value.get
+    val fnc: Try[T] => Try[S] = ((t: Try[T])) => f(t).value.get
     transform(fnc)(executor)
   }
 
   def transform[S](f: Try[T] => Try[S])(implicit executor: ExecutionContext): Future[S] = {
-    val fnc = (t: T) => f(Try(t)).get
+    val fnc = ((t: T)) => f(Try(t)).get
     val lf: ListenableFuture[S] = GuavaFutures.transform(delegate, AsGuavaFunction(fnc), executor.execute _)
     Futures.asScalaFutureConverter(lf).asScala
   }

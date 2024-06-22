@@ -53,7 +53,7 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
 
   /** Puts all the associations from `rangeMap` into this range map.
    */
-  def putAll(rangeMap: collect.RangeMap[K, V, O]) = rangeMap.asMapOfRanges().foreach { case (range, value) =>
+  def putAll(rangeMap: collect.RangeMap[K, V, O]): Unit = rangeMap.asMapOfRanges().foreach { case (range, value) =>
     put(range, value)
   }
 

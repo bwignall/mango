@@ -427,7 +427,7 @@ private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
 
     it should "contain only values within the range" in {
 
-      forAll { n: Int =>
+      forAll { (n: Int) =>
         whenever((n != start && n != end) && (n < start - 10 || n > end + 10)) {
           if (n < start || n > end) {
             range.contains(n) should be(false)

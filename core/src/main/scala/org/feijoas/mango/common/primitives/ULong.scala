@@ -149,7 +149,7 @@ object ULong {
 
   /** Maximum value an ULong can represent
    */
-  val MaxValue = fromLongBits(-1L)
+  val MaxValue: ULong = fromLongBits(-1L)
 
   /** Returns an {@code ULong} representing the same value as the specified {@code Long}.
    *
@@ -335,7 +335,7 @@ object ULong {
   /** Ordering that compares the two specified {@code ULong} values.
    */
   implicit object ULongOrdering extends Ordering[ULong] {
-    def compare(x: ULong, y: ULong) = UnsignedLongs.compare(x.value, y.value)
+    def compare(x: ULong, y: ULong): Int = UnsignedLongs.compare(x.value, y.value)
   }
 
   /** Adds an `asJava` method that converts a Mango `ULong` to a

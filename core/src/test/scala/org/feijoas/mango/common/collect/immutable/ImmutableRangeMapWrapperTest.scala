@@ -48,7 +48,7 @@ class ImmutableRangeMapWrapperTest extends AnyFreeSpec with RangeMapBehaviors wi
       (fst should be).theSameInstanceAs(snd)
     }
     behave.like(
-      immutableWrapper((guava: gcc.RangeMap[AsOrdered[Int], String]) =>
+      immutableWrapper(((guava: gcc.RangeMap[AsOrdered[Int], String])) =>
         ImmutableRangeMapWrapper[Int, String, Int.type](guava)
       )
     )

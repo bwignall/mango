@@ -41,8 +41,8 @@ import scala.util.Try
  */
 class LoadingCacheTest extends AnyFlatSpec with Matchers with MockitoSugar {
 
-  def fixture = {
-    val loader = (key: String) => 100 / key.length
+  def fixture: (String => Int, MapLoadingCache[String,Int]) = {
+    val loader = ((key: String)) => 100 / key.length
     val cache = new MapLoadingCache(loader)
     (loader, cache)
   }

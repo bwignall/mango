@@ -45,7 +45,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   behavior of "CacheBuilder"
 
   it should "create a new LoadingCache if build is called with a loader" in {
-    val loader = (_: String) => 1
+    val loader = ((_: String)) => 1
     val cache: LoadingCache[String, Int] = CacheBuilder
       .newBuilder()
       .removalListener(CountingRemovalListener())
@@ -68,7 +68,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
       .newBuilder()
       .maximumSize(0)
       .removalListener(listener)
-      .build((any: Any) => any)
+      .build(((any: Any)) => any)
 
     cache.size() should be(0)
 
@@ -110,7 +110,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   }
 
   it should "accept the smallest possible value" in {
-    CacheBuilder().initialCapacity(0).build((_: String) => 0)
+    CacheBuilder().initialCapacity(0).build(((_: String)) => 0)
   }
 
   it should "accept the largest possible value" in {
@@ -136,7 +136,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   }
 
   it should "accept the smallest possible value" in {
-    CacheBuilder().concurrencyLevel(1).build((_: String) => 0)
+    CacheBuilder().concurrencyLevel(1).build(((_: String)) => 0)
   }
 
   it should "accept the largest possible value" in {
@@ -187,7 +187,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   it should "throw a IllegalStateException if called without #weigher" in {
     val builder = CacheBuilder().maximumWeight(1)
     intercept[IllegalStateException] {
-      builder.build((_: String) => 0)
+      builder.build(((_: String)) => 0)
     }
   }
 
@@ -196,7 +196,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   it should "throw a IllegalStateException if called without #maximumWeight" in {
     val builder = CacheBuilder().weigher((_: Any, _: Any) => 42)
     intercept[IllegalStateException] {
-      builder.build((_: String) => 0)
+      builder.build(((_: String)) => 0)
     }
   }
 
@@ -254,7 +254,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   }
 
   it should "accept the smallest possible value" in {
-    CacheBuilder().expireAfterWrite(1, NANOSECONDS).build((_: String) => 0)
+    CacheBuilder().expireAfterWrite(1, NANOSECONDS).build(((_: String)) => 0)
     // must not blow up
   }
 
@@ -275,7 +275,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   }
 
   it should "accept the smallest possible value" in {
-    CacheBuilder().expireAfterAccess(1, NANOSECONDS).build((_: String) => 0)
+    CacheBuilder().expireAfterAccess(1, NANOSECONDS).build(((_: String)) => 0)
     // must not blow up
   }
 
@@ -283,7 +283,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
     CacheBuilder()
       .expireAfterWrite(1, NANOSECONDS)
       .expireAfterAccess(1, NANOSECONDS)
-      .build((_: String) => 0)
+      .build(((_: String)) => 0)
     // must not blow up
   }
 
@@ -316,7 +316,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   behavior of "CacheBuilder#removalListener"
 
   it should "throw a IllegalStateException if called twice" in {
-    val listener = (_: RemovalNotification[Any, Any]) => {}
+    val listener = ((_: RemovalNotification[Any, Any])) => {}
     val builder = CacheBuilder().removalListener(listener)
     intercept[IllegalStateException] {
       builder.removalListener(listener)
@@ -377,7 +377,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   }
 
   it should "forward the call on recordStats" in {
-    val cache = CacheBuilder().recordStats().build((any: Any) => any)
+    val cache = CacheBuilder().recordStats().build(((any: Any)) => any)
     cache.get("foo")
     cache.stats() match {
       case CacheStats(0, 1, 1, 0, _, 0) => // OK
@@ -390,7 +390,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
   }
 
   it should "forward the call on removalListener" in {
-    val listener = (_: RemovalNotification[Any, Any]) => {}
+    val listener = ((_: RemovalNotification[Any, Any])) => {}
     testNotNull("removalListener", CacheBuilder().removalListener(listener))
   }
 

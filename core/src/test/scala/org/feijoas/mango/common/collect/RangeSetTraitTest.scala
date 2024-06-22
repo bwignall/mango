@@ -41,7 +41,8 @@ class RangeSetTraitTest extends AnyFreeSpec with RangeSetBehaviors {
 
   /** Returns a new builder for a range set.
    */
-  def newBuilder[C, O <: Ordering[C]](implicit ord: O) = new Builder[Range[C, O], DummyRangeSet[C, O]]() {
+  def newBuilder[C, O <: Ordering[C]](implicit ord: O): newBuilder[C, O] = new newBuilder[C, O](ord)
+  class newBuilder[C, O <: Ordering[C]](ord: O) extends Builder[Range[C, O], DummyRangeSet[C, O]]() {
     var guavaBuilder = ImmutableRangeSet.builder[AsOrdered[C]]()
     override def addOne(range: Range[C, O]): this.type = {
       guavaBuilder.add(range.asJava)
@@ -89,5 +90,5 @@ private[mango] class DummyRangeSet[C, O <: Ordering[C]] private[mango] (
 
   override def complement(): RangeSet[C, O] = new DummyRangeSet[C, O](rset.complement())
   override def subRangeSet(view: Range[C, O]) = new DummyRangeSet[C, O](rset.subRangeSet(view.asJava))
-  override def newBuilder = throw new NotImplementedError
+  override def newBuilder: Builder[Range[C,O],RangeSet[C,O]] = throw new NotImplementedError
 }

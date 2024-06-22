@@ -30,6 +30,7 @@ import org.feijoas.mango.common.convert.AsScala
 
 import scala.jdk.CollectionConverters.IterableHasAsJava
 import scala.jdk.CollectionConverters.IterableHasAsScala
+import java.lang
 
 /**
  * Views elements of a type {@code T} as nodes in a tree, and provides methods to traverse the trees
@@ -149,7 +150,7 @@ private[mango] case class AsGuavaTreeTraverser[T](delegate: TreeTraverser[T])
     extends cgcc.TreeTraverser[T]
     with Serializable {
   checkNotNull(delegate)
-  final override def children(root: T) = delegate.children(root).asJava
+  final override def children(root: T): lang.Iterable[T] = delegate.children(root).asJava
 }
 
 /**
@@ -160,5 +161,5 @@ private[mango] case class AsMangoTreeTraverser[T](delegate: cgcc.TreeTraverser[T
     extends TreeTraverser[T]
     with Serializable {
   checkNotNull(delegate)
-  final override def children: T => Iterable[T] = { (root: T) => delegate.children(root).asScala }
+  final override def children: T => Iterable[T] = { ((root: T)) => delegate.children(root).asScala }
 }

@@ -38,9 +38,9 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
  */
 class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
-  val isEven: Int => Boolean = (n: Int) => n % 2 == 0
-  val isOdd: Int => Boolean = (n: Int) => n % 2 != 0
-  val neverReach: Any => Boolean = { (_: Any) =>
+  val isEven: Int => Boolean = ((n: Int)) => n % 2 == 0
+  val isOdd: Int => Boolean = ((n: Int)) => n % 2 != 0
+  val neverReach: Any => Boolean = { ((_: Any)) =>
     {
       fail("should never reach this code")
     }
@@ -49,18 +49,18 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
   behavior of "Predicates"
 
   "alwaysTrue" should "should always return true" in {
-    forAll { (n: AnyVal) => alwaysTrue(n) should be(true) }
+    forAll { ((n: AnyVal)) => alwaysTrue(n) should be(true) }
     alwaysTrue(null) should be(true)
   }
 
   "alwaysFalse" should "should always return false" in {
-    forAll { (n: AnyVal) => alwaysFalse(n) should be(false) }
+    forAll { ((n: AnyVal)) => alwaysFalse(n) should be(false) }
     alwaysFalse(null) should be(false)
   }
 
   "not" should "return !predicate(arg)" in {
     val notIsEven = Predicates.not(isEven)
-    forAll { (n: Int) => notIsEven(n) should be(isOdd(n)) }
+    forAll { ((n: Int)) => notIsEven(n) should be(isOdd(n)) }
   }
 
   "not alwaysTrue" should "be the same instance as alwaysFalse" in {
@@ -85,26 +85,26 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
 
   "and with one arg" should "be the same as the arg itself" in {
     val andIsEven = and(List(isEven))
-    forAll { (n: Int) => andIsEven(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => andIsEven(n) should be(isEven(n)) }
   }
 
   "and" should "meat the requirements with 2 args" in {
-    forAll { (n: Int) => and(isEven, alwaysTrue)(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(alwaysTrue, isEven)(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(alwaysFalse, neverReach)(n) should be(false) }
+    forAll { ((n: Int)) => and(isEven, alwaysTrue)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(alwaysTrue, isEven)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(alwaysFalse, neverReach)(n) should be(false) }
   }
 
   "and" should "meat the requirements with 3 args" in {
-    forAll { (n: Int) => and(isEven, alwaysTrue, alwaysTrue)(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(alwaysTrue, isEven, alwaysTrue)(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(alwaysTrue, alwaysTrue, isEven)(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(alwaysTrue, alwaysFalse, neverReach)(n) should be(false) }
+    forAll { ((n: Int)) => and(isEven, alwaysTrue, alwaysTrue)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(alwaysTrue, isEven, alwaysTrue)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(alwaysTrue, alwaysTrue, isEven)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(alwaysTrue, alwaysFalse, neverReach)(n) should be(false) }
   }
 
   "and" should "meat the requirements with Seq" in {
-    forAll { (n: Int) => and(List(isEven))(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(List(alwaysTrue, isEven))(n) should be(isEven(n)) }
-    forAll { (n: Int) => and(List(alwaysFalse, neverReach))(n) should be(false) }
+    forAll { ((n: Int)) => and(List(isEven))(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(List(alwaysTrue, isEven))(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => and(List(alwaysFalse, neverReach))(n) should be(false) }
   }
 
   "and" should "defensively copy mutable Seq" in {
@@ -130,26 +130,26 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
 
   "or with one arg" should "be the same as the arg itself" in {
     val orIsEven = or(List(isEven))
-    forAll { (n: Int) => orIsEven(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => orIsEven(n) should be(isEven(n)) }
   }
 
   "or" should "meat the requirements with 2 args" in {
-    forAll { (n: Int) => or(isEven, alwaysFalse)(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(alwaysFalse, isEven)(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(alwaysTrue, neverReach)(n) should be(true) }
+    forAll { ((n: Int)) => or(isEven, alwaysFalse)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(alwaysFalse, isEven)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(alwaysTrue, neverReach)(n) should be(true) }
   }
 
   "or" should "meat the requirements with 3 args" in {
-    forAll { (n: Int) => or(isEven, alwaysFalse, alwaysFalse)(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(alwaysFalse, isEven, alwaysFalse)(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(alwaysFalse, alwaysFalse, isEven)(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(alwaysFalse, alwaysTrue, neverReach)(n) should be(true) }
+    forAll { ((n: Int)) => or(isEven, alwaysFalse, alwaysFalse)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(alwaysFalse, isEven, alwaysFalse)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(alwaysFalse, alwaysFalse, isEven)(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(alwaysFalse, alwaysTrue, neverReach)(n) should be(true) }
   }
 
   "or" should "meat the requirements with Seq" in {
-    forAll { (n: Int) => or(List(isEven))(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(List(alwaysFalse, isEven))(n) should be(isEven(n)) }
-    forAll { (n: Int) => or(List(alwaysTrue, neverReach))(n) should be(true) }
+    forAll { ((n: Int)) => or(List(isEven))(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(List(alwaysFalse, isEven))(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => or(List(alwaysTrue, neverReach))(n) should be(true) }
   }
 
   "or" should "defensively copy mutable Seq" in {
@@ -175,23 +175,23 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
 
   "xor with one arg" should "be the same as the arg itself" in {
     val xorIsEven = xor(List(isEven))
-    forAll { (n: Int) => xorIsEven(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => xorIsEven(n) should be(isEven(n)) }
   }
 
   "xor" should "meat the requirements with 2 args" in {
-    forAll { (n: Int) => xor(isEven, isEven)(n) should be(false) }
-    forAll { (n: Int) => xor(isOdd, isEven)(n) should be(true) }
+    forAll { ((n: Int)) => xor(isEven, isEven)(n) should be(false) }
+    forAll { ((n: Int)) => xor(isOdd, isEven)(n) should be(true) }
   }
 
   "xor" should "meat the requirements with 3 args" in {
-    forAll { (n: Int) => xor(isEven, isOdd, alwaysFalse)(n) should be(xor(isEven, xor(isOdd, alwaysFalse))(n)) }
-    forAll { (n: Int) => xor(isEven, isOdd, alwaysFalse)(n) should be(xor(xor(isEven, isOdd), alwaysFalse)(n)) }
+    forAll { ((n: Int)) => xor(isEven, isOdd, alwaysFalse)(n) should be(xor(isEven, xor(isOdd, alwaysFalse))(n)) }
+    forAll { ((n: Int)) => xor(isEven, isOdd, alwaysFalse)(n) should be(xor(xor(isEven, isOdd), alwaysFalse)(n)) }
   }
 
   "xor" should "meat the requirements with Seq" in {
-    forAll { (n: Int) => xor(List(isEven))(n) should be(isEven(n)) }
-    forAll { (n: Int) => xor(List(isEven, isEven))(n) should be(false) }
-    forAll { (n: Int) => xor(List(isEven, isOdd))(n) should be(true) }
+    forAll { ((n: Int)) => xor(List(isEven))(n) should be(isEven(n)) }
+    forAll { ((n: Int)) => xor(List(isEven, isEven))(n) should be(false) }
+    forAll { ((n: Int)) => xor(List(isEven, isOdd))(n) should be(true) }
   }
 
   "xor" should "defensively copy mutable Seq" in {
@@ -214,23 +214,23 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
   "equalTo(1)" should "be equal to ?==1" in {
     val eq1 = equalTo(1)
     eq1(1) should be(true)
-    forAll { (n: Int) => eq1(n) should be(n == 1) }
+    forAll { ((n: Int)) => eq1(n) should be(n == 1) }
   }
 
   "equalTo(null)" should "be equal to ?==null" in {
     val equalToNull = equalTo[Any](null)
     equalToNull(null) should be(true)
-    forAll { (n: AnyVal) => equalToNull(n) should be(false) }
+    forAll { ((n: AnyVal)) => equalToNull(n) should be(false) }
   }
 
   "equalTo" should " be equal/have same hash if content is equal" in {
-    forAll { (n: AnyVal) => equalTo(n) should be(equalTo(n)) }
-    forAll { (n: AnyVal) => equalTo(n).hashCode should be(equalTo(n).hashCode) }
+    forAll { ((n: AnyVal)) => equalTo(n) should be(equalTo(n)) }
+    forAll { ((n: AnyVal)) => equalTo(n).hashCode should be(equalTo(n).hashCode) }
   }
 
   "subtypeOf(classOf[Int])" should "be true for Class[Int]" in {
     val isInt = subtypeOf(classOf[Int])
-    forAll { (n: Int) => isInt(n.getClass) should be(true) }
+    forAll { ((n: Int)) => isInt(n.getClass) should be(true) }
     isInt("".getClass) should be(false)
     isInt(null) should be(false)
   }
@@ -243,12 +243,12 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
 
   "isNull" should "return true only for null" in {
     isNull(null) should be(true)
-    forAll { (n: AnyVal) => isNull(n) should be(false) }
+    forAll { ((n: AnyVal)) => isNull(n) should be(false) }
   }
 
   "notNull" should "return never return true for null" in {
     notNull(null) should be(false)
-    forAll { (n: AnyVal) => notNull(n) should be(true) }
+    forAll { ((n: AnyVal)) => notNull(n) should be(true) }
   }
 
   "in" should "test weather the values is in the collection" in {
@@ -300,6 +300,6 @@ class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCh
   }
 
   "Predicates" should "convert a Scala function T => Boolean to a Guava Predicate[T]" in {
-    val _: GuavaPredicate[Any] = { (_: Any) => true }.asJava
+    val _: GuavaPredicate[Any] = { ((_: Any)) => true }.asJava
   }
 }

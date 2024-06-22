@@ -161,7 +161,7 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
         }
       } yield map.updated(key, value)
     }*/
-    Try { keys.toSet.map((k: K) => (k, get(k).get)).toMap }
+    Try { keys.toSet.map(((k: K)) => (k, get(k).get)).toMap }
   }
 
   /** Returns the value associated with `key` in this cache, first loading that value if

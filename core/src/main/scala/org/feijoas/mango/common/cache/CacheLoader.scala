@@ -119,7 +119,7 @@ trait CacheLoader[K, V] {
    */
   def loadAll(keys: Iterable[K]): immutable.Map[K, V] = {
     checkNotNull(keys)
-    keys.map { (key: K) => (key, load(key)) }.toMap
+    keys.map { ((key: K)) => (key, load(key)) }.toMap
   }
 }
 

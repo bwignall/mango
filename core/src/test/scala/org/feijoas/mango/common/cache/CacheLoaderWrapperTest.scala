@@ -45,7 +45,8 @@ class CacheLoaderWrapperTest extends AnyFlatSpec with Matchers {
 
   behavior of "CacheLoaderWrapper"
 
-  def fixture = new {
+  def fixture: fixture = new fixture()
+  class fixture() extends {
     val cacheLoader = new CountingCacheLoader
     val wrapper: GuavaCacheLoader[Int, Int] = cacheLoader.asJava
   }
@@ -164,16 +165,16 @@ private[mango] case class CountingCacheLoader(var loadCnt: Int = 0, var reloadCn
     extends CacheLoader[Int, Int] {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  override def load(key: Int) = synchronized {
+  override def load(key: Int): Int = synchronized {
     loadCnt = loadCnt + 1
     key * key
   }
-  override def reload(key: Int, oldValue: Int) = {
+  override def reload(key: Int, oldValue: Int): Future[Int] = {
     reloadCnt = reloadCnt + 1
     Future { oldValue }
   }
-  override def loadAll(keys: Iterable[Int]) = {
+  override def loadAll(keys: Iterable[Int]): Map[Int,Int] = {
     loadAllCnt = loadAllCnt + 1
-    keys.map { (key: Int) => (key, key * key) }.toMap
+    keys.map { ((key: Int)) => (key, key * key) }.toMap
   }
 }

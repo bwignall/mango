@@ -50,7 +50,7 @@ private[mango] trait DiscreteDomainBehaviors extends ScalaCheckPropertyChecks wi
 
   def guavaDomain[C <: Comparable[?], T: Arbitrary: Shrink](domain: DiscreteDomain[T], guava: GuavaDiscreteDomain[C])(
     implicit view: T => C
-  ) = {
+  ): Unit = {
 
     it should "implement distance" in {
       forAll { (start: T, end: T) =>
@@ -59,7 +59,7 @@ private[mango] trait DiscreteDomainBehaviors extends ScalaCheckPropertyChecks wi
     }
 
     it should "implement next" in {
-      forAll { value: T =>
+      forAll { (value: T) =>
         val gn = guava.next(value)
         if (gn == null)
           domain.next(value) should be(None)
@@ -69,7 +69,7 @@ private[mango] trait DiscreteDomainBehaviors extends ScalaCheckPropertyChecks wi
     }
 
     it should "implement previous" in {
-      forAll { value: T =>
+      forAll { (value: T) =>
         val gn = guava.previous(value)
         if (gn == null)
           domain.previous(value) should be(None)

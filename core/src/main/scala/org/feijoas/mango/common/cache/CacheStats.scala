@@ -115,7 +115,7 @@ case class CacheStats(
    * Returns the number of times [[Cache]] lookup methods have returned either a cached or
    *  uncached value. This is defined as `hitCount + missCount`.
    */
-  def requestCount = hitCount + missCount
+  def requestCount: Long = hitCount + missCount
 
   /**
    * Returns the ratio of cache requests which were hits. This is defined as
@@ -146,7 +146,7 @@ case class CacheStats(
    *  values. This includes both successful load operations, as well as those that threw
    *  exceptions. This is defined as `loadSuccessCount + loadExceptionCount`.
    */
-  def loadCount = loadSuccessCount + loadExceptionCount
+  def loadCount: Long = loadSuccessCount + loadExceptionCount
 
   /**
    * Returns the ratio of cache loading attempts which threw exceptions. This is defined as
@@ -199,7 +199,7 @@ case class CacheStats(
     )
   }
 
-  override def toString = {
+  override def toString: String = {
     MoreObjects
       .toStringHelper(this)
       .add("hitCount", hitCount)

@@ -60,7 +60,7 @@ class RemovalNotificationTest extends AnyFlatSpec {
   /**
    * create a guava GuavaRemovalNotification via reflection
    */
-  def guavaNotification[K, V](key: K, value: V, cause: RemovalCause) = {
+  def guavaNotification[K, V](key: K, value: V, cause: RemovalCause): GuavaRemovalNotification[K,V] = {
     val ctors = classOf[GuavaRemovalNotification[K, V]].getDeclaredConstructors
     ctors.length should be(1)
     val ctor = ctors(0)

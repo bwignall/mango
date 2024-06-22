@@ -60,7 +60,7 @@ class RemovalListenerTest extends AnyFlatSpec {
 
     // create a which checks that the notification is the one we give
     // to the Guava listener
-    val listener = (n: RemovalNotification[String, String]) => {
+    val listener = ((n: RemovalNotification[String, String])) => {
       n should be(RemovalNotification(Option(key), Option(value), cause))
       called should be(false)
       called = true
