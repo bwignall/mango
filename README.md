@@ -1,8 +1,10 @@
 # The Mango library
 
 The purpose of the Mango library is to provide
-[Guava](https://code.google.com/p/guava-libraries/) (Google's core libraries) functionalities to Scala. This is primarily achieved through wrappers around Guava classes and converter between Java and Scala.
+[Guava](https://code.google.com/p/guava-libraries/) (Google's core libraries) functionalities to Scala 2.13. This is primarily achieved through wrappers around Guava classes and converter between Java and Scala.
 Also the package structure is intended to mirror the one from Guava.
+
+Note that references to `org.feijoas` are referring to the [original upstream repo](https://github.com/feijoas/mango).
 
 However there are differences from the Guava libraries:
  - Whenever `null` is in Guava to indicate the absence of a value we use `Option`
@@ -19,7 +21,7 @@ This is a beta version of the library. Many modules are not published yet becaus
 
 ## Downloading 
 
-Mango is programmed against `guava-20.0` using Scala 2.12. If you want to run the tests you will also need the `guava-testlib-20.0`.
+Mango is programmed against `guava-20.0` using Scala 2.13. If you want to run the tests you will also need the `guava-testlib-20.0`.
 
 To use the Mango library in [sbt](http://www.scala-sbt.org/) add the following dependency to your project file:
 
@@ -164,7 +166,7 @@ sbt test
 
 Besides the [Scaladoc](http://feijoas.github.io/mango/scaladoc) there is an excellent user guide [Guava Explained](https://code.google.com/p/guava-libraries/wiki/GuavaExplained) which should be sufficient for almost all questions.
 
- - Mango-Guava conversions: [Functions](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Functions$), [Optional](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Optional$), [Predicates] (http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Predicates$), [Suppliers](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Suppliers$), [Futures](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.util.concurrent.Futures$)
+ - Mango-Guava conversions: [Functions](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Functions$), [Optional](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Optional$), [Predicates](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Predicates$), [Suppliers](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Suppliers$), [Futures](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.util.concurrent.Futures$)
  - [Preconditions](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.base.Preconditions$): Test preconditions for your methods more easily.
  - [Caches](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.cache.CacheBuilder$): Local caching, done right, and supporting a wide variety of expiration behaviors.
  - [Ranges](http://feijoas.github.io/mango/scaladoc/index.html#org.feijoas.mango.common.collect.Range$): RangeSets/RangeMaps query, merge and manipulate ranges
