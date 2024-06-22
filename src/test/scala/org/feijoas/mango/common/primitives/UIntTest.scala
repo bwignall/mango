@@ -50,26 +50,26 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     "should implement +" in {
       forAll { (a: Int, b: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).plus(UnsignedInteger.fromIntBits(b))
-        (UInt.fromIntBits(a) + UInt.fromIntBits(b)).toInt() should be(expected.intValue)
+        (UInt.fromIntBits(a) + UInt.fromIntBits(b)).toInt should be(expected.intValue)
       }
     }
     "should implement -" in {
       forAll { (a: Int, b: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).minus(UnsignedInteger.fromIntBits(b))
-        (UInt.fromIntBits(a) - UInt.fromIntBits(b)).toInt() should be(expected.intValue)
+        (UInt.fromIntBits(a) - UInt.fromIntBits(b)).toInt should be(expected.intValue)
       }
     }
     "should implement *" in {
       forAll { (a: Int, b: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).times(UnsignedInteger.fromIntBits(b))
-        (UInt.fromIntBits(a) * UInt.fromIntBits(b)).toInt() should be(expected.intValue)
+        (UInt.fromIntBits(a) * UInt.fromIntBits(b)).toInt should be(expected.intValue)
       }
     }
     "should implement /" in {
       forAll { (a: Int, b: Int) =>
         whenever(b != 0) {
           val expected = UnsignedInteger.fromIntBits(a).dividedBy(UnsignedInteger.fromIntBits(b))
-          (UInt.fromIntBits(a) / UInt.fromIntBits(b)).toInt() should be(expected.intValue)
+          (UInt.fromIntBits(a) / UInt.fromIntBits(b)).toInt should be(expected.intValue)
         }
       }
       intercept[ArithmeticException] {
@@ -80,7 +80,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll { (a: Int, b: Int) =>
         whenever(b != 0) {
           val expected = UnsignedInteger.fromIntBits(a).mod(UnsignedInteger.fromIntBits(b))
-          UInt.fromIntBits(a).mod(UInt.fromIntBits(b)).toInt() should be(expected.intValue)
+          UInt.fromIntBits(a).mod(UInt.fromIntBits(b)).toInt should be(expected.intValue)
         }
       }
       intercept[ArithmeticException] {
@@ -104,31 +104,31 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     "should implement #toLong" in {
       forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).longValue()
-        UInt.fromIntBits(a).toLong() should be(expected)
+        UInt.fromIntBits(a).toLong should be(expected)
       }
     }
     "should implement #toInt" in {
       forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).intValue()
-        UInt.fromIntBits(a).toInt() should be(expected)
+        UInt.fromIntBits(a).toInt should be(expected)
       }
     }
     "should implement #toFloat" in {
       forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).floatValue()
-        UInt.fromIntBits(a).toFloat() should be(expected)
+        UInt.fromIntBits(a).toFloat should be(expected)
       }
     }
     "should implement #toDouble" in {
       forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).doubleValue()
-        UInt.fromIntBits(a).toDouble() should be(expected)
+        UInt.fromIntBits(a).toDouble should be(expected)
       }
     }
     "should implement #toBigInt" in {
       forAll { (a: Int) =>
         val expected = UnsignedInteger.fromIntBits(a).bigIntegerValue()
-        UInt.fromIntBits(a).toBigInt().longValue should be(expected.longValue)
+        UInt.fromIntBits(a).toBigInt.longValue should be(expected.longValue)
       }
     }
     "should implement #asScala" in {
@@ -136,7 +136,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll { (bits: Int) =>
         val guava: UnsignedInteger = UnsignedInteger.fromIntBits(bits)
         val mango: UInt = guava.asScala
-        mango.toLong() should be(guava.longValue)
+        mango.toLong should be(guava.longValue)
       }
     }
     "should implement #compare" in {
@@ -150,11 +150,11 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll { (bits: Int) =>
         val mango: UInt = UInt.fromIntBits(bits)
         val guava: UnsignedInteger = mango.asJava
-        mango.toLong() should be(guava.longValue)
+        mango.toLong should be(guava.longValue)
       }
     }
 
-    "should be serializeable" in {
+    "should be serializable" in {
       for (bits <- testInts) {
         SerializableTester.reserializeAndAssert(UInt.fromIntBits(bits))
       }
@@ -175,7 +175,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       for (value <- testLongs) {
         val expectSuccess = value >= min && value <= max
         try {
-          UInt.valueOf(value).toLong() should be(value)
+          UInt.valueOf(value).toLong should be(value)
           expectSuccess should be(true)
         } catch {
           case _: IllegalArgumentException => expectSuccess should be(false)
@@ -189,7 +189,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       for (value <- testLongs) {
         val expectSuccess = value >= min && value <= max
         try {
-          UInt.valueOf(BigInt(value)).toLong() should be(value)
+          UInt.valueOf(BigInt(value)).toLong should be(value)
           expectSuccess should be(true)
         } catch {
           case _: IllegalArgumentException => expectSuccess should be(false)
@@ -201,7 +201,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll(posNum[Long]) { (a: Long) =>
         val str = a.toString
         val expected = UnsignedInteger.valueOf(str).intValue()
-        UInt.valueOf(str).toInt() should be(expected)
+        UInt.valueOf(str).toInt should be(expected)
       }
       intercept[NumberFormatException] {
         UInt.valueOf(java.lang.Long.toString(1L << 32))
@@ -212,7 +212,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
         for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
           val str = java.lang.Long.toString(a, radix)
           val expected = UnsignedInts.parseUnsignedInt(str, radix)
-          UInt.valueOf(str, radix).toInt() should be(expected)
+          UInt.valueOf(str, radix).toInt should be(expected)
         }
 
         // loops through all legal radix values.
@@ -220,10 +220,10 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
           // tests can successfully parse a number string with this radix.
           val maxAsString = java.lang.Long.toString((1L << 32) - 1, radix)
           val expected = UnsignedInts.parseUnsignedInt(maxAsString, radix)
-          UInt.valueOf(maxAsString, radix).toInt() should be(expected)
+          UInt.valueOf(maxAsString, radix).toInt should be(expected)
 
           intercept[NumberFormatException] {
-            // tests that we get exception whre an overflow would occur.
+            // tests that we get exception where an overflow would occur.
             val overflow: Long = 1L << 32
             val overflowAsString = java.lang.Long.toString(overflow, radix)
             UInt.valueOf(overflowAsString, radix)
@@ -246,12 +246,12 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #decode" in {
-      UInt.decode("0xffffffff").toInt() should be(0xffffffff)
-      UInt.decode("#12345678").toInt() should be(0x12345678)
-      UInt.decode("76543210").toInt() should be(76543210)
-      UInt.decode("0x13579135").toInt() should be(0x13579135)
-      UInt.decode("0X13579135").toInt() should be(0x13579135)
-      UInt.decode("0").toInt() should be(0)
+      UInt.decode("0xffffffff").toInt should be(0xffffffff)
+      UInt.decode("#12345678").toInt should be(0x12345678)
+      UInt.decode("76543210").toInt should be(76543210)
+      UInt.decode("0x13579135").toInt should be(0x13579135)
+      UInt.decode("0X13579135").toInt should be(0x13579135)
+      UInt.decode("0").toInt should be(0)
 
       intercept[NumberFormatException] {
         UInt.decode("0xfffffffff")
@@ -319,7 +319,7 @@ class UIntTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
 
       val comparator = UInt.lexicographicalComparator()
 
-      for (i <- 0 until valuesInExpectedOrder.size) {
+      for (i <- valuesInExpectedOrder.indices) {
         val t = valuesInExpectedOrder(i)
         for (j <- 0 until i) {
           val lesser = valuesInExpectedOrder(j)

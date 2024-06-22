@@ -68,26 +68,26 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     "should implement +" in {
       forAll { (a: Long, b: Long) =>
         val expected = UnsignedLong.fromLongBits(a).plus(UnsignedLong.fromLongBits(b))
-        (ULong.fromLongBits(a) + ULong.fromLongBits(b)).toLong() should be(expected.longValue)
+        (ULong.fromLongBits(a) + ULong.fromLongBits(b)).toLong should be(expected.longValue)
       }
     }
     "should implement -" in {
       forAll { (a: Long, b: Long) =>
         val expected = UnsignedLong.fromLongBits(a).minus(UnsignedLong.fromLongBits(b))
-        (ULong.fromLongBits(a) - ULong.fromLongBits(b)).toLong() should be(expected.longValue)
+        (ULong.fromLongBits(a) - ULong.fromLongBits(b)).toLong should be(expected.longValue)
       }
     }
     "should implement *" in {
       forAll { (a: Long, b: Long) =>
         val expected = UnsignedLong.fromLongBits(a).times(UnsignedLong.fromLongBits(b))
-        (ULong.fromLongBits(a) * ULong.fromLongBits(b)).toLong() should be(expected.longValue)
+        (ULong.fromLongBits(a) * ULong.fromLongBits(b)).toLong should be(expected.longValue)
       }
     }
     "should implement /" in {
       forAll { (a: Long, b: Long) =>
         whenever(b != 0) {
           val expected = UnsignedLong.fromLongBits(a).dividedBy(UnsignedLong.fromLongBits(b))
-          (ULong.fromLongBits(a) / ULong.fromLongBits(b)).toLong() should be(expected.longValue)
+          (ULong.fromLongBits(a) / ULong.fromLongBits(b)).toLong should be(expected.longValue)
         }
       }
       intercept[ArithmeticException] {
@@ -98,7 +98,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll { (a: Long, b: Long) =>
         whenever(b != 0) {
           val expected = UnsignedLong.fromLongBits(a).mod(UnsignedLong.fromLongBits(b))
-          ULong.fromLongBits(a).mod(ULong.fromLongBits(b)).toLong() should be(expected.longValue)
+          ULong.fromLongBits(a).mod(ULong.fromLongBits(b)).toLong should be(expected.longValue)
         }
       }
       intercept[ArithmeticException] {
@@ -122,31 +122,31 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     "should implement #toInt" in {
       forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).intValue()
-        ULong.fromLongBits(a).toInt() should be(expected)
+        ULong.fromLongBits(a).toInt should be(expected)
       }
     }
     "should implement #toLong" in {
       forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).longValue()
-        ULong.fromLongBits(a).toLong() should be(expected)
+        ULong.fromLongBits(a).toLong should be(expected)
       }
     }
     "should implement #toFloat" in {
       forAll { (a: UnsignedLong) =>
         val expected = UnsignedLong.fromLongBits(a.longValue()).floatValue()
-        ULong.fromLongBits(a.longValue()).toFloat() should be(expected)
+        ULong.fromLongBits(a.longValue()).toFloat should be(expected)
       }
     }
     "should implement #toDouble" in {
       forAll { (a: UnsignedLong) =>
         val expected = UnsignedLong.fromLongBits(a.longValue()).doubleValue()
-        ULong.fromLongBits(a.longValue()).toDouble() should be(expected)
+        ULong.fromLongBits(a.longValue()).toDouble should be(expected)
       }
     }
     "should implement #toBigInt" in {
       forAll { (a: Long) =>
         val expected = UnsignedLong.fromLongBits(a).bigIntegerValue()
-        ULong.fromLongBits(a).toBigInt().longValue should be(expected.longValue)
+        ULong.fromLongBits(a).toBigInt.longValue should be(expected.longValue)
       }
     }
     "should implement #compare" in {
@@ -160,7 +160,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll { (bits: Long) =>
         val guava: UnsignedLong = UnsignedLong.fromLongBits(bits)
         val mango: ULong = guava.asScala
-        mango.toLong() should be(guava.longValue)
+        mango.toLong should be(guava.longValue)
       }
     }
     "should implement #asJava" in {
@@ -168,11 +168,11 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       forAll { (bits: Long) =>
         val mango: ULong = ULong.fromLongBits(bits)
         val guava: UnsignedLong = mango.asJava
-        mango.toLong() should be(guava.longValue)
+        mango.toLong should be(guava.longValue)
       }
     }
 
-    "should be serializeable" in {
+    "should be serializable" in {
       forAll { (bits: Long) =>
         val ulong = ULong.fromLongBits(bits)
         SerializableTester.reserializeAndAssert(ulong)
@@ -193,7 +193,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       for (value <- testLongs) {
         val expectSuccess = value >= 0
         try {
-          ULong.valueOf(value).toLong() should be(value)
+          ULong.valueOf(value).toLong should be(value)
           expectSuccess should be(true)
         } catch {
           case _: IllegalArgumentException => expectSuccess should be(false)
@@ -208,7 +208,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       for (big <- testBigInts) {
         val expectSuccess = big.compare(min) >= 0 && big.compare(max) <= 0
         try {
-          ULong.apply(big).toBigInt() should be(big)
+          ULong.apply(big).toBigInt should be(big)
           expectSuccess should be(true)
         } catch {
           case _: IllegalArgumentException => expectSuccess should be(false)
@@ -217,29 +217,29 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
       }
     }
     "should implement #valueOf(String)" in {
-      ULong.valueOf("18446744073709551615").toLong() should be(0xffffffffffffffffL)
-      ULong.valueOf("9223372036854775807").toLong() should be(0x7fffffffffffffffL)
-      ULong.valueOf("18382112080831834642").toLong() should be(0xff1a618b7f65ea12L)
-      ULong.valueOf("6504067269626408013").toLong() should be(0x5a4316b8c153ac4dL)
-      ULong.valueOf("7851896530399809066").toLong() should be(0x6cf78a4b139a4e2aL)
+      ULong.valueOf("18446744073709551615").toLong should be(0xffffffffffffffffL)
+      ULong.valueOf("9223372036854775807").toLong should be(0x7fffffffffffffffL)
+      ULong.valueOf("18382112080831834642").toLong should be(0xff1a618b7f65ea12L)
+      ULong.valueOf("6504067269626408013").toLong should be(0x5a4316b8c153ac4dL)
+      ULong.valueOf("7851896530399809066").toLong should be(0x6cf78a4b139a4e2aL)
 
       intercept[NumberFormatException] {
         ULong.valueOf("18446744073709551616")
       }
     }
     "should implement #valueOf(String,Int)" in {
-      ULong.valueOf("ffffffffffffffff", 16).toLong() should be(0xffffffffffffffffL)
-      ULong.valueOf("1234567890abcdef", 16).toLong() should be(0x1234567890abcdefL)
+      ULong.valueOf("ffffffffffffffff", 16).toLong should be(0xffffffffffffffffL)
+      ULong.valueOf("1234567890abcdef", 16).toLong should be(0x1234567890abcdefL)
 
       val max = BigInteger.ZERO.setBit(64).subtract(BigInteger.ONE)
       // loops through all legal radix values.
       for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
         // tests can successfully parse a number string with this radix.
         val maxAsString = max.toString(radix)
-        ULong.valueOf(maxAsString, radix).toLong() should be(max.longValue())
+        ULong.valueOf(maxAsString, radix).toLong should be(max.longValue())
 
         intercept[NumberFormatException] {
-          // tests that we get exception whre an overflow would occur.
+          // tests that we get exception where an overflow would occur.
           val overflow = max.add(BigInteger.ONE)
           val overflowAsString = overflow.toString(radix)
           ULong.valueOf(overflowAsString, radix)
@@ -262,11 +262,11 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #decode" in {
 
-      ULong.decode("0xffffffffffffffff").toLong() should be(0xffffffffffffffffL)
-      ULong.decode("#1234567890abcdef").toLong() should be(0x1234567890abcdefL)
-      ULong.decode("987654321012345678").toLong() should be(987654321012345678L)
-      ULong.decode("0X135791357913579").toLong() should be(0x135791357913579L)
-      ULong.decode("0").toLong() should be(0)
+      ULong.decode("0xffffffffffffffff").toLong should be(0xffffffffffffffffL)
+      ULong.decode("#1234567890abcdef").toLong should be(0x1234567890abcdefL)
+      ULong.decode("987654321012345678").toLong should be(987654321012345678L)
+      ULong.decode("0X135791357913579").toLong should be(0x135791357913579L)
+      ULong.decode("0").toLong should be(0)
 
       intercept[NumberFormatException] {
         ULong.decode("0xfffffffffffffffff")
@@ -336,7 +336,7 @@ class ULongTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
 
       val comparator = ULong.lexicographicalComparator()
 
-      for (i <- 0 until valuesInExpectedOrder.size) {
+      for (i <- valuesInExpectedOrder.indices) {
         val t = valuesInExpectedOrder(i)
         for (j <- 0 until i) {
           val lesser = valuesInExpectedOrder(j)

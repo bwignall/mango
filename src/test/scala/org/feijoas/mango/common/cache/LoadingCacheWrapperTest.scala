@@ -392,7 +392,7 @@ class LoadingCacheWrapperTest
     cache.stats() should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
 
-  it should "handle execptions during reload" in {
+  it should "handle exceptions during reload" in {
     val one = new Object
     val e = new Error
     val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
@@ -414,7 +414,7 @@ class LoadingCacheWrapperTest
     cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
-  it should "handle execptions in the Future returned by reload" in {
+  it should "handle exceptions in the Future returned by reload" in {
     val one = new Object
     val e = new Error
     val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
@@ -512,7 +512,7 @@ class LoadingCacheWrapperTest
     cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
-  it should "ignore the reloaded value if reload returns a Future with null (implicity by refreshAfterWrite)" in {
+  it should "ignore the reloaded value if reload returns a Future with null (implicitly by refreshAfterWrite)" in {
     val one = new Object
     val ticker = new FakeTicker()
     val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
@@ -666,7 +666,7 @@ class LoadingCacheWrapperTest
     cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
-  it should "not replace value if an execption occures during #reload" in {
+  it should "not replace value if an exception occurs during #reload" in {
     val one = new Object
     val e = new Error
     val ticker = new FakeTicker()
@@ -1001,7 +1001,7 @@ class LoadingCacheWrapperTest
     removalListener.getCount should be(0)
   }
 
-  it should "reaload after value reclamation" in {
+  it should "reload after value reclamation" in {
     val countingLoader = new CountingLoader
     val cache: LoadingCache[Any, Any] = CacheBuilder
       .newBuilder()

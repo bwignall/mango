@@ -28,7 +28,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import com.google.common.cache.{CacheStats => GuavaCacheStats}
+import com.google.common.cache.CacheStats as GuavaCacheStats
 
 /**
  * Tests for [[CacheStats]]

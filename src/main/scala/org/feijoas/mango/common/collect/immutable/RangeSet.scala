@@ -37,7 +37,7 @@ trait RangeSet[C, O <: Ordering[C]] extends collect.RangeSet[C, O] with RangeSet
 
 /** Factory for immutable [[RangeSet]]
  */
-final object RangeSet extends RangeSetFactory[RangeSet] {
+object RangeSet extends RangeSetFactory[RangeSet] {
 
   override def all[C, O <: Ordering[C]](implicit ord: O) = ImmutableRangeSetWrapper.all[C, O]
   override def empty[C, O <: Ordering[C]](implicit ord: O) = ImmutableRangeSetWrapper.empty[C, O]

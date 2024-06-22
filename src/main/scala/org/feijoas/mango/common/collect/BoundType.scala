@@ -25,7 +25,7 @@ package org.feijoas.mango.common.collect
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.collect.{BoundType => GuavaBoundType}
+import com.google.common.collect.BoundType as GuavaBoundType
 
 /** Indicates whether an endpoint of some range is contained in the range itself ("closed") or not
  *  ("open"). If a range is unbounded on a side, it is neither open nor closed on that side; the
@@ -43,7 +43,7 @@ sealed trait BoundType extends Serializable
  *  @author Markus Schneider
  *  @since 0.8 (copied from Guava-libraries)
  */
-final object BoundType {
+object BoundType {
 
   /** The endpoint value <i>is not</i> considered part of the set ("exclusive").
    */
@@ -59,7 +59,7 @@ final object BoundType {
    *  @return An object with an `asScala` method that converts a Guava `BoundType`
    *  to a Mango `BoundType`
    */
-  implicit final def asMangoBoundType(bt: GuavaBoundType): AsScala[BoundType] = {
+  implicit def asMangoBoundType(bt: GuavaBoundType): AsScala[BoundType] = {
     new AsScala(checkNotNull(bt) match {
       case GuavaBoundType.OPEN   => Open
       case GuavaBoundType.CLOSED => Closed
@@ -72,7 +72,7 @@ final object BoundType {
    *  @return An object with an `asJava` method that converts a Mango `BoundType`
    *  to a Guava `BoundType`
    */
-  implicit final def asGuavaBoundType(bt: BoundType): AsJava[GuavaBoundType] = {
+  implicit def asGuavaBoundType(bt: BoundType): AsJava[GuavaBoundType] = {
     new AsJava(checkNotNull(bt) match {
       case Open   => GuavaBoundType.OPEN
       case Closed => GuavaBoundType.CLOSED

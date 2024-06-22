@@ -37,7 +37,7 @@ trait RangeSet[C, O <: Ordering[C]] extends RangeSetLike[C, O, RangeSet[C, O]] {
 
 /** Factory for immutable [[RangeSet]]
  */
-final object RangeSet extends RangeSetFactory[RangeSet] {
+object RangeSet extends RangeSetFactory[RangeSet] {
 
   override def all[C, O <: Ordering[C]](implicit ord: O) = immutable.RangeSet.all[C, O]
   override def empty[C, O <: Ordering[C]](implicit ord: O) = immutable.RangeSet.empty[C, O]

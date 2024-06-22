@@ -43,9 +43,9 @@ import org.feijoas.mango.common.convert.AsScala
  *  @since 0.7 (copied from Guava-libraries)
  */
 @Beta
-case class RemovalNotification[+K, +V](val key: Option[K], val value: Option[V], val cause: RemovalCause) {}
+case class RemovalNotification[+K, +V](key: Option[K], value: Option[V], cause: RemovalCause) {}
 
-final object RemovalNotification {
+object RemovalNotification {
 
   /** Adds an `asScala` method that converts a Guava `RemovalNotification[K, V]`
    *  to a Mango `RemovalNotification[K, V]`.
@@ -58,10 +58,10 @@ final object RemovalNotification {
    *  @return An object with an `asScala` method that returns a Mango `RemovalNotification[K, V]`
    *   view of the argument
    */
-  implicit final def asMangoRemovalNotificationConverter[K, V](
+  implicit def asMangoRemovalNotificationConverter[K, V](
     notification: GuavaRemovalNotification[K, V]
   ): AsScala[RemovalNotification[K, V]] = {
-    val (key, value, cause) = (notification.getKey(), notification.getValue(), notification.getCause())
+    val (key, value, cause) = (notification.getKey, notification.getValue, notification.getCause)
     new AsScala(RemovalNotification(Option(key), Option(value), cause.asScala))
   }
 }

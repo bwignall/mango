@@ -27,7 +27,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.junit.Assert._
-import com.google.common.cache.{Cache => GuavaCache}
+import com.google.common.cache.Cache as GuavaCache
 
 /**
  * Tests for [[CacheWrapper]]

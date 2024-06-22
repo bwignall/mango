@@ -79,7 +79,7 @@ class OptionalTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChec
     }
   }
 
-  it should "be serializeable" in {
+  it should "be serializable" in {
     SerializableTester.reserialize(GuavaOptional.of("some").asScala)
     SerializableTester.reserialize(GuavaOptional.absent().asScala)
     SerializableTester.reserialize(Some("some").asJava)

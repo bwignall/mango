@@ -49,7 +49,7 @@ private[mango] class ImmutableRangeMapWrapper[K, V, O <: Ordering[K]] private (g
 
 /** Factory for ImmutableRangeMapWrapper
  */
-final private[mango] object ImmutableRangeMapWrapper extends RangeMapFactory[ImmutableRangeMapWrapper] {
+private[mango] object ImmutableRangeMapWrapper extends RangeMapFactory[ImmutableRangeMapWrapper] {
 
   /** Factory method */
   private[mango] def apply[K, V, O <: Ordering[K]](guava: gcc.RangeMap[AsOrdered[K], V])(implicit ord: O) =

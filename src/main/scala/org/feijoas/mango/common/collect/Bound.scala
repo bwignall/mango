@@ -28,7 +28,7 @@ import org.feijoas.mango.common.collect.BoundType.{Closed, Open}
 /** A `Bound` describes the to bounds of a [[Range]]. For example the range
  *  `(4,7]` has the two (finite) bounds "open" 4 and 7 "closed". A bound is
  *  either a `FiniteBound[T]` with a value of type `T` and a [[BoundType]] or
- *  an `InifinteBound`. An `InifinteBound` is used to describe unbounded ranges
+ *  an `InfiniteBound`. An `InfiniteBound` is used to describe unbounded ranges
  *  as for example `[a..+∞)`
  *
  *  @author Markus Schneider
@@ -42,13 +42,13 @@ sealed trait Bound[+T] extends Serializable {
 /** A `Bound` describes the to bounds of a [[Range]]. For example the range
  *  `(4,7]` has the two (finite) bounds "open" 4 and 7 "closed". A bound is
  *  either a `FiniteBound[T]` with a value of type `T` and a [[BoundType]] or
- *  an `InifinteBound`. An `InifinteBound` is used to describe unbounded ranges
+ *  an `InfiniteBound`. An `InfiniteBound` is used to describe unbounded ranges
  *  as for example `[a..+∞)`
  *
  *  @author Markus Schneider
  *  @since 0.8
  */
-final object Bound {
+object Bound {
 
   /** A `FiniteBound[T]` is a bound with a value of type `T` and a [[BoundType]].
    */
@@ -66,7 +66,7 @@ final object Bound {
     }
   }
 
-  /** An `InifinteBound` is used to describe unbounded ranges
+  /** An `InfiniteBound` is used to describe unbounded ranges
    *  as for example `[a..+∞)`
    */
   final object InfiniteBound extends Bound[Nothing] {

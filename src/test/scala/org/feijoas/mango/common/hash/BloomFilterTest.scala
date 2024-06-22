@@ -103,7 +103,7 @@ class BloomFilterTest extends AnyFlatSpec with MockitoSugar {
     lhs should be(BloomFilter.create(100)(new CustomFunnel))
   }
 
-  it should "be serializeable" in {
+  it should "be serializable" in {
     SerializableTester.reserializeAndAssert(BloomFilter.create[CharSequence](100))
     SerializableTester.reserializeAndAssert(BloomFilter.create[Int](100))
     SerializableTester.reserializeAndAssert(BloomFilter.create[Long](100))

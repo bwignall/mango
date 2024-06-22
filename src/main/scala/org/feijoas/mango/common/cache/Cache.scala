@@ -23,6 +23,7 @@
 package org.feijoas.mango.common.cache
 
 import com.google.common.cache.Cache as GuavaCache
+import com.google.common.util.concurrent.{ExecutionError, UncheckedExecutionException}
 import org.feijoas.mango.common.convert.AsScala
 
 import java.util.concurrent.ExecutionException
@@ -66,7 +67,9 @@ trait Cache[K, V] {
    *     value
    *  @throws ExecutionError if an error was thrown while loading the value
    */
+  @throws[ExecutionError]
   @throws[ExecutionException]
+  @throws[UncheckedExecutionException]
   def getOrElseUpdate(key: K, loader: () => V): V
 
   /**

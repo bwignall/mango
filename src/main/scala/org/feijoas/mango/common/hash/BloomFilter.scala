@@ -27,7 +27,7 @@ import scala.annotation.implicitNotFound
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.hash.Funnel.asGuavaFunnel
 
-import com.google.common.hash.{BloomFilter => GuavaBloomFilter}
+import com.google.common.hash.BloomFilter as GuavaBloomFilter
 
 /**
  * A Bloom filter for instances of `T`. A Bloom filter offers an approximate containment test

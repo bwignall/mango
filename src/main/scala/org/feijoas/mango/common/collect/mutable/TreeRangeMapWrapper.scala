@@ -48,7 +48,7 @@ private[mango] class TreeRangeMapWrapper[K, V, O <: Ordering[K]] private (guava:
 
 /** Factory for TreeRangeMapWrapper
  */
-final private[mango] object TreeRangeMapWrapper extends RangeMapFactory[TreeRangeMapWrapper] {
+private[mango] object TreeRangeMapWrapper extends RangeMapFactory[TreeRangeMapWrapper] {
 
   /** Factory method */
   private[mango] def apply[K, V, O <: Ordering[K]](guava: gcc.RangeMap[AsOrdered[K], V])(implicit ord: O) =

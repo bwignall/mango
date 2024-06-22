@@ -42,32 +42,32 @@ class UByteTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
   "An UByte" - {
     "should implement #toInt" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toLong).toInt() should be(value)
+        UByte.valueOf(value.toLong).toInt should be(value)
       }
     }
     "should implement #toLong" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toLong).toLong() should be(value.toLong)
+        UByte.valueOf(value.toLong).toLong should be(value.toLong)
       }
     }
     "should implement #toFloat" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toLong).toFloat() should be(value.toFloat)
+        UByte.valueOf(value.toLong).toFloat should be(value.toFloat)
       }
     }
     "should implement #toDouble" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toLong).toDouble() should be(value.toDouble)
+        UByte.valueOf(value.toLong).toDouble should be(value.toDouble)
       }
     }
     "should implement #toBigInt" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toLong).toBigInt() should be(BigInt(value))
+        UByte.valueOf(value.toLong).toBigInt should be(BigInt(value))
       }
     }
     "should implement #UByte(Long)" in {
       for (value <- 0 to 255) {
-        UByte(value.toLong).toInt() should be(value)
+        UByte(value.toLong).toInt should be(value)
       }
       intercept[IllegalArgumentException] {
         UByte(256)
@@ -78,7 +78,7 @@ class UByteTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #valueOf(Long)" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toLong).toInt() should be(value)
+        UByte.valueOf(value.toLong).toInt should be(value)
       }
       intercept[IllegalArgumentException] {
         UByte.valueOf(256)
@@ -89,7 +89,7 @@ class UByteTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #valueOf(String)" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toString).toInt() should be(value)
+        UByte.valueOf(value.toString).toInt should be(value)
       }
       intercept[IllegalArgumentException] {
         UByte.valueOf("256")
@@ -120,7 +120,7 @@ class UByteTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
     }
     "should implement #saturatedValueOf(Long)" in {
       for (value <- 0 to 255) {
-        UByte.saturatedValueOf(value.toLong).toInt() should be(value)
+        UByte.saturatedValueOf(value.toLong).toInt should be(value)
       }
       UByte.saturatedValueOf(256L).value should be(greatest)
       UByte.saturatedValueOf(-1L).value should be(least)
@@ -195,7 +195,7 @@ class UByteTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
 
       val comparator = UByte.lexicographicalComparator()
 
-      for (i <- 0 until valuesInExpectedOrder.size) {
+      for (i <- valuesInExpectedOrder.indices) {
         val t = valuesInExpectedOrder(i)
         for (j <- 0 until i) {
           val lesser = valuesInExpectedOrder(j)

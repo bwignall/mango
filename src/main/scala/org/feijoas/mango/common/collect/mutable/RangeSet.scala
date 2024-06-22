@@ -38,7 +38,7 @@ trait RangeSet[C, O <: Ordering[C]] extends collect.RangeSet[C, O] with RangeSet
 
 /** Factory for mutable [[RangeSet]]
  */
-final object RangeSet extends RangeSetFactory[RangeSet] {
+object RangeSet extends RangeSetFactory[RangeSet] {
 
   override def newBuilder[C, O <: Ordering[C]](implicit ord: O): Builder[Range[C, O], RangeSet[C, O]] =
     TreeRangeSetWrapper.newBuilder

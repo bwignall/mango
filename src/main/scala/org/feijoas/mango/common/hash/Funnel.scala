@@ -25,7 +25,7 @@ package org.feijoas.mango.common.hash
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
-import com.google.common.{hash => cgch}
+import com.google.common.{hash as cgch}
 import com.google.common.hash.PrimitiveSink
 import java.nio.charset.Charset
 
@@ -66,7 +66,7 @@ trait Funnel[T] extends Serializable {
    *  later.
    *
    */
-  def funnel(from: T, into: PrimitiveSink)
+  def funnel(from: T, into: PrimitiveSink): Unit
 }
 
 /**
@@ -87,7 +87,7 @@ trait Funnel[T] extends Serializable {
  *  @author Markus Schneider
  *  @since 0.6
  */
-final object Funnel {
+object Funnel {
 
   /**
    * Returns a funnel that extracts the characters from a {@code CharSequence}, a character at a
@@ -138,7 +138,7 @@ final object Funnel {
    *  @return An object with an `asJava` method that returns a Guava `Funnel[T]`
    *   view of the argument
    */
-  implicit final def asGuavaFunnel[T](funnel: Funnel[T]): AsJava[cgch.Funnel[T]] = {
+  implicit def asGuavaFunnel[T](funnel: Funnel[T]): AsJava[cgch.Funnel[T]] = {
     def convert(f: Funnel[T]): cgch.Funnel[T] = f match {
       case AsScalaFunnel(internal_funnel) => internal_funnel
       case _                              => AsGuavaFunnel(funnel)
@@ -157,7 +157,7 @@ final object Funnel {
    *  @return An object with an `asScala` method that returns a Mango `Funnel[T]`
    *   view of the argument
    */
-  implicit final def asScalaFunnel[T](funnel: cgch.Funnel[T]): AsScala[Funnel[T]] = {
+  implicit def asScalaFunnel[T](funnel: cgch.Funnel[T]): AsScala[Funnel[T]] = {
     def convert(f: cgch.Funnel[T]): Funnel[T] = f match {
       case AsGuavaFunnel(internal_funnel) => internal_funnel
       case _                              => AsScalaFunnel(funnel)
@@ -185,14 +185,14 @@ private[mango] case class AsScalaFunnel[T](f: cgch.Funnel[T]) extends Funnel[T] 
 }
 
 @SerialVersionUID(1L)
-final private[mango] object LongFunnel extends Funnel[Long] with Serializable {
+private[mango] object LongFunnel extends Funnel[Long] with Serializable {
   val delegate = cgch.Funnels.longFunnel()
   override def funnel(from: Long, into: PrimitiveSink) = delegate.funnel(from, into)
   override def toString = delegate.toString
 }
 
 @SerialVersionUID(1L)
-final private[mango] object IntFunnel extends Funnel[Int] with Serializable {
+private[mango] object IntFunnel extends Funnel[Int] with Serializable {
   val delegate = cgch.Funnels.integerFunnel()
   override def funnel(from: Int, into: PrimitiveSink) = delegate.funnel(from, into)
   override def toString = delegate.toString

@@ -54,7 +54,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
     (mem should be).theSameInstanceAs(memoize(mem))
   }
 
-  it should "be serializeable" in {
+  it should "be serializable" in {
     val count = new CountingSupplier()
     val mem = memoize(count)
 
@@ -95,7 +95,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
     checkMemoize(count, mem)
   }
 
-  it should "be serializeable" in {
+  it should "be serializable" in {
     val count = new CountingSupplier()
     val mem = memoizeWithExpiration(count, 75, TimeUnit.MILLISECONDS)
     checkMemoize(count, mem)
@@ -116,7 +116,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
 
   behavior of "implicits"
 
-  it should "be serializeable" in {
+  it should "be serializable" in {
     import org.feijoas.mango.common.base.Suppliers._
 
     val gs: GuavaSupplier[Int] = { () => 1 } asJava
@@ -132,7 +132,7 @@ class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
 
   behavior of "synchronized supplier"
 
-  it should "synchonize on non-thread-safe supplier" in {
+  it should "synchronize on non-thread-safe supplier" in {
 
     val nonThreadSafe: () => Int = new (() => Int) {
       var counter = 0

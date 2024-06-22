@@ -52,7 +52,7 @@ protected[mango] trait LoadingCacheWrapper[K, V] extends CacheWrapper[K, V] with
   override def getIfPresent(key: K) = Option(cache.getIfPresent(key))
 }
 
-final private[mango] object LoadingCacheWrapper {
+private[mango] object LoadingCacheWrapper {
 
   /** Factory method to create a `LoadingCache[K, V]` from a Guava `LoadingCache[K, V]`
    */

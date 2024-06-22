@@ -25,7 +25,7 @@ package org.feijoas.mango.common.base
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.base.{Optional => GuavaOptional}
+import com.google.common.base.{Optional as GuavaOptional}
 
 /** Utility functions for the work with `Option[T]` and `Optional[T]`
  *
@@ -43,7 +43,7 @@ import com.google.common.base.{Optional => GuavaOptional}
  *  @author Markus Schneider
  *  @since 0.7
  */
-final object Optional {
+object Optional {
 
   /** Adds an `asJava` method that converts a Scala `Option[T]` to
    *  a Guava `Optional[T]`.
@@ -74,9 +74,10 @@ final object Optional {
    *   view of the argument
    */
   implicit def asMangoOptionConverter[T](option: GuavaOptional[T]): AsScala[Option[T]] = {
-    def convert(option: GuavaOptional[T]) = option.isPresent() match {
-      case true  => Some(option.get())
-      case false => None
+    def convert(option: GuavaOptional[T]) = if (option.isPresent) {
+      Some(option.get())
+    } else {
+      None
     }
     new AsScala(convert(option))
   }

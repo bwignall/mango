@@ -63,8 +63,8 @@ class LoadingCacheTest extends AnyFlatSpec with Matchers with MockitoSugar {
   }
 
   "getAll" must "call get only once per key" in {
-    val (_, unspyedcache) = fixture
-    val cache = spy(unspyedcache)
+    val (_, real_cache) = fixture
+    val cache = spy(real_cache)
     cache.getAll(List("a", "bb", "a")) must be(Success(Map("a" -> 100, "bb" -> 50)))
     verify(cache, times(1)).get("a")
   }

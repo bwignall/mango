@@ -23,7 +23,7 @@
 package org.feijoas.mango.common.base
 
 import org.feijoas.mango.common.annotations.Beta
-import com.google.common.base.{Ticker => GuavaTicker}
+import com.google.common.base.{Ticker as GuavaTicker}
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
 /** A time source; returns a time value representing the number of nanoseconds elapsed since some

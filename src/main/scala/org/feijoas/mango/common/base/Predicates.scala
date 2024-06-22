@@ -30,7 +30,7 @@ import scala.collection.immutable
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.base.{Predicate => GuavaPredicate}
+import com.google.common.base.{Predicate as GuavaPredicate}
 
 /**
  * Utility functions for the work with Guava `Predicate[T]`
@@ -142,7 +142,7 @@ object Predicates {
     override def hashCode: Int = px.hashCode + 0x75bcf4d
   }
 
-  private[mango] case class InstanceOfPredicate(clazz: Class[_]) extends (Any => Boolean) {
+  private[mango] case class InstanceOfPredicate(clazz: Class[?]) extends (Any => Boolean) {
     checkNotNull(clazz)
     override def apply(arg: Any): Boolean = arg != null && arg.getClass == clazz
     override def toString: String = "InstanceOf(" + clazz + ")"
@@ -299,7 +299,7 @@ object Predicates {
    * @since 10.0
    */
   @deprecated("Use the correctly-named method {@link #subtypeOf} instead.", "10.0")
-  def assignableFrom(clazz: Class[_]): Class[_] => Boolean = subtypeOf(clazz)
+  def assignableFrom(clazz: Class[?]): Class[?] => Boolean = subtypeOf(clazz)
 
   /**
    * Returns a predicate that evaluates to {@code true} if the class being
@@ -308,9 +308,9 @@ object Predicates {
    *
    * @since 20.0 (since 10.0 under the incorrect name {@code assignableFrom})
    */
-  def subtypeOf(clazz: Class[_]): Class[_] => Boolean = {
+  def subtypeOf(clazz: Class[?]): Class[?] => Boolean = {
     checkNotNull(clazz)
-    (arg: Class[_]) => arg != null && clazz.isAssignableFrom(arg)
+    (arg: Class[?]) => arg != null && clazz.isAssignableFrom(arg)
   }
 
   /**

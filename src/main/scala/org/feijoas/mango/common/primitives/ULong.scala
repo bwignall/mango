@@ -71,7 +71,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
 
   /** Returns the value of this {@code ULong} as an {@code Int}.
    */
-  def toInt(): Int = value.toInt
+  def toInt: Int = value.toInt
 
   /** Returns the value of this {@code ULong} as a {@code Long}. This is an inverse operation
    *  to `#fromLongBits`.
@@ -79,12 +79,12 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
    *  <p>Note that if this {@code ULong} holds a value {@code >= 2^63}, the returned value
    *  will be equal to {@code this - 2^64}.
    */
-  def toLong(): Long = value
+  def toLong: Long = value
 
   /** Returns the value of this {@code ULong} as a {@code Float}, analogous to a widening
    *  primitive conversion from {@code Long} to {@code Float}, and correctly rounded.
    */
-  def toFloat(): Float = {
+  def toFloat: Float = {
     val fValue: Float = (value & unsigned_mask).toFloat
     if (value < 0)
       fValue + maxLongAsFloat
@@ -95,7 +95,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
   /** Returns the value of this {@code ULong} as a {@code Double}, analogous to a widening
    *  primitive conversion from {@code Long} to {@code Double}, and correctly rounded.
    */
-  def toDouble(): Double = {
+  def toDouble: Double = {
     val dValue: Double = (value & unsigned_mask).toDouble
     if (value < 0)
       dValue + maxLongAsFloat
@@ -105,7 +105,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
 
   /** Returns the value of this {@code ULong} as a {@code BigInt}.
    */
-  def toBigInt(): BigInt = {
+  def toBigInt: BigInt = {
     val bigInt = BigInt(value & unsigned_mask)
     if (value < 0)
       bigInt.setBit(java.lang.Long.SIZE - 1)
@@ -121,7 +121,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
 
   /** Returns a string representation of the {@code ULong} value, in base 10.
    */
-  override def toString(): String = UnsignedLongs.toString(value)
+  override def toString: String = UnsignedLongs.toString(value)
 
   /** Returns a string representation of the {@code ULong} value, in base {@code radix}. If
    *  {@code radix < Character.MIN_RADIX} or {@code radix > Character.MAX_RADIX}, the radix
@@ -144,7 +144,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
  *  @author Markus Schneider
  *  @since 0.10 (copied from Guava-libraries)
  */
-final object ULong {
+object ULong {
   private val maxLongAsFloat = Long.MaxValue.toFloat
   private val unsigned_mask: Long = Long.MaxValue // 0x7fffffffffffffffL
 
@@ -173,7 +173,7 @@ final object ULong {
    *  The argument is interpreted as an unsigned 64-bit value. Specifically, the sign bit
    *  of {@code bits} is interpreted as a normal bit, and all other bits are treated as usual.
    *
-   *  <p>If the argument is nonnegative, the returned result will be equal to {@code bits},
+   *  <p>If the argument is non-negative, the returned result will be equal to {@code bits},
    *  otherwise, the result will be equal to {@code 2^64 + bits}.
    *
    *  <p>To represent decimal constants less than {@code 2^63}, consider {@link #valueOf(long)}
@@ -240,7 +240,7 @@ final object ULong {
    *  @throws IllegalArgumentException if {@code array} is empty
    */
   def min(array: ULong*): ULong = {
-    checkArgument(array.length > 0)
+    checkArgument(array.nonEmpty)
     val it = array.iterator
     var min = flip(it.next().value)
     while (it.hasNext) {
@@ -259,7 +259,7 @@ final object ULong {
    *  @throws IllegalArgumentException if {@code array} is empty
    */
   def max(array: ULong*): ULong = {
-    checkArgument(array.length > 0)
+    checkArgument(array.nonEmpty)
     val it = array.iterator
     var max = flip(it.next().value)
     while (it.hasNext) {
@@ -280,14 +280,14 @@ final object ULong {
    */
   def join(separator: String, array: ULong*): String = {
     checkNotNull(separator)
-    if (array.length == 0) {
+    if (array.isEmpty) {
       ""
     } else {
       val it = array.iterator
       val builder = new StringBuilder(array.length * 5)
-      builder.append(it.next().toString)
+      builder.append(it.next().toString())
       while (it.hasNext) {
-        builder.append(separator).append(it.next().toString)
+        builder.append(separator).append(it.next().toString())
       }
       builder.toString
     }
@@ -313,7 +313,7 @@ final object ULong {
         }
         i = i + 1
       }
-      return left.length - right.length
+      left.length - right.length
     }
   }
 

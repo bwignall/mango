@@ -30,7 +30,7 @@ import org.feijoas.mango.common.collect.Range
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 import org.feijoas.mango.common.collect.RangeSetFactory
 
-import com.google.common.collect.{RangeSet => GuavaRangeSet}
+import com.google.common.collect.{RangeSet as GuavaRangeSet}
 import com.google.common.collect.TreeRangeSet
 
 /** An mutable implementation of RangeSet that delegates to Guava TreeRangeSet
@@ -49,7 +49,7 @@ private[mango] class TreeRangeSetWrapper[C, O <: Ordering[C]] private (guava: Gu
   override def newBuilder = TreeRangeSetWrapper.newBuilder[C, O](ordering)
 }
 
-final private[mango] object TreeRangeSetWrapper extends RangeSetFactory[TreeRangeSetWrapper] {
+private[mango] object TreeRangeSetWrapper extends RangeSetFactory[TreeRangeSetWrapper] {
 
   /** Factory method */
   private[mango] def apply[C, O <: Ordering[C]](guava: GuavaRangeSet[AsOrdered[C]])(implicit ord: O) =

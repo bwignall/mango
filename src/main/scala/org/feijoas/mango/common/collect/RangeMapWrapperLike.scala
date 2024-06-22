@@ -61,7 +61,7 @@ private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeM
     if (entry == null)
       None
     else
-      Some((Range(entry.getKey()), entry.getValue()))
+      Some((Range(entry.getKey), entry.getValue))
   }
 
   override def span() = {

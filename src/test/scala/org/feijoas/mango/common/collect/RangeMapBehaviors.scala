@@ -52,7 +52,12 @@ object RangeMapBehaviors {
   type TIntMutableRangeMap = mutable.RangeMap[Int, String, Int.type]
   type TIntRangeMapLike = RangeMapLike[Int, String, Int.type, TIntRangeMap]
   type TIntMutableRangeMapLike = mutable.RangeMapLike[Int, String, Int.type, TIntMutableRangeMap]
-  type TIntRangeMapWrapperLike = RangeMapWrapperLike[Int, String, Int.type, _]
+  type TIntRangeMapWrapperLike = RangeMapWrapperLike[
+    Int,
+    String,
+    Int.type,
+    ?
+  ]
   type TBuilder = Builder[(TIntRange, String), TIntRangeMap]
 }
 
@@ -387,7 +392,7 @@ private[mango] trait RangeMapBehaviors extends AnyFreeSpec with ScalaCheckProper
         }
       }
       "given the RangeMap contains a single range" - {
-        "it should return Some(thatRanage)" in {
+        "it should return Some(thatRange)" in {
           forAll { range: Range[Int, Int.type] =>
             val rangeMap = (newBuilder += range -> "dummy").result()
             rangeMap.span() should be(Some(range))
@@ -423,7 +428,7 @@ private[mango] trait RangeMapBehaviors extends AnyFreeSpec with ScalaCheckProper
             val expected = {
               val builder = newBuilder
               rangeMap.asMapOfRanges().foreach { case (key, value) =>
-                if (key.isConnected(subRange) && !key.intersection(subRange).isEmpty())
+                if (key.isConnected(subRange) && !key.intersection(subRange).isEmpty)
                   builder += key.intersection(subRange) -> value
               }
               builder.result()

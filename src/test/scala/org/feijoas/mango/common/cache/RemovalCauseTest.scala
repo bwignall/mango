@@ -28,7 +28,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.be
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
-import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
+import com.google.common.cache.{RemovalCause as GuavaRemovalCause}
 
 /** Tests for [[RemovalCause]]
  *

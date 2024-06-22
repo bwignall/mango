@@ -47,7 +47,7 @@ private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetW
   implicit protected def ordering: O
 
   /** Creates a new Repr from a Guava RangeSet */
-  protected[this] def factory: (GuavaRangeSet[AsOrdered[C]]) => Repr
+  protected[this] def factory: GuavaRangeSet[AsOrdered[C]] => Repr
 
   override def contains(value: C): Boolean = delegate.contains(value)
   override def encloses(otherRange: Range[C, O]): Boolean = delegate.encloses(otherRange.asJava)
@@ -65,9 +65,10 @@ private[mango] trait RangeSetWrapperLike[C, O <: Ordering[C], +Repr <: RangeSetW
     case _                                     => super.enclosesAll(other)
   }
 
-  override def span(): Option[Range[C, O]] = delegate.isEmpty match {
-    case true  => None
-    case false => Some(Range(delegate.span()))
+  override def span(): Option[Range[C, O]] = if (delegate.isEmpty) {
+    None
+  } else {
+    Some(Range(delegate.span()))
   }
 
   override def asRanges(): Set[Range[C, O]] = {

@@ -29,9 +29,9 @@ import org.feijoas.mango.common.collect.RangeSetBehaviors
 import org.feijoas.mango.common.collect.RangeSetWrapperBehaviours
 import org.scalatest.freespec.AnyFreeSpec
 
-import com.google.common.collect.{RangeSet => GuavaRangeSet}
+import com.google.common.collect.{RangeSet as GuavaRangeSet}
 
-/** Tests for [[ImmutableRangeSetWrapperTest]]
+/** Tests for [[ImmutableRangeSetWrapper]]
  *
  *  @author Markus Schneider
  *  @since 0.8

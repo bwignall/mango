@@ -41,29 +41,29 @@ final class UByte private (val value: Byte) extends AnyVal with Ordered[UByte] w
    *  unsigned. That is, returns {@code value + 256} if {@code value} is
    *  negative; {@code value} itself otherwise.
    */
-  def toInt(): Int = UnsignedBytes.toInt(this.value)
+  def toInt: Int = UnsignedBytes.toInt(this.value)
 
   /** Returns the value of this {@code UByte} as a {@code Long}. This is an inverse operation.
    */
-  def toLong(): Long = toInt().toLong
+  def toLong: Long = toInt.toLong
 
   /** Returns the value of this {@code UByte} as a {@code Float}, analogous to a widening
    *  primitive conversion from {@code Byte} to {@code Float}, and correctly rounded.
    */
-  def toFloat(): Float = toLong().toFloat
+  def toFloat: Float = toLong.toFloat
 
   /** Returns the value of this {@code UByte} as a {@code Double}, analogous to a widening
    *  primitive conversion from {@code Byte} to {@code Double}, and correctly rounded.
    */
-  def toDouble(): Double = toLong().toDouble
+  def toDouble: Double = toLong.toDouble
 
   /** Returns the value of this {@code UInt} as a {@code BigInt}.
    */
-  def toBigInt(): BigInt = BigInt(toLong())
+  def toBigInt: BigInt = BigInt(toLong)
 
   /** Returns a string representation of x, where x is treated as unsigned.
    */
-  override def toString(): String = UnsignedBytes.toString(value)
+  override def toString: String = UnsignedBytes.toString(value)
 
   /** Returns a string representation of {@code x} for the given radix, where {@code x} is treated
    *  as unsigned.
@@ -92,7 +92,7 @@ final class UByte private (val value: Byte) extends AnyVal with Ordered[UByte] w
  *  @author Markus Schneider
  *  @since 0.10 (copied from Guava-libraries)
  */
-final object UByte {
+object UByte {
 
   /** The largest power of two that can be represented as an unsigned {@code
    *  Byte}.
@@ -107,7 +107,7 @@ final object UByte {
    *  The argument is interpreted as an unsigned byte value. Specifically, the sign bit
    *  of {@code bits} is interpreted as a normal bit, and all other bits are treated as usual.
    *
-   *  <p>If the argument is nonnegative, the returned result will be equal to {@code bits},
+   *  <p>If the argument is non-negative, the returned result will be equal to {@code bits},
    *  otherwise, the result will be equal to {@code bits + 256}.
    */
   def fromByteBits(bits: Byte): UByte = new UByte(bits)
@@ -186,11 +186,11 @@ final object UByte {
    *  @throws IllegalArgumentException if {@code array} is empty
    */
   def min(array: UByte*): UByte = {
-    checkArgument(array.length > 0)
+    checkArgument(array.nonEmpty)
     val it = array.iterator
-    var min = it.next().toInt()
+    var min = it.next().toInt
     while (it.hasNext) {
-      val next = it.next().toInt()
+      val next = it.next().toInt
       if (next < min)
         min = next
     }
@@ -205,11 +205,11 @@ final object UByte {
    *  @throws IllegalArgumentException if {@code array} is empty
    */
   def max(array: UByte*): UByte = {
-    checkArgument(array.length > 0)
+    checkArgument(array.nonEmpty)
     val it = array.iterator
-    var max = it.next().toInt()
+    var max = it.next().toInt
     while (it.hasNext) {
-      val next = it.next().toInt()
+      val next = it.next().toInt
       if (next > max)
         max = next
     }
@@ -226,14 +226,14 @@ final object UByte {
    */
   def join(separator: String, array: UByte*): String = {
     checkNotNull(separator)
-    if (array.length == 0) {
+    if (array.isEmpty) {
       ""
     } else {
       val it = array.iterator
       val builder = new StringBuilder(array.length * (3 + separator.length()))
-      builder.append(it.next().toString)
+      builder.append(it.next().toString())
       while (it.hasNext) {
-        builder.append(separator).append(it.next().toString)
+        builder.append(separator).append(it.next().toString())
       }
       builder.toString
     }
@@ -265,7 +265,7 @@ final object UByte {
           return result
         i = i + 1
       }
-      return left.length - right.length
+      left.length - right.length
     }
   }
 

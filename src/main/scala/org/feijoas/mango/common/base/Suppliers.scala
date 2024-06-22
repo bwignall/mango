@@ -25,7 +25,7 @@ package org.feijoas.mango.common.base
 import java.util.concurrent.TimeUnit
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
-import com.google.common.base.{Supplier => GuavaSupplier, Suppliers => GuavaSuppliers}
+import com.google.common.base.{Supplier as GuavaSupplier, Suppliers as GuavaSuppliers}
 
 /** Utility functions for the work with suppliers which are functions of
  *  the type `() => T`
@@ -45,15 +45,15 @@ import com.google.common.base.{Supplier => GuavaSupplier, Suppliers => GuavaSupp
  *  @author Markus Schneider
  *  @since 0.7
  */
-final object Suppliers {
+object Suppliers {
 
   /** Returns a function which caches the instance retrieved during the first
    *  evaluation and returns that value on subsequent evaluations. See:
    *  [[http://en.wikipedia.org/wiki/Memoization memoization]]
    *
-   *  <p>The returned function is thread-safe. The functions's serialized form
+   *  <p>The returned function is thread-safe. The function's serialized form
    *  does not contain the cached value, which will be recalculated when
-   *  the reserialized instance is evaluated.
+   *  the serialized instance is evaluated.
    *
    *  <p>If `f` is an instance created by an earlier call to
    *  `memoize, it is returned directly.
@@ -72,7 +72,7 @@ final object Suppliers {
    *
    *  <p>The returned function is thread-safe. The function's serialized form
    *  does not contain the cached value, which will be recalculated when
-   *  the reserialized instance is evaluated.
+   *  the serialized instance is evaluated.
    *
    *  @param duration the length of time after a value is created that it
    *     should stop being returned by subsequent evaluations
@@ -101,7 +101,7 @@ final object Suppliers {
    *  @return An object with an `asJava` method that returns a Guava `Supplier[T]`
    *   view of the argument
    */
-  implicit final def asGuavaSupplierConverter[T](fnc: () => T): AsJava[GuavaSupplier[T]] = {
+  implicit def asGuavaSupplierConverter[T](fnc: () => T): AsJava[GuavaSupplier[T]] = {
     def convert(fnc: () => T): GuavaSupplier[T] = fnc match {
       case s: AsMangoSupplier[T] => s.delegate
       case _                     => AsGuavaSupplier(fnc)
@@ -119,7 +119,7 @@ final object Suppliers {
    *  @return An object with an `asScala` method that returns a Scala function `() => T`
    *   view of the argument
    */
-  implicit final def asMangoSupplierConverter[T](fnc: GuavaSupplier[T]): AsScala[() => T] = {
+  implicit def asMangoSupplierConverter[T](fnc: GuavaSupplier[T]): AsScala[() => T] = {
     def convert(fnc: GuavaSupplier[T]) = fnc match {
       case AsGuavaSupplier(delegate) => delegate
       case _                         => AsMangoSupplier(fnc)

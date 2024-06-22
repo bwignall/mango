@@ -47,7 +47,7 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
     (it should behave).like(leftOpenBoundedRange(builder))
     (it should behave).like(rightOpenBoundedRange(builder))
 
-    it should "not acccept the same value as lower and upper bound" in {
+    it should "not accept the same value as lower and upper bound" in {
       intercept[IllegalArgumentException] {
         builder(3, 3)
       }
@@ -78,9 +78,9 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
     (it should behave).like(leftClosedBoundedRange(builder))
     (it should behave).like(rightClosedBoundedRange(builder))
 
-    it should "acccept the same value as lower and upper bound" in {
+    it should "accept the same value as lower and upper bound" in {
       val range = builder(3, 3)
-      range.isEmpty() should be(false)
+      range.isEmpty should be(false)
       range.contains(2) should be(false)
       range.contains(3) should be(true)
       range.contains(4) should be(false)
@@ -111,9 +111,9 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
     (it should behave).like(leftClosedBoundedRange(builder))
     (it should behave).like(rightOpenBoundedRange(builder))
 
-    it should "acccept the same value as lower and upper bound" in {
+    it should "accept the same value as lower and upper bound" in {
       val range = builder(3, 3)
-      range.isEmpty() should be(true)
+      range.isEmpty should be(true)
       range.contains(2) should be(false)
       range.contains(3) should be(false)
       range.contains(4) should be(false)
@@ -128,9 +128,9 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
     (it should behave).like(leftOpenBoundedRange(builder))
     (it should behave).like(rightClosedBoundedRange(builder))
 
-    it should "acccept the same value as lower and upper bound" in {
+    it should "accept the same value as lower and upper bound" in {
       val range = builder(3, 3)
-      range.isEmpty() should be(true)
+      range.isEmpty should be(true)
       range.contains(2) should be(false)
       range.contains(3) should be(false)
       range.contains(4) should be(false)
@@ -138,7 +138,7 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
   }
 
   {
-    "A Range" should "be determine if it is connected to another Rane" in {
+    "A Range" should "be determine if it is connected to another Range" in {
       Range.closed(3, 5).isConnected(Range.open(5, 6)) should be(true)
       Range.closed(3, 5).isConnected(Range.openClosed(5, 5)) should be(true)
       Range.open(3, 5).isConnected(Range.closed(5, 6)) should be(true)
@@ -147,7 +147,7 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
       Range.closed(3, 5).isConnected(Range.closed(7, 8)) should be(false)
       Range.closed(3, 5).isConnected(Range.closedOpen(7, 7)) should be(false)
     }
-    it should "detemine if it contains all elements in an iterable" in {
+    it should "determine if it contains all elements in an iterable" in {
       val range = Range.closed(3, 5)
       range containsAll List(3, 3, 4, 5) should be(true)
       range containsAll List(3, 3, 4, 5, 6) should be(false)
@@ -340,7 +340,7 @@ class RangeTest extends AnyFlatSpec with RangeBehaviors {
     }
   }
 
-  "Range#ecloseAll" should "return a range that ecloses all given points" in {
+  "Range#ecloseAll" should "return a range that closes all given points" in {
     Range.encloseAll(List(0)) should be(Range.closed(0, 0))
     Range.encloseAll(List(5, -3)) should be(Range.closed(-3, 5))
     Range.encloseAll(List(1, 2, 2, 2, 5, -3, 0, -1)) should be(Range.closed(-3, 5))
@@ -387,7 +387,7 @@ private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
     val range = build(start, end)
 
     it should "not be empty" in {
-      range.isEmpty() should be(false)
+      range.isEmpty should be(false)
     }
 
     it should "pattern match with 'Range(lower, upper)'" in {
@@ -401,7 +401,7 @@ private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
       range.toString contains ".." should be(true)
     }
 
-    it should "be serializeable" in {
+    it should "be serializable" in {
       reserializeAndAssert(range)
     }
 
@@ -423,7 +423,7 @@ private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
     val end = 7
     val range = build(start, end)
 
-    it should "contain only values wihtin the range" in {
+    it should "contain only values within the range" in {
 
       forAll { n: Int =>
         whenever((n != start && n != end) && (n < start - 10 || n > end + 10)) {
@@ -439,11 +439,11 @@ private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
     }
 
     it should "have a lower bound" in {
-      range.hasLowerBound() should be(true)
+      range.hasLowerBound should be(true)
     }
 
     it should "have an upper bound" in {
-      range.hasUpperBound() should be(true)
+      range.hasUpperBound should be(true)
     }
 
     it should "pattern match with 'Range(FiniteBound(start, _), FiniteBound(end, _))'" in {
@@ -458,7 +458,7 @@ private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
       str.substring(1, str.length - 1) should be(s"$start..$end")
     }
 
-    it should "not acccept invalid inputs" in {
+    it should "not accept invalid inputs" in {
       intercept[IllegalArgumentException] {
         build(4, 3)
       }

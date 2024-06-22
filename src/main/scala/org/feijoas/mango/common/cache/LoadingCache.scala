@@ -23,10 +23,11 @@
 package org.feijoas.mango.common.cache
 
 import com.google.common.cache.LoadingCache as GuavaLoadingCache
-import com.google.common.util.concurrent.UncheckedExecutionException
+import com.google.common.util.concurrent.{ExecutionError, UncheckedExecutionException}
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.convert.AsScala
 
+import java.util.concurrent.ExecutionException
 import scala.collection.immutable
 import scala.util.{Failure, Success, Try}
 
@@ -73,6 +74,9 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
    *     value
    *  @throws ExecutionError if an error was thrown while loading the value
    */
+  @throws[ExecutionError]
+  @throws[ExecutionException]
+  @throws[UncheckedExecutionException]
   def get(key: K): Try[V]
 
   /** Returns the value associated with `key` in this cache, first loading that value if
@@ -98,9 +102,11 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
    *     regardless of whether the exception was checked or unchecked
    *  @throws ExecutionError if an error was thrown while loading the value
    */
+  @throws[ExecutionError]
+  @throws[UncheckedExecutionException]
   def getUnchecked(key: K): V = get(key) match {
     case Success(value) => value
-    case Failure(e)     => throw new UncheckedExecutionException(e.getCause())
+    case Failure(e)     => throw new UncheckedExecutionException(e.getCause)
   }
 
   /** Loads a new value for key `key`, possibly asynchronously. While the new value is loading
@@ -139,6 +145,9 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
    *     values
    *  @throws ExecutionError if an error was thrown while loading the values
    */
+  @throws[ExecutionError]
+  @throws[ExecutionException]
+  @throws[UncheckedExecutionException]
   def getAll(keys: Iterable[K]): Try[immutable.Map[K, V]] = {
     /*keys.foldLeft(Try(Map.empty[K, V])) {
       case (tmap, key) => for {
@@ -169,7 +178,7 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
 /** Utility functions to convert between Guava `LoadingCache[K, V]` and `LoadingCache[K, V]`
  *  and vice versa.
  */
-final object LoadingCache {
+object LoadingCache {
 
   /** Adds an `asScala` method that wraps Guava `LoadingCache[K, V]` in a Mango `LoadingCache[K, V]`
    *  using a `LoadingCacheWrapper[K, V]`.
