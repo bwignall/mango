@@ -14,7 +14,7 @@ ThisBuild / developers := List(
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
 // dependency tracking
-ThisBuild / tlCiDependencyGraphJob := true
+ThisBuild / tlCiDependencyGraphJob := false
 
 // generate documentation
 ThisBuild / tlCiDocCheck := true
