@@ -25,8 +25,8 @@ package org.feijoas.mango.common.collect.mutable
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect
 import org.feijoas.mango.common.collect.Range
-import scala.collection.generic.Growable
-import scala.collection.generic.Shrinkable
+import scala.collection.mutable.Growable
+import scala.collection.mutable.Shrinkable
 
 /** Implementation trait for mutable [[RangeMap]]
  *
@@ -36,9 +36,9 @@ import scala.collection.generic.Shrinkable
  */
 @Beta
 trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] with RangeMap[K, V, O]]
-  extends collect.RangeMapLike[K, V, O, Repr]
-  with Growable[(Range[K, O], V)]
-  with Shrinkable[Range[K, O]] {
+    extends collect.RangeMapLike[K, V, O, Repr]
+    with Growable[(Range[K, O], V)]
+    with Shrinkable[Range[K, O]] {
 
   /** Maps a range to a specified value.
    *
@@ -52,7 +52,9 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
 
   /** Puts all the associations from `rangeMap` into this range map.
    */
-  def putAll(rangeMap: collect.RangeMap[K, V, O]) = rangeMap.asMapOfRanges foreach { case (range, value) => put(range, value) }
+  def putAll(rangeMap: collect.RangeMap[K, V, O]) = rangeMap.asMapOfRanges().foreach { case (range, value) =>
+    put(range, value)
+  }
 
   /** Removes all associations from this range map.
    */
@@ -82,13 +84,13 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
   override def subRangeMap(range: Range[K, O]): Repr
 
   /** Alias for `#put(range, value)` */
-  final override def +=(kv: (Range[K, O], V)): this.type = {
+  final override def addOne(kv: (Range[K, O], V)): this.type = {
     put(kv._1, kv._2)
     this
   }
 
   /** Alias for `#remove(range)` */
-  final override def -=(range: Range[K, O]): this.type = {
+  final override def subtractOne(range: Range[K, O]): this.type = {
     remove(range)
     this
   }

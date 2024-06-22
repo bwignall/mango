@@ -22,14 +22,10 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
-import org.feijoas.mango.common.convert.AsScala
+import com.google.common.cache.RemovalNotification as GuavaRemovalNotification
 import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.cache.RemovalCause._
-
-import com.google.common.cache.{ RemovalNotification => GuavaRemovalNotification }
-import com.google.common.cache.{ RemovalCause => GuavaRemovalCause }
-import org.feijoas.mango.common.cache.RemovalCause._
+import org.feijoas.mango.common.cache.RemovalCause.*
+import org.feijoas.mango.common.convert.AsScala
 
 /** A notification of the removal of a single entry. The key and/or value may be
  *  `None` if the corresponding key/value was already garbage collected.
@@ -47,11 +43,7 @@ import org.feijoas.mango.common.cache.RemovalCause._
  *  @since 0.7 (copied from Guava-libraries)
  */
 @Beta
-case class RemovalNotification[+K, +V](
-    val key: Option[K],
-    val value: Option[V],
-    val cause: RemovalCause) {
-}
+case class RemovalNotification[+K, +V](val key: Option[K], val value: Option[V], val cause: RemovalCause) {}
 
 final object RemovalNotification {
 
@@ -66,7 +58,9 @@ final object RemovalNotification {
    *  @return An object with an `asScala` method that returns a Mango `RemovalNotification[K, V]`
    *   view of the argument
    */
-  implicit final def asMangoRemovalNotificationConverter[K, V](notification: GuavaRemovalNotification[K, V]): AsScala[RemovalNotification[K, V]] = {
+  implicit final def asMangoRemovalNotificationConverter[K, V](
+    notification: GuavaRemovalNotification[K, V]
+  ): AsScala[RemovalNotification[K, V]] = {
     val (key, value, cause) = (notification.getKey(), notification.getValue(), notification.getCause())
     new AsScala(RemovalNotification(Option(key), Option(value), cause.asScala))
   }

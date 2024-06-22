@@ -37,22 +37,22 @@ trait RangeMapFactory[Repr[K, V, O <: Ordering[K]] <: RangeMap[K, V, O] with Ran
 
   /** Returns an empty [[RangeMap]].
    */
-  def empty[K, V, O <: Ordering[K]](implicit ord: O): Repr[K, V, O] = newBuilder[K, V, O](ord).result
+  def empty[K, V, O <: Ordering[K]](implicit ord: O): Repr[K, V, O] = newBuilder[K, V, O](ord).result()
 
   /** Returns a [[RangeMap]] that contains the provided ranges
    */
   def apply[K, V, O <: Ordering[K]](entries: (Range[K, O], V)*)(implicit ord: O): Repr[K, V, O] = {
     val builder = newBuilder[K, V, O](ord)
     entries.foreach { builder += checkNotNull(_) }
-    builder.result
+    builder.result()
   }
 
   /** Returns a [[RangeMap]] initialized with the ranges in the specified range map.
    */
   def apply[K, V, O <: Ordering[K]](rangeMap: RangeMap[K, V, O])(implicit ord: O): Repr[K, V, O] = {
     val builder = newBuilder[K, V, O](ord)
-    rangeMap.asMapOfRanges.foreach { builder += checkNotNull(_) }
-    builder.result
+    rangeMap.asMapOfRanges().foreach { builder += checkNotNull(_) }
+    builder.result()
   }
 
   /** Returns a new builder for [[RangeMap]].

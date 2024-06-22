@@ -24,9 +24,9 @@ package org.feijoas.mango.common.cache
 
 import org.feijoas.mango.common.cache.RemovalCause.asGuavaRemovalCauseConverter
 import org.feijoas.mango.common.cache.RemovalCause.asMangoRemovalCauseConverter
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers.be
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
 import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
 
@@ -35,7 +35,7 @@ import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class RemovalCauseTest extends FlatSpec {
+class RemovalCauseTest extends AnyFlatSpec {
 
   behavior of "RemovalCause"
 

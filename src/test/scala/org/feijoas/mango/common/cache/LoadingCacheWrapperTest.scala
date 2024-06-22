@@ -23,30 +23,27 @@
 package org.feijoas.mango.common.cache
 
 import java.util.concurrent.ExecutionException
-import java.util.logging.{ Level, Logger }
-import java.lang.{ Iterable => jIterable }
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
+import java.lang.Iterable as jIterable
 import scala.concurrent.duration.MILLISECONDS
-import scala.concurrent.Future._
 import scala.collection.mutable
-import scala.util.{ Failure, Success }
-import org.feijoas.mango.common.annotations.Beta
+import scala.util.{Failure, Success}
 import org.feijoas.mango.common.base.Ticker.asMangoTickerConverter
 import org.feijoas.mango.common.cache.LoadingCache.asMangoLoadingCacheConverter
-import org.feijoas.mango.common.util.concurrent.Futures.asScalaFutureConverter
-import org.junit.Assert.{ assertSame, assertEquals, assertTrue }
-import org.mockito.ArgumentMatchers._
-import org.mockito.Mockito.{ times, verify, when }
-import org.scalatest._
-import org.scalatest.mockito.MockitoSugar
+import org.junit.Assert.{assertEquals, assertSame, assertTrue}
+import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.{times, verify, when}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatestplus.mockito.MockitoSugar
 import com.google.common.cache.CacheLoader.InvalidCacheLoadException
-import com.google.common.cache.{ LoadingCache => GuavaLoadingCache }
+import com.google.common.cache.LoadingCache as GuavaLoadingCache
 import com.google.common.testing.FakeTicker
-import com.google.common.util.concurrent.{ ExecutionError }
+import com.google.common.util.concurrent.ExecutionError
+
 import scala.concurrent.Future
-import scala.util.Failure
-import org.scalatest.BeforeAndAfter
+import org.scalatest.{Assertion, BeforeAndAfter}
 import com.google.common.util.concurrent.UncheckedExecutionException
+
 import java.util.concurrent.atomic.AtomicInteger
 import scala.ref.WeakReference
 import java.util.concurrent.TimeUnit
@@ -60,7 +57,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray
  *  @author Markus Schneider
  *  @since 0.7
  */
-class LoadingCacheWrapperTest extends FlatSpec
+class LoadingCacheWrapperTest
+    extends AnyFlatSpec
     with CacheWrapperBehaviour
     with Matchers
     with MockitoSugar
@@ -74,13 +72,13 @@ class LoadingCacheWrapperTest extends FlatSpec
     logger.setLevel(Level.OFF)
   }
 
-  def wrappedCacheFixture = {
+  def wrappedCacheFixture: (GuavaLoadingCache[String, Int], LoadingCache[String, Int]) = {
     val wrapped = mock[GuavaLoadingCache[String, Int]]
     val cache: LoadingCache[String, Int] = wrapped.asScala
     (wrapped, cache)
   }
 
-  "LoadingCacheWrapper" should behave like forwardingWrapper(wrappedCacheFixture)
+  ("LoadingCacheWrapper" should behave).like(forwardingWrapper(wrappedCacheFixture))
 
   behavior of "LoadingCacheWrapper"
 
@@ -138,155 +136,157 @@ class LoadingCacheWrapperTest extends FlatSpec
 
   it should "load values if not present" in {
     val cache = CacheBuilder.newBuilder().recordStats().build((a: Any) => a)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key1 = new Object()
     assertSame(key1, cache.get(key1).get)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     val key2 = new Object()
     assertSame(key2, cache.getUnchecked(key2))
-    cache.stats should have(missCount(2), loadSuccessCount(2), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(2), loadExceptionCount(0), hitCount(0))
 
     val key3 = new Object()
     cache.refresh(key3)
-    cache.stats should have(missCount(2), loadSuccessCount(3), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(3), loadExceptionCount(0), hitCount(0))
     assertSame(key3, cache.get(key3).get)
-    cache.stats should have(missCount(2), loadSuccessCount(3), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(2), loadSuccessCount(3), loadExceptionCount(0), hitCount(1))
 
     // callable is not called
     assertSame(key3, cache.getOrElseUpdate(key3, () => throw new Exception()))
-    cache.stats should have(missCount(2), loadSuccessCount(3), loadExceptionCount(0), hitCount(2))
+    cache.stats() should have(missCount(2), loadSuccessCount(3), loadExceptionCount(0), hitCount(2))
 
     val key4 = new Object()
     val value4 = new Object()
     assertSame(value4, cache.getOrElseUpdate(key4, () => value4))
-    cache.stats should have(missCount(3), loadSuccessCount(4), loadExceptionCount(0), hitCount(2))
+    cache.stats() should have(missCount(3), loadSuccessCount(4), loadExceptionCount(0), hitCount(2))
   }
 
   it should "be able to reload values" in {
-    val one = new Integer(1)
-    val two = new Integer(2)
+    val one = Integer.valueOf(1)
+    val two = Integer.valueOf(2)
 
-    val loader = new CacheLoader[Any, Any] {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.successful(two)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any] {
+      override def load(key: Any): Integer = one
+      override def reload(key: Any, oldValue: Any): Future[Integer] = Future.successful(two)
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object()
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(0))
 
     assertSame(two, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(1))
   }
 
   it should "be able to refresh values" in {
     val one = new Object()
     val two = new Object()
     val ticker = new FakeTicker
-    val loader = new CacheLoader[Any, Any] {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.successful(two)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any] {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Object] = Future.successful(two)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
       .build(loader)
 
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object()
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(two, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(2))
+    cache.stats() should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(2))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(two, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(3))
+    cache.stats() should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(3))
   }
 
   it should "reload the value if refreshAfterWrite expires" in {
     val one = new Object()
     val two = new Object()
     val ticker = new FakeTicker()
-    val loader = new CacheLoader[Any, Any] {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.successful(two)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any] {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Object] = Future.successful(two)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
       .build(loader)
 
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object()
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
-    ticker.advance(1, MILLISECONDS);
+    ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getIfPresent(key).get)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
 
-    ticker.advance(1, MILLISECONDS);
+    ticker.advance(1, MILLISECONDS)
     assertSame(two, cache.getIfPresent(key).get)
-    cache.stats should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(2))
+    cache.stats() should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(2))
 
-    ticker.advance(1, MILLISECONDS);
+    ticker.advance(1, MILLISECONDS)
     assertSame(two, cache.getIfPresent(key).get)
-    cache.stats should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(3))
+    cache.stats() should have(missCount(1), loadSuccessCount(2), loadExceptionCount(0), hitCount(3))
   }
 
   it should "be able to bulk load values" in {
     val bulkLoader = new CacheLoader[Int, Int]() {
-      override def load(key: Int) = key
-      override def loadAll(keys: Traversable[Int]): Map[Int, Int] = {
+      override def load(key: Int): Int = key
+      override def loadAll(keys: Iterable[Int]): Map[Int, Int] = {
         keys.map { (key: Int) => (key, load(key)) }.toMap
       }
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(bulkLoader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.getAll(List()) should be(Success(Map()))
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.getAll(List(1)) should be(Success(Map(1 -> 1)))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.getAll(List(1, 2, 3, 4)) should be(Success(Map(1 -> 1, 2 -> 2, 3 -> 3, 4 -> 4)))
-    cache.stats should have(missCount(4), loadSuccessCount(2), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(4), loadSuccessCount(2), loadExceptionCount(0), hitCount(1))
 
     cache.getAll(List(2, 3)) should be(Success(Map(2 -> 2, 3 -> 3)))
-    cache.stats should have(missCount(4), loadSuccessCount(2), loadExceptionCount(0), hitCount(3))
+    cache.stats() should have(missCount(4), loadSuccessCount(2), loadExceptionCount(0), hitCount(3))
 
     cache.getAll(List(4, 5)) should be(Success(Map(4 -> 4, 5 -> 5)))
-    cache.stats should have(missCount(5), loadSuccessCount(3), loadExceptionCount(0), hitCount(4))
+    cache.stats() should have(missCount(5), loadSuccessCount(3), loadExceptionCount(0), hitCount(4))
   }
 
   it should "ignore extra values returned from a bulk loader" in {
-    val extraValueBulkLoader = new CacheLoader[Any, Any]() {
+    val extraValueBulkLoader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
       override def load(key: Any) = new Object()
-      override def loadAll(keys: Traversable[Any]): Map[Any, Any] = {
-        val kvs = keys.map { case key => (key, new Object) }
+      override def loadAll(keys: Iterable[Any]): Map[Any, Any] = {
+        val kvs = keys.map(key => (key, new Object))
         kvs.toMap ++ // add extra entries
           kvs.map { case (key, value) => (value, key) }.toMap
       }
@@ -298,675 +298,676 @@ class LoadingCacheWrapperTest extends FlatSpec
     val result = cache.getAll(lookupKeys).get
     result.keySet should be(lookupKeys.toSet)
 
-    result.foreach {
-      case (key: Any, value: Any) =>
-        assertSame(value, result.get(key).get)
-        result.get(value) should be(None)
-        assertSame(value, cache.asMap().get(key).get)
-        assertSame(key, cache.asMap().get(value).get)
+    result.foreach { case (key: Any, value: Any) =>
+      assertSame(value, result(key))
+      result.get(value) should be(None)
+      assertSame(value, cache.asMap()(key))
+      assertSame(key, cache.asMap()(value))
     }
   }
 
   it should "not call CacheLoader#load if bulk loading is required" in {
     val extraKey: Any = new Object
     val extraValue: Any = new Object
-    val clobbingBulkLoader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = throw new AssertionError()
-      override def loadAll(keys: Traversable[Any]): Map[Any, Any] = {
-        val kvs = keys.map { case key => (key, new Object) }.toMap
-        kvs.toMap + ((extraKey, extraValue))
+    val clobbingBulkLoader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Any = throw new AssertionError()
+      override def loadAll(keys: Iterable[Any]): Map[Any, Any] = {
+        val kvs = keys.map(key => (key, new Object)).toMap
+        kvs + ((extraKey, extraValue))
       }
     }
 
     val cache = CacheBuilder.newBuilder().build(clobbingBulkLoader)
     cache.asMap().put(extraKey, extraKey)
-    assertSame(extraKey, cache.asMap().get(extraKey).get)
+    assertSame(extraKey, cache.asMap()(extraKey))
 
     val lookupKeys = List(new Object, new Object, new Object)
     val result = cache.getAll(lookupKeys).get
     result.keySet should be(lookupKeys.toSet)
 
-    result.foreach {
-      case (key: Any, value: Any) =>
-        assertSame(value, result.get(key).get)
-        assertSame(value, cache.asMap().get(key).get)
+    result.foreach { case (key: Any, value: Any) =>
+      assertSame(value, result(key))
+      assertSame(value, cache.asMap()(key))
     }
 
     result.get(extraKey) should be(None)
-    assertSame(extraValue, cache.asMap().get(extraKey).get)
+    assertSame(extraValue, cache.asMap()(extraKey))
   }
 
   it should "#getAll should be Failure if not all keys are in the Map returned by Loader#loadAll" in {
     val extraKey: Any = new Object
     val extraValue: Any = new Object
     val ignoringBulkLoader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = throw new AssertionError()
-      override def loadAll(keys: Traversable[Any]): Map[Any, Any] = {
+      override def load(key: Any): Any = throw new AssertionError()
+      override def loadAll(keys: Iterable[Any]): Map[Any, Any] = {
         // ignore request keys
         Map(extraKey -> extraValue)
       }
     }
 
-    val cache = CacheBuilder.newBuilder().build(ignoringBulkLoader)
+    val cache: LoadingCache[Any, Any] = CacheBuilder.newBuilder().build(ignoringBulkLoader)
     val lookupKeys = List(new Object, new Object, new Object)
     cache.getAll(lookupKeys) match {
-      case Failure(e: InvalidCacheLoadException) => // expected
-      case _                                     => fail
+      case Failure(_: InvalidCacheLoadException) => // expected
+      case _                                     => fail()
     }
 
-    assertSame(extraValue, cache.asMap().get(extraKey).get)
+    assertSame(extraValue, cache.asMap()(extraKey))
   }
 
   it should "fail if the loader throws an error" in {
     val e = new Error()
-    val loader = (arg: Any) => throw e
+    val loader = (_: Any) => throw e
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
-      case Failure(expected: ExecutionError) => assertSame(e, expected.getCause())
-      case _                                 => fail
+      case Failure(expected: ExecutionError) => assertSame(e, expected.getCause)
+      case _                                 => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
 
     try {
       cache.getUnchecked(new Object)
-      fail()
     } catch {
-      case expected: ExecutionError => assertSame(e, expected.getCause())
+      case expected: ExecutionError => assertSame(e, expected.getCause)
     }
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
 
     cache.refresh(new Object)
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
 
     val callableError = new Error()
     try {
       cache.getOrElseUpdate(key, () => throw callableError)
-      fail()
     } catch {
-      case expected: ExecutionError => assertSame(callableError, expected.getCause())
+      case expected: ExecutionError => assertSame(callableError, expected.getCause)
     }
-    cache.stats should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
+    cache.stats() should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(expected: ExecutionError) => assertSame(e, expected.getCause())
-      case _                                 => fail
+      case Failure(expected: ExecutionError) => assertSame(e, expected.getCause)
+      case _                                 => fail()
     }
-    cache.stats should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
+    cache.stats() should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
 
   it should "handle execptions during reload" in {
     val one = new Object
     val e = new Error
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = throw e
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Any] = throw e
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "handle execptions in the Future returned by reload" in {
     val one = new Object
     val e = new Error
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "fail if the loader returns null" in {
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
-      .build((any: Any) => null)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+      .build((_: Any) => null)
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
-      case Failure(e: InvalidCacheLoadException) => // expected
+      case Failure(_: InvalidCacheLoadException) => // expected
       case _                                     => fail()
     }
 
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
 
     intercept[InvalidCacheLoadException] {
       cache.getUnchecked(new Object)
     }
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
 
     cache.refresh(new Object())
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
 
     intercept[InvalidCacheLoadException] {
       cache.getOrElseUpdate(new Object, () => null)
     }
-    cache.stats should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
+    cache.stats() should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(e: InvalidCacheLoadException) => // expected
+      case Failure(_: InvalidCacheLoadException) => // expected
       case _                                     => fail()
     }
 
-    cache.stats should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
+    cache.stats() should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
 
   it should "ignore the reloaded value if reload returns null" in {
     val one = new Object
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = null
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Null = null
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "ignore the reloaded value if reload returns a Future with null" in {
     val one = new Object
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.successful(null)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Null] = Future.successful(null)
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
-    cache.refresh(key);
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.refresh(key)
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "ignore the reloaded value if reload returns a Future with null (implicity by refreshAfterWrite)" in {
     val one = new Object
     val ticker = new FakeTicker()
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.successful(null)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Null] = Future.successful(null)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
       .build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
     // refreshed
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
   }
 
   it should "fail if CacheLoader#loadAll has a null value in the returned Map" in {
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = fail
-      override def loadAll(keys: Traversable[Any]) = keys.map { case key => (key, null) }.toMap
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Any = fail()
+      override def loadAll(keys: Iterable[Any]): Map[Any, Null] = keys.map(key => (key, null)).toMap
     }
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(e: InvalidCacheLoadException) => // expected
-      case _                                     => fail
+      case Failure(_: InvalidCacheLoadException) => // expected
+      case _                                     => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
   }
 
   it should "fail if CacheLoader#loadAll returns null" in {
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(key: Any) = fail
-      override def loadAll(keys: Traversable[Any]) = null
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(key: Any): Any = fail()
+      override def loadAll(keys: Iterable[Any]): Null = null
     }
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(e: InvalidCacheLoadException) => // expected
-      case _                                     => fail
+      case Failure(_: InvalidCacheLoadException) => // expected
+      case _                                     => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
   }
 
   it should "fail if the loader throws an Error" in {
     val error = new Error()
-    val cache = CacheBuilder.newBuilder().recordStats().build((any: Any) => throw error)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    val cache = CacheBuilder.newBuilder().recordStats().build((_: Any) => throw error)
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
       case Failure(expected: ExecutionError) => assertSame(error, expected.getCause)
-      case _                                 => fail
+      case _                                 => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
 
     try {
       cache.getUnchecked(new Object())
-      fail
     } catch {
       case expected: ExecutionError => assertSame(error, expected.getCause)
-      case _: Throwable             => fail
+      case _: Throwable             => fail()
     }
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
 
     cache.refresh(new Object())
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
 
     val callableError = new Error
     try {
       cache.getOrElseUpdate(new Object, () => throw callableError)
-      fail
     } catch {
       case expected: ExecutionError => assertSame(callableError, expected.getCause)
-      case _: Throwable             => fail
+      case _: Throwable             => fail()
     }
-    cache.stats should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
+    cache.stats() should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
 
     cache.getAll(List(new Object)) match {
       case Failure(expected: ExecutionError) => assertSame(error, expected.getCause)
-      case _                                 => fail
+      case _                                 => fail()
     }
-    cache.stats should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
+    cache.stats() should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
 
   it should "only log the error thrown in #reload" in {
     val one = new Object
     val e = new Error
 
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = throw e
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Any] = throw e
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "only log the error returned as a failed Future by #reload" in {
     val one = new Object
     val e = new Error
 
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "not replace value if an execption occures during #reload" in {
     val one = new Object
     val e = new Error
     val ticker = new FakeTicker()
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
 
-    val cache = CacheBuilder.newBuilder()
+    val cache = CacheBuilder
+      .newBuilder()
       .recordStats()
       .ticker(ticker.asScala)
       .refreshAfterWrite(1, MILLISECONDS)
       .build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
-    ticker.advance(1, MILLISECONDS);
+    ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
     // refreshed
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
   }
 
   it should "return a failure from #getAll if loader#loadAll throws an error" in {
     val e = new Error()
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = throw e
-      override def loadAll(keys: Traversable[Any]) = throw e
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Any = throw e
+      override def loadAll(keys: Iterable[Any]): Map[Any, Any] = throw e
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
-    val key = new Object
+    val _ = new Object
     cache.getAll(List(new Object)) match {
-      case Failure(expected: ExecutionError) => assertSame(e, expected.getCause())
-      case _                                 => fail
+      case Failure(expected: ExecutionError) => assertSame(e, expected.getCause)
+      case _                                 => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
   }
 
   it should "throw an UncheckedExecutionException in #getUncheched if loader throws an Exception" in {
     val e = new Exception
-    val loader = (any: Any) => throw e
+    val loader = (_: Any) => throw e
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
-      case Failure(expected: ExecutionException) => assertSame(e, expected.getCause())
-      case _                                     => fail
+      case Failure(expected: ExecutionException) => assertSame(e, expected.getCause)
+      case _                                     => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
 
     try {
       cache.getUnchecked(new Object())
-      fail()
     } catch {
-      case expected: UncheckedExecutionException => assertSame(e, expected.getCause())
-      case _: Throwable                          => fail
+      case expected: UncheckedExecutionException => assertSame(e, expected.getCause)
+      case _: Throwable                          => fail()
     }
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
 
     cache.refresh(new Object)
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
 
     val callableException = new Exception()
     try {
       cache.getOrElseUpdate(new Object, () => throw callableException)
-      fail()
     } catch {
-      case expected: ExecutionException => assertSame(callableException, expected.getCause())
+      case expected: ExecutionException => assertSame(callableException, expected.getCause)
     }
-    cache.stats should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
+    cache.stats() should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(expected: ExecutionException) => assertSame(e, expected.getCause())
-      case _                                     => fail
+      case Failure(expected: ExecutionException) => assertSame(e, expected.getCause)
+      case _                                     => fail()
     }
-    cache.stats should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
+    cache.stats() should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
 
   it should "not replace the value in the cache if Loader#reload throws an Exception" in {
     val one = new Object()
     val e = new Exception()
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = throw e
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Any] = throw e
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "not replace the value in the cache if Loader#reload returns a failed Future" in {
     val one = new Object
     val e = new Exception
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "not replace the value in the cache if Loader#reload returns a failed Future on refreshAfterWrite" in {
     val one = new Object
     val e = new Exception
     val ticker = new FakeTicker
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
 
-    val cache = CacheBuilder.newBuilder()
-      .recordStats().ticker(ticker.asScala)
-      .refreshAfterWrite(1, MILLISECONDS).build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    val cache = CacheBuilder
+      .newBuilder()
+      .recordStats()
+      .ticker(ticker.asScala)
+      .refreshAfterWrite(1, MILLISECONDS)
+      .build(loader)
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
     // refreshed
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
   }
 
   it should "return Failure on bulk-load if loadAll throws a checked exception" in {
     val e = new Exception
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = throw e
-      override def loadAll(keys: Traversable[Any]) = throw e
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Any = throw e
+      override def loadAll(keys: Iterable[Any]): Map[Any, Any] = throw e
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(expected: ExecutionException) => assertSame(e, expected.getCause())
-      case _                                     => fail
+      case Failure(expected: ExecutionException) => assertSame(e, expected.getCause)
+      case _                                     => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
   }
 
   it should "return Failure if #load throws an unchecked exception" in {
     val e = new RuntimeException()
-    val cache = CacheBuilder.newBuilder().recordStats().build((any: Any) => throw e)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    val cache = CacheBuilder.newBuilder().recordStats().build((_: Any) => throw e)
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     cache.get(new Object) match {
-      case Failure(expected: UncheckedExecutionException) => assertSame(e, expected.getCause())
-      case _ => fail
+      case Failure(expected: UncheckedExecutionException) => assertSame(e, expected.getCause)
+      case _                                              => fail()
     }
-    cache.stats should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(0), loadExceptionCount(1), hitCount(0))
 
     try {
       cache.getUnchecked(new Object)
-      fail()
     } catch {
       case expected: UncheckedExecutionException => assertSame(e, expected.getCause)
     }
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(2), hitCount(0))
 
     cache.refresh(new Object)
-    cache.stats should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
+    cache.stats() should have(missCount(2), loadSuccessCount(0), loadExceptionCount(3), hitCount(0))
 
-    val callableException = new RuntimeException();
+    val callableException = new RuntimeException()
     try {
       cache.getOrElseUpdate(new Object, () => throw callableException)
-      fail()
     } catch {
       case expected: UncheckedExecutionException => assertSame(callableException, expected.getCause)
     }
-    cache.stats should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
+    cache.stats() should have(missCount(3), loadSuccessCount(0), loadExceptionCount(4), hitCount(0))
 
     cache.getAll(List(new Object)) match {
-      case Failure(expected: UncheckedExecutionException) => assertSame(e, expected.getCause())
-      case _ => fail
+      case Failure(expected: UncheckedExecutionException) => assertSame(e, expected.getCause)
+      case _                                              => fail()
     }
-    cache.stats should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
+    cache.stats() should have(missCount(4), loadSuccessCount(0), loadExceptionCount(5), hitCount(0))
   }
 
   it should "not fail if reload throws an unchecked exception" in {
     val one = new Object
     val e = new RuntimeException
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = throw e
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Any] = throw e
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "not fail on refresh if reload returns a Future with an unchecked exception" in {
     val one = new Object
     val e = new RuntimeException
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
 
     val cache = CacheBuilder.newBuilder().recordStats().build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     cache.refresh(key)
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(0))
 
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(1))
   }
 
   it should "not fail on reload if reload returns a Future with an unchecked exception" in {
     val one = new Object
     val e = new RuntimeException
-    val loader = new CacheLoader[Any, Any]() {
-      override def load(any: Any) = one
-      override def reload(key: Any, oldValue: Any) = Future.failed(e)
+    val loader: CacheLoader[Any, Any] = new CacheLoader[Any, Any]() {
+      override def load(any: Any): Object = one
+      override def reload(key: Any, oldValue: Any): Future[Nothing] = Future.failed(e)
     }
     val ticker = new FakeTicker
 
-    val cache = CacheBuilder.newBuilder()
-      .recordStats().ticker(ticker.asScala)
-      .refreshAfterWrite(1, MILLISECONDS).build(loader)
-    cache.stats should be(CacheStats(0, 0, 0, 0, 0, 0))
+    val cache = CacheBuilder
+      .newBuilder()
+      .recordStats()
+      .ticker(ticker.asScala)
+      .refreshAfterWrite(1, MILLISECONDS)
+      .build(loader)
+    cache.stats() should be(CacheStats(0, 0, 0, 0, 0, 0))
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(0))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(0), hitCount(1))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
     // refreshed
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(1), hitCount(2))
 
     ticker.advance(1, MILLISECONDS)
     assertSame(one, cache.getUnchecked(key))
-    cache.stats should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
+    cache.stats() should have(missCount(1), loadSuccessCount(1), loadExceptionCount(2), hitCount(3))
   }
 
   it should "not notify removal listener if reload fails" in {
@@ -977,7 +978,7 @@ class LoadingCacheWrapperTest extends FlatSpec
         if (count.getAndIncrement() == 0) {
           throw e
         }
-        return key.toString
+        key.toString
       }
     }
     val removalListener = new CountingRemovalListener[Int, String]
@@ -987,7 +988,7 @@ class LoadingCacheWrapperTest extends FlatSpec
       cache.getUnchecked(1)
       fail()
     } catch {
-      case ue: UncheckedExecutionException => assertSame(e, ue.getCause())
+      case ue: UncheckedExecutionException => assertSame(e, ue.getCause)
     }
 
     cache.getUnchecked(1) should be("1")
@@ -1002,39 +1003,41 @@ class LoadingCacheWrapperTest extends FlatSpec
 
   it should "reaload after value reclamation" in {
     val countingLoader = new CountingLoader
-    val cache = CacheBuilder.newBuilder()
-      .weakValues().build(countingLoader)
+    val cache: LoadingCache[Any, Any] = CacheBuilder
+      .newBuilder()
+      .weakValues()
+      .build(countingLoader)
     val map = cache.asMap()
 
     val iterations = 10
     var ref = new WeakReference[AnyRef](null)
-    var expectedComputations = 0
+    var expectedComputations: Int = 0
     for (i <- 0 until iterations) {
       // The entry should get garbage collected and recomputed.
       var oldValue = ref.get
-      if (oldValue == None) {
+      if (oldValue.isEmpty) {
         expectedComputations = expectedComputations + 1
       }
       ref = new WeakReference[AnyRef](cache.getUnchecked(1).asInstanceOf[AnyRef])
       oldValue = None
-      Thread.sleep(i)
+      Thread.sleep(i.toLong)
       System.gc()
     }
-    assertEquals(expectedComputations, countingLoader.getCount())
+    assertEquals(expectedComputations.toLong, countingLoader.getCount.toLong)
 
     for (i <- 0 until iterations) {
       // The entry should get garbage collected and recomputed.
       var oldValue = ref.get
-      if (oldValue == None) {
+      if (oldValue.isEmpty) {
         expectedComputations = expectedComputations + 1
       }
       cache.refresh(1)
-      ref = new WeakReference[AnyRef](map.get(1).get.asInstanceOf[AnyRef])
+      ref = new WeakReference[AnyRef](map(1).asInstanceOf[AnyRef])
       oldValue = None
-      Thread.sleep(i)
+      Thread.sleep(i.toLong)
       System.gc()
     }
-    assertEquals(expectedComputations, countingLoader.getCount())
+    assertEquals(expectedComputations.toLong, countingLoader.getCount.toLong)
   }
 
   it should "be able to load concurrently" in {
@@ -1056,13 +1059,13 @@ class LoadingCacheWrapperTest extends FlatSpec
    * On a successful concurrent computation, only one thread does the work,
    *  but all the threads get the same result.
    */
-  private def testConcurrentLoadingDefault(builder: CacheBuilder[Any, Any]) = {
+  private def testConcurrentLoadingDefault(builder: CacheBuilder[Any, Any]): Unit = {
     val count = 10
     val callCount = new AtomicInteger
     val startSignal = new CountDownLatch(count + 1)
     val result = new Object
 
-    val cache = builder.build(new CacheLoader[String, AnyRef]() {
+    val cache: LoadingCache[String, AnyRef] = builder.build(new CacheLoader[String, AnyRef]() {
       override def load(key: String): AnyRef = {
         callCount.incrementAndGet()
         startSignal.await()
@@ -1088,7 +1091,7 @@ class LoadingCacheWrapperTest extends FlatSpec
     val callCount = new AtomicInteger
     val startSignal = new CountDownLatch(count + 1)
 
-    val cache = builder.build(new CacheLoader[String, AnyRef]() {
+    val cache: LoadingCache[String, AnyRef] = builder.build(new CacheLoader[String, AnyRef]() {
       override def load(key: String): AnyRef = {
         callCount.incrementAndGet()
         startSignal.await()
@@ -1110,7 +1113,7 @@ class LoadingCacheWrapperTest extends FlatSpec
       cache.getUnchecked("bar")
       fail()
     } catch {
-      case expected: InvalidCacheLoadException =>
+      case _: InvalidCacheLoadException =>
     }
     callCount.get() should be(2)
   }
@@ -1121,13 +1124,13 @@ class LoadingCacheWrapperTest extends FlatSpec
    *  once. The result should not be cached (a later request should call the
    *  loader again).
    */
-  def testConcurrentLoadingUncheckedException(builder: CacheBuilder[Any, Any]) = {
+  def testConcurrentLoadingUncheckedException(builder: CacheBuilder[Any, Any]): Assertion = {
     val count = 10
     val callCount = new AtomicInteger
     val startSignal = new CountDownLatch(count + 1)
     val e = new RuntimeException()
 
-    val cache = builder.build(new CacheLoader[String, AnyRef]() {
+    val cache: LoadingCache[String, AnyRef] = builder.build(new CacheLoader[String, AnyRef]() {
       override def load(key: String): AnyRef = {
         callCount.incrementAndGet()
         startSignal.await()
@@ -1146,7 +1149,7 @@ class LoadingCacheWrapperTest extends FlatSpec
       // UncheckedExecutionException.
       result(i) match {
         case _: UncheckedExecutionException => // expected
-        case _                              => fail
+        case _                              => fail()
       }
       assertSame(e, result(i).asInstanceOf[UncheckedExecutionException].getCause)
     }
@@ -1157,8 +1160,8 @@ class LoadingCacheWrapperTest extends FlatSpec
       cache.getUnchecked("bar")
       fail()
     } catch {
-      case expected: UncheckedExecutionException => // expected
-      case _: Throwable                          => fail
+      case _: UncheckedExecutionException => // expected
+      case _: Throwable                   => fail()
     }
     callCount.get() should be(2)
   }
@@ -1175,7 +1178,7 @@ class LoadingCacheWrapperTest extends FlatSpec
     val startSignal = new CountDownLatch(count + 1)
     val e = new IOException
 
-    val cache = builder.build(new CacheLoader[String, AnyRef]() {
+    val cache: LoadingCache[String, AnyRef] = builder.build(new CacheLoader[String, AnyRef]() {
       override def load(key: String): AnyRef = {
         callCount.incrementAndGet()
         startSignal.await()
@@ -1197,14 +1200,14 @@ class LoadingCacheWrapperTest extends FlatSpec
       if (mod == 0 || mod == 2) {
         result(i) match {
           case _: ExecutionException => // expected
-          case _                     => fail
+          case _                     => fail()
         }
         assertSame(e, result(i).asInstanceOf[ExecutionException].getCause)
 
       } else {
         result(i) match {
           case _: UncheckedExecutionException => // expected
-          case _                              => fail
+          case _                              => fail()
         }
         assertSame(e, result(i).asInstanceOf[UncheckedExecutionException].getCause)
       }
@@ -1214,10 +1217,10 @@ class LoadingCacheWrapperTest extends FlatSpec
     // exception
     try {
       cache.getUnchecked("bar")
-      fail
+      fail()
     } catch {
-      case expected: UncheckedExecutionException =>
-      case _: Throwable                          => fail
+      case _: UncheckedExecutionException =>
+      case _: Throwable                   => fail()
     }
     callCount.get() should be(2)
   }
@@ -1235,13 +1238,17 @@ class LoadingCacheWrapperTest extends FlatSpec
    *  call {@code get}. If the cache throws exceptions, this difference may be
    *  visible in the returned List.
    */
-  private def doConcurrentGet[K](cache: LoadingCache[K, AnyRef], key: K, nThreads: Int, gettersStartedSignal: CountDownLatch): List[AnyRef] = {
+  private def doConcurrentGet[K](cache: LoadingCache[K, AnyRef],
+                                 key: K,
+                                 nThreads: Int,
+                                 gettersStartedSignal: CountDownLatch
+  ): List[AnyRef] = {
     val result = new AtomicReferenceArray[AnyRef](nThreads)
     val gettersComplete = new CountDownLatch(nThreads)
     for (i <- 0 until nThreads) {
       val index = i
       val thread = new Thread(new Runnable() {
-        override def run() = {
+        override def run(): Unit = {
           gettersStartedSignal.countDown()
           var value: AnyRef = null
           try {
@@ -1254,7 +1261,7 @@ class LoadingCacheWrapperTest extends FlatSpec
               cache.refresh(key)
               value = cache.get(key).get
             }
-            result.set(index, value);
+            result.set(index, value)
           } catch {
             case t: Throwable => result.set(index, t)
           }
@@ -1266,18 +1273,18 @@ class LoadingCacheWrapperTest extends FlatSpec
       // inside CacheLoader.load
       // (in startSignal.await()), and the others waiting for that
       // thread's result.
-      while (thread.isAlive() && thread.getState() != Thread.State.WAITING) {
-        Thread.`yield`
+      while (thread.isAlive && thread.getState != Thread.State.WAITING) {
+        Thread.`yield`()
       }
     }
     gettersStartedSignal.countDown()
     gettersComplete.await()
 
-    var resultList = mutable.MutableList[AnyRef]()
-    for (i <- (0 until nThreads)) {
-      resultList = resultList ++ mutable.MutableList(result.get(i))
+    var resultList = mutable.ListBuffer[AnyRef]()
+    for (i <- 0 until nThreads) {
+      resultList = resultList ++ mutable.ListBuffer(result.get(i))
     }
-    return List.empty ++ resultList
+    List.empty ++ resultList
   }
 
   it should "be possible to view #asMap during loading" in {
@@ -1301,35 +1308,35 @@ class LoadingCacheWrapperTest extends FlatSpec
     map.put(refreshKey, refreshKey)
     map.size should be(1)
     map.keySet.contains(getKey) should be(false)
-    assertSame(refreshKey, map.get(refreshKey).get)
+    assertSame(refreshKey, map(refreshKey))
 
     new Thread() {
-      override def run {
+      override def run(): Unit = {
         cache.getUnchecked(getKey)
-        getFinishedSignal.countDown
+        getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     new Thread() {
-      override def run {
+      override def run(): Unit = {
         cache.refresh(refreshKey)
-        getFinishedSignal.countDown
+        getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
-    getStartedSignal.await
+    getStartedSignal.await()
 
     // computation is in progress; asMap shouldn't have changed
     map.size should be(1)
     map.keySet.contains(getKey) should be(false)
-    assertSame(refreshKey, map.get(refreshKey).get)
+    assertSame(refreshKey, map(refreshKey))
 
     // let computation complete
-    letGetFinishSignal.countDown
-    getFinishedSignal.await
+    letGetFinishSignal.countDown()
+    getFinishedSignal.await()
 
     // asMap view should have been updated
-    cache.size should be(2)
+    cache.size() should be(2)
     map.get(getKey) should be(Some(getKey + suffix))
     map.get(refreshKey) should be(Some(refreshKey + suffix))
   }
@@ -1355,18 +1362,18 @@ class LoadingCacheWrapperTest extends FlatSpec
     map.put(refreshKey, refreshKey)
 
     new Thread() {
-      override def run() = {
+      override def run(): Unit = {
         cache.getUnchecked(getKey)
         getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     new Thread() {
-      override def run() = {
+      override def run(): Unit = {
         cache.refresh(refreshKey)
         getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     computationStarted.await()
     cache.invalidate(getKey)
@@ -1379,10 +1386,10 @@ class LoadingCacheWrapperTest extends FlatSpec
     getFinishedSignal.await()
 
     // results should be visible
-    cache.size should be(2)
-    map.get(getKey).get should be(getKey + suffix)
-    map.get(refreshKey).get should be(refreshKey + suffix)
-    cache.size should be(2)
+    cache.size() should be(2)
+    map(getKey) should be(getKey + suffix)
+    map(refreshKey) should be(refreshKey + suffix)
+    cache.size() should be(2)
   }
 
   it should "be able to invalidate and reload during loading" in {
@@ -1405,18 +1412,18 @@ class LoadingCacheWrapperTest extends FlatSpec
     map.put(refreshKey, refreshKey)
 
     new Thread() {
-      override def run() = {
+      override def run(): Unit = {
         cache.getUnchecked(getKey)
         getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     new Thread() {
-      override def run() = {
+      override def run(): Unit = {
         cache.refresh(refreshKey)
         getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     computationStarted.await()
     cache.invalidate(getKey)
@@ -1426,26 +1433,26 @@ class LoadingCacheWrapperTest extends FlatSpec
 
     // start new computations
     new Thread() {
-      override def run() = {
+      override def run(): Unit = {
         cache.getUnchecked(getKey)
         getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     new Thread() {
-      override def run() = {
+      override def run(): Unit = {
         cache.refresh(refreshKey)
         getFinishedSignal.countDown()
       }
-    }.start
+    }.start()
 
     // let computation complete
     letGetFinishSignal.countDown()
     getFinishedSignal.await()
 
     // results should be visible
-    cache.size should be(2)
-    map.get(getKey).get should be(getKey + suffix)
-    map.get(refreshKey).get should be(refreshKey + suffix)
+    cache.size() should be(2)
+    map(getKey) should be(getKey + suffix)
+    map(refreshKey) should be(refreshKey + suffix)
   }
 }

@@ -24,10 +24,11 @@ package org.feijoas.mango.common.cache
 
 import org.feijoas.mango.common.cache.CacheStats._
 import org.scalacheck.Gen
-import org.scalatest._
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
-import com.google.common.cache.{ CacheStats => GuavaCacheStats }
+import com.google.common.cache.{CacheStats => GuavaCacheStats}
 
 /**
  * Tests for [[CacheStats]]
@@ -35,14 +36,12 @@ import com.google.common.cache.{ CacheStats => GuavaCacheStats }
  *  @author Markus Schneider
  *  @since 0.7
  */
-class CacheStatsTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
+class CacheStatsTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 
   behavior of "CacheStats"
 
   // a non-negative generator
-  val nonNegGen: Gen[Long] = Gen.frequency(
-    1 -> 0,
-    2 -> Gen.choose(0, Long.MaxValue / 2))
+  val nonNegGen: Gen[Long] = Gen.frequency(1 -> 0, 2 -> Gen.choose(0, Long.MaxValue / 2))
 
   // a CacheStats generator
   val cacheStatsGen: Gen[GuavaCacheStats] = for {
@@ -68,36 +67,34 @@ class CacheStatsTest extends FlatSpec with GeneratorDrivenPropertyChecks with Ma
       mango.evictionCount should be(guava.evictionCount())
 
       // check methods
-      mango.hitRate should be(guava.hitRate())
-      mango.loadExceptionRate should be(guava.loadExceptionRate())
-      mango.missRate should be(guava.missRate())
+      mango.hitRate() should be(guava.hitRate())
+      mango.loadExceptionRate() should be(guava.loadExceptionRate())
+      mango.missRate() should be(guava.missRate())
       mango.totalLoadTime should be(guava.totalLoadTime())
       mango.requestCount should be(guava.requestCount())
-      mango.averageLoadPenalty should be(guava.averageLoadPenalty())
+      mango.averageLoadPenalty() should be(guava.averageLoadPenalty())
     }
   }
 
   it should "be able to add values" in {
-    forAll(cacheStatsGen, cacheStatsGen) {
-      (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
-        val mangoA: CacheStats = guavaA.asScala
-        val mangoB: CacheStats = guavaB.asScala
+    forAll(cacheStatsGen, cacheStatsGen) { (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
+      val mangoA: CacheStats = guavaA.asScala
+      val mangoB: CacheStats = guavaB.asScala
 
-        // if the first test passes we can safely convert a Guava-CacheStats
-        // to a mango implementation
-        (mangoA + mangoB) should be(guavaA.plus(guavaB).asScala)
+      // if the first test passes we can safely convert a Guava-CacheStats
+      // to a mango implementation
+      (mangoA + mangoB) should be(guavaA.plus(guavaB).asScala)
     }
   }
 
   it should "be able to subtract values" in {
-    forAll(cacheStatsGen, cacheStatsGen) {
-      (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
-        val mangoA: CacheStats = guavaA.asScala
-        val mangoB: CacheStats = guavaB.asScala
+    forAll(cacheStatsGen, cacheStatsGen) { (guavaA: GuavaCacheStats, guavaB: GuavaCacheStats) =>
+      val mangoA: CacheStats = guavaA.asScala
+      val mangoB: CacheStats = guavaB.asScala
 
-        // if the first test passes we can safely convert a Guava-CacheStats
-        // to a mango implementation
-        (mangoA - mangoB) should be(guavaA.minus(guavaB).asScala)
+      // if the first test passes we can safely convert a Guava-CacheStats
+      // to a mango implementation
+      (mangoA - mangoB) should be(guavaA.minus(guavaB).asScala)
     }
   }
 

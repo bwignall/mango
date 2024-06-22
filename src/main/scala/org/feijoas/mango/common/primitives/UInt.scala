@@ -100,7 +100,10 @@ final object UInt {
    */
   def valueOf(value: BigInt): UInt = {
     checkNotNull(value)
-    checkArgument(value.signum >= 0 && value.bitLength <= Integer.SIZE, "value (%s) is outside the range for an unsigned integer value", value)
+    checkArgument(value.signum >= 0 && value.bitLength <= Integer.SIZE,
+                  "value (%s) is outside the range for an unsigned integer value",
+                  value
+    )
     fromIntBits(value.intValue)
   }
 
@@ -147,9 +150,9 @@ final object UInt {
   def min(array: UInt*): UInt = {
     checkArgument(array.length > 0)
     val it = array.iterator
-    var min = flip(it.next.value)
+    var min = flip(it.next().value)
     while (it.hasNext) {
-      val next = flip(it.next.value)
+      val next = flip(it.next().value)
       if (next < min)
         min = next
     }
@@ -166,9 +169,9 @@ final object UInt {
   def max(array: UInt*): UInt = {
     checkArgument(array.length > 0)
     val it = array.iterator
-    var max = flip(it.next.value)
+    var max = flip(it.next().value)
     while (it.hasNext) {
-      val next = flip(it.next.value)
+      val next = flip(it.next().value)
       if (next > max) {
         max = next
       }
@@ -190,9 +193,9 @@ final object UInt {
     } else {
       val it = array.iterator
       val builder = new StringBuilder(array.length * 5)
-      builder.append(it.next.toString)
+      builder.append(it.next().toString)
       while (it.hasNext) {
-        builder.append(separator).append(it.next.toString)
+        builder.append(separator).append(it.next().toString)
       }
       builder.toString
     }
@@ -338,14 +341,14 @@ final class UInt private (val value: Int) extends AnyVal with Ordered[UInt] with
   /** Returns the value of this {@code UInt} as a {@code Float}, analogous to a widening
    *  primitive conversion from {@code Int} to {@code Float}, and correctly rounded.
    */
-  def toFloat(): Float = toLong
+  def toFloat(): Float = toLong().toFloat
 
   /** Returns the value of this {@code UInt} as a {@code Double}, analogous to a widening
    *  primitive conversion from {@code Int} to {@code Double}, and correctly rounded.
    */
-  def toDouble(): Double = toLong
+  def toDouble(): Double = toLong().toDouble
 
   /** Returns the value of this {@code UInt} as a {@code BigInt}.
    */
-  def toBigInt() = BigInt(toLong)
+  def toBigInt(): BigInt = BigInt(toLong())
 }

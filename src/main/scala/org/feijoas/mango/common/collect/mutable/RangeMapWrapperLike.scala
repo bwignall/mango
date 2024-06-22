@@ -22,14 +22,10 @@
  */
 package org.feijoas.mango.common.collect.mutable
 
-import scala.collection.convert.decorateAll.mapAsScalaMapConverter
 import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.AsOrdered.asOrdered
-import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
-import com.google.common.{ collect => gcc }
-import org.feijoas.mango.common.collect.AsOrdered
 import org.feijoas.mango.common.collect
 import org.feijoas.mango.common.collect.Range
+import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 
 /** Implementation trait for mutable [[RangeMap]] that delegates to Guava
  *
@@ -37,8 +33,13 @@ import org.feijoas.mango.common.collect.Range
  *  @since 0.9
  */
 @Beta
-private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeMapWrapperLike[K, V, O, Repr] with RangeMap[K, V, O]]
-  extends collect.RangeMapWrapperLike[K, V, O, Repr] with RangeMap[K, V, O] {
+private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeMapWrapperLike[K,
+                                                                                              V,
+                                                                                              O,
+                                                                                              Repr
+] with RangeMap[K, V, O]]
+    extends collect.RangeMapWrapperLike[K, V, O, Repr]
+    with RangeMap[K, V, O] {
   self =>
 
   override def clear() = delegate.clear()

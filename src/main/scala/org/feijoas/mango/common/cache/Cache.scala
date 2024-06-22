@@ -22,16 +22,11 @@
  */
 package org.feijoas.mango.common.cache
 
-import java.util.concurrent.ExecutionException
-
-import scala.Option.option2Iterable
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
-import scala.collection.{ concurrent, immutable }
-
-import org.feijoas.mango.common.annotations.Beta
+import com.google.common.cache.Cache as GuavaCache
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.cache.{ Cache => GuavaCache }
+import java.util.concurrent.ExecutionException
+import scala.collection.{concurrent, immutable}
 
 /**
  * A semi-persistent mapping from keys to values. Cache entries are manually added using
@@ -78,7 +73,7 @@ trait Cache[K, V] {
    * Returns a map of the values associated with `keys` in this cache.
    *  The returned map will only contain entries which are already present in the cache.
    */
-  def getAllPresent(keys: Traversable[K]): immutable.Map[K, V] = {
+  def getAllPresent(keys: Iterable[K]): immutable.Map[K, V] = {
     def getOptional(key: K): Option[(K, V)] = getIfPresent(key) match {
       case Some(value) => Some((key, value))
       case _           => None
@@ -103,8 +98,8 @@ trait Cache[K, V] {
    *  each `(key, value)` in the `Traversable`. The behavior of this operation is undefined
    *  if the specified map is modified while the operation is in progress.
    */
-  def putAll(kvs: Traversable[(K, V)]): Unit = {
-    kvs.seq foreach { kv => put(kv._1, kv._2) }
+  def putAll(kvs: Iterable[(K, V)]): Unit = {
+    kvs.foreach { kv => put(kv._1, kv._2) }
   }
 
   /**
@@ -115,7 +110,7 @@ trait Cache[K, V] {
   /**
    * Discards any cached values for keys `keys`.
    */
-  def invalidateAll(keys: Traversable[K]): Unit = { keys foreach invalidate }
+  def invalidateAll(keys: Iterable[K]): Unit = { keys.foreach(invalidate) }
 
   /**
    * Discards all entries in the cache.

@@ -34,13 +34,12 @@ import org.feijoas.mango.common.collect.RangeSetFactory
  *  @since 0.8
  */
 @Beta
-trait RangeSet[C, O <: Ordering[C]] extends collect.RangeSet[C, O] with RangeSetLike[C, O, RangeSet[C, O]] {
-
-}
+trait RangeSet[C, O <: Ordering[C]] extends collect.RangeSet[C, O] with RangeSetLike[C, O, RangeSet[C, O]] {}
 
 /** Factory for mutable [[RangeSet]]
  */
 final object RangeSet extends RangeSetFactory[RangeSet] {
 
-  override def newBuilder[C, O <: Ordering[C]](implicit ord: O): Builder[Range[C, O], RangeSet[C, O]] = TreeRangeSetWrapper.newBuilder
+  override def newBuilder[C, O <: Ordering[C]](implicit ord: O): Builder[Range[C, O], RangeSet[C, O]] =
+    TreeRangeSetWrapper.newBuilder
 }

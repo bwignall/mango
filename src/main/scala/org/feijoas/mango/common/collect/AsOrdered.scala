@@ -35,7 +35,7 @@ private[mango] case class AsOrdered[T](val value: T)(implicit ord: Ordering[T]) 
 
 /** Factory for AsOrdered
  */
-private[mango] final object AsOrdered {
+final private[mango] object AsOrdered {
 
   /** Implicit conversion from `Ordering[T]` to `AsOrdered[T]`
    */

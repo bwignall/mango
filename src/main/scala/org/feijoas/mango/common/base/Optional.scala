@@ -23,9 +23,9 @@
 package org.feijoas.mango.common.base
 
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert.{ AsJava, AsScala }
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.base.{ Optional => GuavaOptional }
+import com.google.common.base.{Optional => GuavaOptional}
 
 /** Utility functions for the work with `Option[T]` and `Optional[T]`
  *
@@ -56,10 +56,10 @@ final object Optional {
    *   view of the argument
    */
   implicit def asGuavaOptionalConverter[T](option: Option[T]): AsJava[GuavaOptional[T]] = {
-      def convert(option: Option[T]): GuavaOptional[T] = checkNotNull(option) match {
-        case Some(value) => GuavaOptional.of(value)
-        case None        => GuavaOptional.absent()
-      }
+    def convert(option: Option[T]): GuavaOptional[T] = checkNotNull(option) match {
+      case Some(value) => GuavaOptional.of(value)
+      case None        => GuavaOptional.absent()
+    }
     new AsJava(convert(option))
   }
 
@@ -74,10 +74,10 @@ final object Optional {
    *   view of the argument
    */
   implicit def asMangoOptionConverter[T](option: GuavaOptional[T]): AsScala[Option[T]] = {
-      def convert(option: GuavaOptional[T]) = option.isPresent() match {
-        case true  => Some(option.get())
-        case false => None
-      }
+    def convert(option: GuavaOptional[T]) = option.isPresent() match {
+      case true  => Some(option.get())
+      case false => None
+    }
     new AsScala(convert(option))
   }
 }

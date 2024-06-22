@@ -1,83 +1,59 @@
-/**
-  * Organization:
-  */
-organization     := "org.feijoas"
+/** Organization */
+ThisBuild / organization := "org.feijoas"
 
-/**
-  * Library Meta:
-  */
-name     := "mango"
-version  := "0.14"
+/** Library Meta */
+ThisBuild / tlBaseVersion := "0.14" // your current series x.y
 
-/**
-  * Scala:
-  */
-scalaVersion       := "2.12.1"
-crossScalaVersions := Seq("2.12.1")
+/** Scala */
+val Scala213 = "2.13.13"
+val Scala3 = "3.3.3"
+ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
+ThisBuild / scalaVersion := Scala213 // the default Scala
 
-/**
-  * Library Dependencies:
-  */
+/** Library Dependencies */
 
 // Versions:
-val GuavaVersion         = "20.0"
+val GuavaVersion = "33.2.1-jre"
+val findbugsV = "3.0.2"
+val junitV = "5.10.2"
+val mockitoV = "5.11.0"
+val scalacheckV = "3.2.18.0"
+val scalamockV = "6.0.0"
+val scalatestV = "3.2.18"
 
 // compile dependencies
 val guava = "com.google.guava" % "guava" % GuavaVersion
-val findbugs = "com.google.code.findbugs" % "jsr305" % "3.0.1"
+val findbugs = "com.google.code.findbugs" % "jsr305" % findbugsV
 
 // test dependencies
-val guavaTestlib = "com.google.guava" % "guava-testlib" % GuavaVersion % "test"
-val junit = "junit" % "junit" % "4.12" % "test"
-val scalatest = "org.scalatest" %% "scalatest" % "3.0.1" % "test"
-val scalacheck = "org.scalacheck" %% "scalacheck" % "1.13.4" % "test"
-val scalamock = "org.scalamock" %% "scalamock-scalatest-support" % "3.4.2" % Test
-val mockito = "org.mockito" % "mockito-core" % "2.3.11" % "test"
+val guavaTestlib = "com.google.guava" % "guava-testlib" % GuavaVersion % Test
+val junit = "junit" % "junit" % junitV % Test
+val scalatest = "org.scalatest" %% "scalatest" % scalatestV % Test
+val scalactic = "org.scalactic" %% "scalactic" % scalatestV
+val scalacheck = "org.scalatestplus" %% "scalacheck-1-18" % scalacheckV % Test
+//val scalacheck = "org.scalacheck" %% "scalacheck" % scalacheckV % Test
+val scalamock = "org.scalamock" %% "scalamock" % scalamockV % Test
+//val mockito = "org.mockito" % "mockito-core" % mockitoV % Test
+val mockito = "org.scalatestplus" %% "mockito-5-10" % scalacheckV % "test"
 
-libraryDependencies ++= Seq(guava, findbugs, guavaTestlib, junit, scalatest, scalacheck, scalamock, mockito)
+//lazy val root = tlCrossRootProject.aggregate(core)
 
-/**
-  * Tests:
-  */
-parallelExecution in Test := false
-
-/**
-  * Scoverage:
-  */
-coverageEnabled in Test := true
-
-/**
-  * Publishing to Sonatype:
-  */
-publishMavenStyle := true
-
-publishArtifact in Test := false
-
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-pomExtra := {
-  <url>mango.feijoas.org</url>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <scm>
-    <url>https://github.com/feijoas/mango.git</url>
-    <connection>https://github.com/feijoas/mango.git</connection>
-  </scm>
-  <developers>
-    <developer>         
-      <id>mschneiderwng</id>
-      <name>Markus Schneider</name>
-    </developer>
-  </developers>
-}
+lazy val core = // crossProject(JVMPlatform)
+  // .crossType(CrossType.Pure)
+  project
+    .in(file("."))
+    .settings(
+      name := "mango",
+      libraryDependencies ++= Seq(
+        guava,
+        findbugs,
+        guavaTestlib,
+        "org.junit.jupiter" % "junit-jupiter-api" % junitV % Test,
+        "org.junit.jupiter" % "junit-jupiter-engine" % junitV % Test,
+        scalatest,
+        scalactic,
+        scalacheck,
+        scalamock,
+        mockito
+      )
+    )

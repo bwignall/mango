@@ -22,11 +22,12 @@
  */
 package org.feijoas.mango.common.cache
 
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.cache.RemovalNotification._
+import com.google.common.cache.{
+  RemovalListener as GuavaRemovalListener,
+  RemovalNotification as GuavaRemovalNotification
+}
+import org.feijoas.mango.common.cache.RemovalNotification.*
 import org.feijoas.mango.common.convert.AsJava
-
-import com.google.common.cache.{ RemovalListener => GuavaRemovalListener, RemovalNotification => GuavaRemovalNotification }
 
 /** A function `RemovalNotification[K, V] => Unit` that can receive a notification when an entry is
  *  removed from a cache. The removal resulting in notification could have occured to an entry being
@@ -52,7 +53,9 @@ final object RemovalListener {
    *  @return An object with an `asJava` method that returns a Guava `RemovalListener`
    *   view of the argument
    */
-  implicit def asGuavaRemovalListenerConverter[K, V](listener: RemovalNotification[K, V] => Unit): AsJava[GuavaRemovalListener[K, V]] =
+  implicit def asGuavaRemovalListenerConverter[K, V](
+    listener: RemovalNotification[K, V] => Unit
+  ): AsJava[GuavaRemovalListener[K, V]] =
     new AsJava(new GuavaRemovalListener[K, V] {
       override def onRemoval(notification: GuavaRemovalNotification[K, V]): Unit = listener(notification.asScala)
     })

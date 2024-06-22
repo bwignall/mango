@@ -22,13 +22,12 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
-import org.feijoas.mango.common.annotations.Beta
-import org.mockito.Mockito.{ spy, times, verify }
-import org.scalatest.{ FlatSpec, MustMatchers }
-import org.scalatest.mockito.MockitoSugar
+import org.mockito.Mockito.{spy, times, verify}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 /**
  * Tests for [[LoadingCache]]
@@ -36,7 +35,7 @@ import org.scalatest.mockito.MockitoSugar
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class LoadingCacheTest extends FlatSpec with MustMatchers with MockitoSugar {
+class LoadingCacheTest extends AnyFlatSpec with Matchers with MockitoSugar {
 
   def fixture = {
     val loader = (key: String) => 100 / key.length
@@ -47,7 +46,7 @@ class LoadingCacheTest extends FlatSpec with MustMatchers with MockitoSugar {
   behavior of "the default implementations of Cache"
 
   "getUnchecked" must "return a value or throw an exception" in {
-    val (loader, cache) = fixture
+    val (_, cache) = fixture
     cache.getUnchecked("a") must be(100)
     intercept[com.google.common.util.concurrent.UncheckedExecutionException] {
       cache.getUnchecked("")
@@ -55,7 +54,7 @@ class LoadingCacheTest extends FlatSpec with MustMatchers with MockitoSugar {
   }
 
   "getAll" must "return Success with a map of all key/values or Failure" in {
-    val (loader, cache) = fixture
+    val (_, cache) = fixture
     cache.getAll(List("a", "bb", "cc")) must be(Success(Map("a" -> 100, "bb" -> 50, "cc" -> 50)))
     cache.getAll(List("a", "", "cc")) match {
       case Failure(_) => // expected
@@ -64,7 +63,7 @@ class LoadingCacheTest extends FlatSpec with MustMatchers with MockitoSugar {
   }
 
   "getAll" must "call get only once per key" in {
-    val (loader, unspyedcache) = fixture
+    val (_, unspyedcache) = fixture
     val cache = spy(unspyedcache)
     cache.getAll(List("a", "bb", "a")) must be(Success(Map("a" -> 100, "bb" -> 50)))
     verify(cache, times(1)).get("a")
@@ -76,5 +75,5 @@ class LoadingCacheTest extends FlatSpec with MustMatchers with MockitoSugar {
  */
 protected[mango] class MapLoadingCache[K, V](loader: K => V) extends MapCache[K, V]() with LoadingCache[K, V] {
   def get(key: K): Try[V] = Try(loader(key))
-  def refresh(key: K): Unit = loader(key)
+  def refresh(key: K): Unit = { loader(key); () }
 }

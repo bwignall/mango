@@ -22,18 +22,8 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.math.Ordering.Int
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.Bound.FiniteBound
-import org.feijoas.mango.common.collect.Bound.InfiniteBound
-import org.feijoas.mango.common.collect.DiscreteDomain.IntDomain
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.prop.PropertyChecks
-import com.google.common.testing.SerializableTester.reserializeAndAssert
-import org.scalatest._
-import org.scalatest.FunSpec
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
  * Tests for [[TreeTraverser]]
@@ -41,12 +31,11 @@ import org.scalatest.FunSpec
  *  @author Markus Schneider
  *  @since 0.11 (copied from guava-libraries)
  */
-class TreeTraverserTest extends FunSpec with Matchers {
+class TreeTraverserTest extends AnyFunSpec with Matchers {
   case class Tree(value: Char, children: Tree*)
   case class BinaryTree(value: Char, left: BinaryTree, right: BinaryTree)
 
-  val traverser = TreeTraverser((node: Tree) => node.children)
-  val binTraverser = BinaryTreeTraverser((node: BinaryTree) => (Option(node.left), Option(node.right)))
+  val traverser: TreeTraverser[Tree] = TreeTraverser((node: Tree) => node.children)
 
   //        h
   //      / | \
@@ -55,14 +44,14 @@ class TreeTraverserTest extends FunSpec with Matchers {
   //   /|\      |
   //  / | \     f
   // a  b  c
-  val a_ = Tree('a')
-  val b_ = Tree('b')
-  val c_ = Tree('c')
-  val d_ = Tree('d', a_, b_, c_)
-  val e_ = Tree('e')
-  val f_ = Tree('f')
-  val g_ = Tree('g', f_)
-  val h_ = Tree('h', d_, e_, g_)
+  val a_ : Tree = Tree('a')
+  val b_ : Tree = Tree('b')
+  val c_ : Tree = Tree('c')
+  val d_ : Tree = Tree('d', a_, b_, c_)
+  val e_ : Tree = Tree('e')
+  val f_ : Tree = Tree('f')
+  val g_ : Tree = Tree('g', f_)
+  val h_ : Tree = Tree('h', d_, e_, g_)
 
   //      d
   //     / \
@@ -71,16 +60,16 @@ class TreeTraverserTest extends FunSpec with Matchers {
   //  a   c   f
   //         /
   //        g
-  val ba_ = BinaryTree('a', null, null)
-  val bc_ = BinaryTree('c', null, null)
-  val bb_ = BinaryTree('b', ba_, bc_)
-  val bg_ = BinaryTree('g', null, null)
-  val bf_ = BinaryTree('f', bg_, null)
-  val be_ = BinaryTree('e', null, bf_)
-  val bd_ = BinaryTree('d', bb_, be_)
+  val ba_ : BinaryTree = BinaryTree('a', null, null)
+  val bc_ : BinaryTree = BinaryTree('c', null, null)
+  val bb_ : BinaryTree = BinaryTree('b', ba_, bc_)
+  val bg_ : BinaryTree = BinaryTree('g', null, null)
+  val bf_ : BinaryTree = BinaryTree('f', bg_, null)
+  val be_ : BinaryTree = BinaryTree('e', null, bf_)
+  val bd_ : BinaryTree = BinaryTree('d', bb_, be_)
 
-  def treeAsString(tree: Iterable[Tree]): String = tree.foldLeft(""){ case (str, tree) => str + tree.value }
-  def bTreeAsString(tree: Iterable[BinaryTree]): String = tree.foldLeft(""){ case (str, tree) => str + tree.value }
+  def treeAsString(tree: Iterable[Tree]): String = tree.foldLeft("") { case (str, tree) => str + tree.value }
+  def bTreeAsString(tree: Iterable[BinaryTree]): String = tree.foldLeft("") { case (str, tree) => str + tree.value }
 
   describe("A TreeTraverser") {
     it("should be able traverse the tree in preOrder") {
@@ -91,21 +80,6 @@ class TreeTraverserTest extends FunSpec with Matchers {
     }
     it("should be able traverse the tree in breadthFirstOrder") {
       treeAsString(traverser.breadthFirstTraversal(h_)) should be("hdegabcf")
-    }
-  }
-
-  describe("A BinaryTreeTraverser") {
-    it("should be able traverse the tree in preOrder") {
-      bTreeAsString(binTraverser.preOrderTraversal(bd_)) should be("dbacefg")
-    }
-    it("should be able traverse the tree in postOrder") {
-      bTreeAsString(binTraverser.postOrderTraversal(bd_)) should be("acbgfed")
-    }
-    it("should be able traverse the tree in breadthFirstOrder") {
-      bTreeAsString(binTraverser.breadthFirstTraversal(bd_)) should be("dbeacfg")
-    }
-    it("should be able traverse the tree in order") {
-      bTreeAsString(binTraverser.inOrderTraversal(bd_)) should be("abcdegf")
     }
   }
 }

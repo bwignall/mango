@@ -35,8 +35,8 @@ import org.feijoas.mango.common.collect.BoundType.{Closed, Open}
  *  @since 0.8
  */
 sealed trait Bound[+T] extends Serializable {
-  private[mango] def describeAsLowerBound(sb: StringBuilder)
-  private[mango] def describeAsUpperBound(sb: StringBuilder)
+  private[mango] def describeAsLowerBound(sb: StringBuilder): StringBuilder
+  private[mango] def describeAsUpperBound(sb: StringBuilder): StringBuilder
 }
 
 /** A `Bound` describes the to bounds of a [[Range]]. For example the range
@@ -49,17 +49,18 @@ sealed trait Bound[+T] extends Serializable {
  *  @since 0.8
  */
 final object Bound {
+
   /** A `FiniteBound[T]` is a bound with a value of type `T` and a [[BoundType]].
    */
   case class FiniteBound[T](value: T, bt: BoundType) extends Bound[T] {
     checkNotNull(value)
     checkNotNull(bt)
 
-    override def describeAsLowerBound(sb: StringBuilder) = bt match {
+    override def describeAsLowerBound(sb: StringBuilder): StringBuilder = bt match {
       case Closed => sb.append('[').append(value)
       case Open   => sb.append('(').append(value)
     }
-    override def describeAsUpperBound(sb: StringBuilder) = bt match {
+    override def describeAsUpperBound(sb: StringBuilder): StringBuilder = bt match {
       case Closed => sb.append(value).append(']')
       case Open   => sb.append(value).append(')')
     }
@@ -69,7 +70,7 @@ final object Bound {
    *  as for example `[a..+∞)`
    */
   final object InfiniteBound extends Bound[Nothing] {
-    override def describeAsLowerBound(sb: StringBuilder) = sb.append("(-\u221e")
-    override def describeAsUpperBound(sb: StringBuilder) = sb.append("+\u221e)")
+    override def describeAsLowerBound(sb: StringBuilder): StringBuilder = sb.append("(-\u221e")
+    override def describeAsUpperBound(sb: StringBuilder): StringBuilder = sb.append("+\u221e)")
   }
 }

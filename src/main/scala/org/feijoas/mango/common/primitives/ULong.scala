@@ -85,7 +85,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
    *  primitive conversion from {@code Long} to {@code Float}, and correctly rounded.
    */
   def toFloat(): Float = {
-    val fValue: Float = (value & unsigned_mask)
+    val fValue: Float = (value & unsigned_mask).toFloat
     if (value < 0)
       fValue + maxLongAsFloat
     else
@@ -96,7 +96,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
    *  primitive conversion from {@code Long} to {@code Double}, and correctly rounded.
    */
   def toDouble(): Double = {
-    val dValue: Double = (value & unsigned_mask)
+    val dValue: Double = (value & unsigned_mask).toDouble
     if (value < 0)
       dValue + maxLongAsFloat
     else
@@ -146,7 +146,7 @@ final class ULong private (val value: Long) extends AnyVal with Ordered[ULong] w
  */
 final object ULong {
   private val maxLongAsFloat = Long.MaxValue.toFloat
-  private val unsigned_mask: Long = 0x7fffffffffffffffL
+  private val unsigned_mask: Long = Long.MaxValue // 0x7fffffffffffffffL
 
   /** Maximum value an ULong can represent
    */
@@ -199,8 +199,10 @@ final object ULong {
   def valueOf(value: BigInt): ULong = {
     checkNotNull(value)
     checkArgument(value.signum >= 0 && value.bitLength <= java.lang.Long.SIZE,
-      "value (%s) is outside the range for an unsigned long value", value)
-    fromLongBits(value.longValue())
+                  "value (%s) is outside the range for an unsigned long value",
+                  value
+    )
+    fromLongBits(value.longValue)
   }
 
   /** Returns an {@code ULong} holding the value of the specified {@code String}, parsed as
@@ -240,9 +242,9 @@ final object ULong {
   def min(array: ULong*): ULong = {
     checkArgument(array.length > 0)
     val it = array.iterator
-    var min = flip(it.next.value)
+    var min = flip(it.next().value)
     while (it.hasNext) {
-      val next = flip(it.next.value)
+      val next = flip(it.next().value)
       if (next < min)
         min = next
     }
@@ -259,9 +261,9 @@ final object ULong {
   def max(array: ULong*): ULong = {
     checkArgument(array.length > 0)
     val it = array.iterator
-    var max = flip(it.next.value)
+    var max = flip(it.next().value)
     while (it.hasNext) {
-      val next = flip(it.next.value)
+      val next = flip(it.next().value)
       if (next > max) {
         max = next
       }
@@ -283,9 +285,9 @@ final object ULong {
     } else {
       val it = array.iterator
       val builder = new StringBuilder(array.length * 5)
-      builder.append(it.next.toString)
+      builder.append(it.next().toString)
       while (it.hasNext) {
-        builder.append(separator).append(it.next.toString)
+        builder.append(separator).append(it.next().toString)
       }
       builder.toString
     }

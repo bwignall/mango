@@ -22,17 +22,13 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.convert.decorateAll.asJavaIterableConverter
-
+import com.google.common.collect.Range as GuavaRange
 import org.feijoas.mango.common.collect.AsOrdered.asOrdered
-import org.feijoas.mango.common.collect.Bound.FiniteBound
-import org.feijoas.mango.common.collect.Bound.InfiniteBound
-import org.feijoas.mango.common.collect.BoundType.asGuavaBoundType
-import org.feijoas.mango.common.collect.BoundType.asMangoBoundType
-import org.feijoas.mango.common.convert.AsJava
-import org.feijoas.mango.common.convert.AsScala
+import org.feijoas.mango.common.collect.Bound.{FiniteBound, InfiniteBound}
+import org.feijoas.mango.common.collect.BoundType.{asGuavaBoundType, asMangoBoundType}
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.collect.{ Range => GuavaRange }
+import scala.jdk.CollectionConverters.IterableHasAsJava
 
 /** $rangeNote
  *  @author Markus Schneider
@@ -128,11 +124,10 @@ import com.google.common.collect.{ Range => GuavaRange }
  *  <a href="http://code.google.com/p/guava-libraries/wiki/RangesExplained">Range</a>.
  */
 @SerialVersionUID(1L)
-final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[AsOrdered[T]])(implicit private val ord: O)
-  extends (T => Boolean) with Serializable {
-
-  // import implicit conversion
-  import org.feijoas.mango.common.collect.Range._
+final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[AsOrdered[T]])(implicit
+  private val ord: O
+) extends (T => Boolean)
+    with Serializable {
 
   /** Returns {@code true} if this range is of the form {@code [v..v)} or {@code (v..v]}. (This does
    *  not encompass ranges of the form {@code (v..v)}, because such ranges are <i>invalid</i> and
@@ -224,7 +219,7 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
    *  <p>The intersection operation is commutative, associative and idempotent, and its identity
    *  element is `Range#all`.
    *
-   *  @throws IllegalArgumentException if {@code isConnected(connectedRange)} is {@code false}
+   *  throws IllegalArgumentException if {@code isConnected(connectedRange)} is {@code false}
    */
   @throws[IllegalAccessException]
   def intersection(connectedRange: Range[T, O]): Range[T, O] = {
@@ -382,12 +377,13 @@ final object Range {
 
   /** Factory method take the Guava delegate
    */
-  private[mango] def apply[T, O <: Ordering[T]](delegate: GuavaRange[AsOrdered[T]])(implicit ord: O): Range[T, O] = new Range(delegate)
+  private[mango] def apply[T, O <: Ordering[T]](delegate: GuavaRange[AsOrdered[T]])(implicit ord: O): Range[T, O] =
+    new Range(delegate)
 
   /** Returns a range that contains all values strictly greater than {@code
    *  lower} and strictly less than {@code upper}.
    *
-   *  @throws IllegalArgumentException if {@code lower} is greater than <i>or
+   *  throws IllegalArgumentException if {@code lower} is greater than <i>or
    *     equal to</i> {@code upper}
    */
   @throws[IllegalArgumentException]
@@ -398,7 +394,7 @@ final object Range {
   /** Returns a range that contains all values greater than or equal to
    *  {@code lower} and less than or equal to {@code upper}.
    *
-   *  @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+   *  throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    */
   @throws[IllegalArgumentException]
   def closed[T, O <: Ordering[T]](lower: T, upper: T)(implicit ord: O): Range[T, O] = {
@@ -408,7 +404,7 @@ final object Range {
   /** Returns a range that contains all values greater than or equal to
    *  {@code lower} and strictly less than {@code upper}.
    *
-   *  @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+   *  throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    */
   @throws[IllegalArgumentException]
   def closedOpen[T, O <: Ordering[T]](lower: T, upper: T)(implicit ord: O): Range[T, O] = {
@@ -418,7 +414,7 @@ final object Range {
   /** Returns a range that contains all values strictly greater than {@code
    *  lower} and less than or equal to {@code upper}.
    *
-   *  @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+   *  throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    */
   @throws[IllegalArgumentException]
   def openClosed[T, O <: Ordering[T]](lower: T, upper: T)(implicit ord: O): Range[T, O] = {
@@ -429,10 +425,12 @@ final object Range {
    *  upper}, where each endpoint may be either inclusive (closed) or exclusive
    *  (open).
    *
-   *  @throws IllegalArgumentException if {@code lower} is greater than {@code upper}
+   *  throws IllegalArgumentException if {@code lower} is greater than {@code upper}
    */
   @throws[IllegalArgumentException]
-  def range[T, O <: Ordering[T]](lower: T, lowerType: BoundType, upper: T, upperType: BoundType)(implicit ord: O): Range[T, O] = {
+  def range[T, O <: Ordering[T]](lower: T, lowerType: BoundType, upper: T, upperType: BoundType)(implicit
+    ord: O
+  ): Range[T, O] = {
     Range(GuavaRange.range(lower, lowerType.asJava, upper, upperType.asJava))
   }
 
@@ -490,11 +488,12 @@ final object Range {
   /** Returns the minimal range that contains all of the given values.
    *  The returned range is closed on both ends.
    *
-   *  @throws ClassCastException if the parameters are not <i>mutually
+   *  throws ClassCastException if the parameters are not <i>mutually
    *     comparable</i>
-   *  @throws NoSuchElementException if {@code values} is empty
-   *  @throws NullPointerException if any of {@code values} is null
+   *  throws NoSuchElementException if {@code values} is empty
+   *  throws NullPointerException if any of {@code values} is null
    */
+  @throws[ClassCastException]
   @throws[NoSuchElementException]
   @throws[NullPointerException]
   def encloseAll[T, O <: Ordering[T]](values: Iterable[T])(implicit ord: O): Range[T, O] = {
@@ -537,7 +536,9 @@ final object Range {
    *  @return An object with an `asJava` method that returns a Guava `Range[AsOrdered[T]]`
    *   view of the argument
    */
-  implicit private[mango] def asGuavaRangeConverter[T, O <: Ordering[T]](range: Range[T, O]): AsJava[GuavaRange[AsOrdered[T]]] = {
+  implicit private[mango] def asGuavaRangeConverter[T, O <: Ordering[T]](
+    range: Range[T, O]
+  ): AsJava[GuavaRange[AsOrdered[T]]] = {
     new AsJava(range.range)
   }
 
@@ -551,8 +552,9 @@ final object Range {
    *  @return An object with an `asScala` method that returns a Scala `Range[T,O]`
    *   view of the argument
    */
-  implicit private[mango] def asMangoRangeConverter[T, O <: Ordering[T]](range: GuavaRange[AsOrdered[T]])(implicit ord: O): AsScala[Range[T, O]] = {
+  implicit private[mango] def asMangoRangeConverter[T, O <: Ordering[T]](
+    range: GuavaRange[AsOrdered[T]]
+  )(implicit ord: O): AsScala[Range[T, O]] = {
     new AsScala(Range[T, O](range))
   }
 }
-

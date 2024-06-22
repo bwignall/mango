@@ -30,7 +30,7 @@ import org.feijoas.mango.common.collect.Range
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 import org.feijoas.mango.common.collect.RangeSetFactory
 
-import com.google.common.collect.{ RangeSet => GuavaRangeSet }
+import com.google.common.collect.{RangeSet => GuavaRangeSet}
 import com.google.common.collect.TreeRangeSet
 
 /** An mutable implementation of RangeSet that delegates to Guava TreeRangeSet
@@ -39,24 +39,27 @@ import com.google.common.collect.TreeRangeSet
  *  @since 0.8
  */
 @Beta
-private[mango] class TreeRangeSetWrapper[C, O <: Ordering[C]] private (guava: GuavaRangeSet[AsOrdered[C]])(override implicit val ordering: O)
-  extends RangeSet[C, O] with RangeSetWrapperLike[C, O, TreeRangeSetWrapper[C, O]] {
+private[mango] class TreeRangeSetWrapper[C, O <: Ordering[C]] private (guava: GuavaRangeSet[AsOrdered[C]])(implicit
+  override val ordering: O
+) extends RangeSet[C, O]
+    with RangeSetWrapperLike[C, O, TreeRangeSetWrapper[C, O]] {
 
   override def delegate = guava
   override def factory = TreeRangeSetWrapper(_)(ordering)
   override def newBuilder = TreeRangeSetWrapper.newBuilder[C, O](ordering)
 }
 
-private[mango] final object TreeRangeSetWrapper extends RangeSetFactory[TreeRangeSetWrapper] {
+final private[mango] object TreeRangeSetWrapper extends RangeSetFactory[TreeRangeSetWrapper] {
 
   /** Factory method */
-  private[mango] def apply[C, O <: Ordering[C]](guava: GuavaRangeSet[AsOrdered[C]])(implicit ord: O) = new TreeRangeSetWrapper(guava)(ord)
+  private[mango] def apply[C, O <: Ordering[C]](guava: GuavaRangeSet[AsOrdered[C]])(implicit ord: O) =
+    new TreeRangeSetWrapper(guava)(ord)
 
   /** Returns a new builder for a range set.
    */
   def newBuilder[C, O <: Ordering[C]](implicit ord: O) = new Builder[Range[C, O], TreeRangeSetWrapper[C, O]]() {
     var builder = TreeRangeSet.create[AsOrdered[C]]()
-    override def +=(range: Range[C, O]): this.type = {
+    override def addOne(range: Range[C, O]): this.type = {
       builder.add(range.asJava)
       this
     }

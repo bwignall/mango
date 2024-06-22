@@ -23,15 +23,15 @@
 package org.feijoas.mango.common.cache
 
 import java.util.concurrent.TimeUnit
-import scala.collection.Traversable
 import scala.concurrent.Future
 import org.feijoas.mango.common.cache.CacheLoader._
-import org.scalatest._
-import com.google.common.{ cache => cgcc }
-import com.google.common.cache.{ CacheLoader => GuavaCacheLoader }
-import com.google.common.collect.{ ImmutableMap, Lists }
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+
+import com.google.common.{cache => cgcc}
+import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
+import com.google.common.collect.{ImmutableMap, Lists}
 import org.junit.Assert._
-import com.google.common.util.concurrent.ListenableFuture
 import org.feijoas.mango.common.util.concurrent.Futures._
 
 /**
@@ -40,7 +40,7 @@ import org.feijoas.mango.common.util.concurrent.Futures._
  *  @author Markus Schneider
  *  @since 0.7
  */
-class CacheLoaderWrapperTest extends FlatSpec with Matchers {
+class CacheLoaderWrapperTest extends AnyFlatSpec with Matchers {
 
   behavior of "CacheLoaderWrapper"
 
@@ -171,7 +171,7 @@ private[mango] case class CountingCacheLoader(var loadCnt: Int = 0, var reloadCn
     reloadCnt = reloadCnt + 1
     Future { oldValue }
   }
-  override def loadAll(keys: Traversable[Int]) = {
+  override def loadAll(keys: Iterable[Int]) = {
     loadAllCnt = loadAllCnt + 1
     keys.map { (key: Int) => (key, key * key) }.toMap
   }

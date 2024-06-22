@@ -22,13 +22,13 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{ beanGetter, beanSetter, field, getter, setter }
 import scala.collection.concurrent
 import scala.collection.concurrent.TrieMap
 
-import org.feijoas.mango.common.annotations.Beta
-import org.scalatest.{ FlatSpec, GivenWhenThen, MustMatchers }
-import org.scalatest.mockito.MockitoSugar
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.GivenWhenThen
+import org.scalatest.matchers.must.Matchers
+import org.scalatestplus.mockito.MockitoSugar
 
 /**
  * Tests for [[Cache]]
@@ -36,11 +36,11 @@ import org.scalatest.mockito.MockitoSugar
  *  @author Markus Schneider
  *  @since 0.7
  */
-class CacheTest extends FlatSpec with MustMatchers with GivenWhenThen with MockitoSugar {
+class CacheTest extends AnyFlatSpec with Matchers with GivenWhenThen with MockitoSugar {
 
-  def fixture = {
+  def fixture: (concurrent.Map[String, Int], MapCache[String, Int]) = {
     val cache = new MapCache[String, Int]()
-    (cache.asMap, cache)
+    (cache.asMap(), cache)
   }
 
   behavior of "the default implementations of Cache"
@@ -72,14 +72,14 @@ class CacheTest extends FlatSpec with MustMatchers with GivenWhenThen with Mocki
 /**
  * A cache implemented with a map
  */
-protected[mango] class MapCache[K, V]() extends Cache[K, V] {
-  val map = TrieMap[K, V]()
+protected[mango] class MapCache[K, V] extends Cache[K, V] {
+  val map: TrieMap[K, V] = TrieMap[K, V]()
   def getIfPresent(key: K): Option[V] = map.get(key)
   def getOrElseUpdate(key: K, loader: () => V): V = map.getOrElseUpdate(key, loader())
-  def put(key: K, value: V): Unit = map.put(key, value)
-  def invalidate(key: K): Unit = map.remove(key)
-  def invalidateAll(): Unit = map.clear
-  def size(): Long = map.size
+  def put(key: K, value: V): Unit = { map.put(key, value); () }
+  def invalidate(key: K): Unit = { map.remove(key); () }
+  def invalidateAll(): Unit = map.clear()
+  def size(): Long = map.size.toLong
   def stats(): CacheStats = throw new NotImplementedError()
   def asMap(): concurrent.Map[K, V] = map
 }

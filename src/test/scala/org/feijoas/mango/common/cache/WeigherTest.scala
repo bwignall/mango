@@ -22,11 +22,10 @@
  */
 package org.feijoas.mango.common.cache
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers._
+import org.scalatest.flatspec.AnyFlatSpec
 import org.feijoas.mango.common.cache.Weigher._
-import com.google.common.cache.{ Weigher => GuavaWeigher }
-import org.scalatest.Matchers._
+import com.google.common.cache.{Weigher => GuavaWeigher}
+import org.scalatest.matchers.should.Matchers._
 
 /**
  * Tests for [[Weigher]]
@@ -34,7 +33,7 @@ import org.scalatest.Matchers._
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class WeigherTest extends FlatSpec {
+class WeigherTest extends AnyFlatSpec {
 
   behavior of "Weigher"
 

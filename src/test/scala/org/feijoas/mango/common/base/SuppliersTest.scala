@@ -22,18 +22,17 @@
  */
 package org.feijoas.mango.common.base
 
-import java.lang.Thread.State.{ BLOCKED, TIMED_WAITING, WAITING }
-import java.util.concurrent.{ TimeUnit, TimeoutException }
-import java.util.concurrent.atomic.{ AtomicInteger, AtomicReference }
-
-import scala.util.control.Breaks.{ break, breakable }
-
-import org.feijoas.mango.common.base.Suppliers._
-import org.scalatest._
-import org.scalatest.prop.PropertyChecks
-
-import com.google.common.base.{ Supplier => GuavaSupplier }
+import java.util.concurrent.{TimeUnit, TimeoutException}
+import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
+import org.feijoas.mango.common.base.Suppliers.*
+import org.scalatest.*
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import com.google.common.base.Supplier as GuavaSupplier
 import com.google.common.testing.SerializableTester
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
+import scala.annotation.unused
 
 /**
  * Tests for [[Suppliers]]
@@ -41,7 +40,7 @@ import com.google.common.testing.SerializableTester
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
+class SuppliersTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
   behavior of "memoize"
 
   it should "memoize" in {
@@ -52,7 +51,7 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
   it should "return the same instance if already memoized" in {
     val count = new CountingSupplier()
     val mem = memoize(count)
-    mem should be theSameInstanceAs memoize(mem)
+    (mem should be).theSameInstanceAs(memoize(mem))
   }
 
   it should "be serializeable" in {
@@ -110,8 +109,8 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
   }
 
   it should "be thread-safe" in {
-    val memoizer = (supplier: () => Boolean) =>
-      memoizeWithExpiration(supplier, java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
+    val memoizer =
+      (supplier: () => Boolean) => memoizeWithExpiration(supplier, java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
     testSupplierThreadSafe(memoizer)
   }
 
@@ -135,12 +134,12 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
 
   it should "synchonize on non-thread-safe supplier" in {
 
-    val nonThreadSafe = new Function0[Int] {
+    val nonThreadSafe: () => Int = new (() => Int) {
       var counter = 0
 
       override def apply(): Int = {
         val nextValue = counter + 1
-        Thread.`yield`
+        Thread.`yield`()
         counter = nextValue
         counter
       }
@@ -151,8 +150,8 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
     val threads = Array.ofDim[Thread](numThreads)
     for (i <- 0 until numThreads) {
       threads(i) = new Thread() {
-        override def run() {
-          for (j <- 0 until iterations) {
+        override def run(): Unit = {
+          for (_ <- 0 until iterations) {
             Suppliers.synchronizedSupplier(nonThreadSafe)()
           }
         }
@@ -173,7 +172,8 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
 
   }
 
-  private def checkExpiration(count: CountingSupplier, mem: () => Int) {
+  @unused
+  private def checkExpiration(count: CountingSupplier, mem: () => Int): Unit = {
     checkMemoize(count, mem)
 
     Thread.sleep(150)
@@ -185,18 +185,19 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
     // it still should only have executed twice due to memoization
     mem() should be(20)
     count.calls should be(2)
+    ()
   }
 
-  def testSupplierThreadSafe(memoizer: (() => Boolean) => (() => Boolean)) = {
+  def testSupplierThreadSafe(memoizer: (() => Boolean) => () => Boolean): Assertion = {
     val count = new AtomicInteger(0)
     val thrown = new AtomicReference[Throwable](null)
     val numThreads = 3
     val threads = Array.ofDim[Thread](numThreads)
     val timeout = TimeUnit.SECONDS.toNanos(60)
 
-    val supplier = new Function0[Boolean]() {
+    val supplier: () => Boolean = new (() => Boolean)() {
       import java.lang.Thread.State._
-      def isWaiting(thread: Thread): Boolean = thread.getState() match {
+      def isWaiting(thread: Thread): Boolean = thread.getState match {
         case BLOCKED       => true
         case WAITING       => true
         case TIMED_WAITING => true
@@ -210,7 +211,7 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
             waitingThreads = waitingThreads + 1
           }
         }
-        return waitingThreads
+        waitingThreads
       }
 
       override def apply(): Boolean = {
@@ -222,16 +223,19 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
         breakable {
           while (waitingThreads() != numThreads - 1) {
             if (System.nanoTime() - t0 > timeout) {
-              thrown.set(new TimeoutException(
-                "timed out waiting for other threads to block" +
-                  " synchronizing on supplier"));
-              break
+              thrown.set(
+                new TimeoutException(
+                  "timed out waiting for other threads to block" +
+                    " synchronizing on supplier"
+                )
+              )
+              break()
             }
-            Thread.`yield`
+            Thread.`yield`()
           }
         }
         count.getAndIncrement()
-        return true
+        true
       }
     }
 
@@ -239,8 +243,8 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
 
     for (i <- 0 until numThreads) {
       threads(i) = new Thread() {
-        override def run() = {
-          memoizedSupplier() should be(true)
+        override def run(): Unit = {
+          memoizedSupplier() should be(true); ()
         }
       }
     }
@@ -249,16 +253,16 @@ class SuppliersTest extends FlatSpec with Matchers with PropertyChecks {
     for (i <- 0 until numThreads) threads(i).join()
 
     if (thrown.get() != null) {
-      throw thrown.get();
+      throw thrown.get()
     }
 
     count.get() should be(1)
   }
 }
 
-private class CountingSupplier() extends (() => Int) with Serializable {
+private class CountingSupplier extends (() => Int) with Serializable {
   @transient var calls = 0
-  override def apply() = {
+  override def apply(): Int = {
     calls = calls + 1
     calls * 10
   }

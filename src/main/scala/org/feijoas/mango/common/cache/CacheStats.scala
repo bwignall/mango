@@ -22,13 +22,10 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.math.max
-
+import com.google.common.base.MoreObjects
+import com.google.common.cache.CacheStats as GuavaCacheStats
 import org.feijoas.mango.common.base.Preconditions.checkArgument
 import org.feijoas.mango.common.convert.AsScala
-
-import com.google.common.base.MoreObjects
-import com.google.common.cache.{ CacheStats => GuavaCacheStats }
 
 /**
  * Statistics about the performance of a [[Cache]]. Instances of this class are immutable.
@@ -61,49 +58,50 @@ import com.google.common.cache.{ CacheStats => GuavaCacheStats }
  *  @since 0.7 (copied from Guava-libraries)
  */
 case class CacheStats(
-    /**
+  /**
      * Returns the number of times [[Cache]] lookup methods have returned a cached value.
      */
-    hitCount: Long,
+  hitCount: Long,
 
-    /**
+  /**
  * Returns the number of times [[Cache]] lookup methods have returned an uncached (newly
  *  loaded) value, or null. Multiple concurrent calls to [[Cache]] lookup methods on an absent
  *  value can result in multiple misses, all returning the results of a single cache load
  *  operation.
  */
-    missCount: Long,
+  missCount: Long,
 
-    /**
+  /**
  * Returns the number of times [[Cache]] lookup methods have successfully loaded a new value.
  *  This is always incremented in conjunction with {@link #missCount}, though `missCount`
  *  is also incremented when an exception is encountered during cache loading (see
  *  `#loadExceptionCount`). Multiple concurrent misses for the same key will result in a
  *  single load operation.
  */
-    loadSuccessCount: Long,
+  loadSuccessCount: Long,
 
-    /**
+  /**
  * Returns the number of times [[Cache]] lookup methods threw an exception while loading a
  *  new value. This is always incremented in conjunction with {@code missCount}, though
  *  `missCount` is also incremented when cache loading completes successfully (see
  *  `#loadSuccessCount`). Multiple concurrent misses for the same key will result in a
  *  single load operation.
  */
-    loadExceptionCount: Long,
+  loadExceptionCount: Long,
 
-    /**
+  /**
  * Returns the total number of nanoseconds the cache has spent loading new values. This can be
  *  used to calculate the miss penalty. This value is increased every time
  *  `loadSuccessCount` or `loadExceptionCount` is incremented.
  */
-    totalLoadTime: Long,
+  totalLoadTime: Long,
 
-    /**
+  /**
  * Returns the number of times an entry has been evicted. This count does not include manual
  *  `Cache#invalidate` invalidations.
  */
-    evictionCount: Long) {
+  evictionCount: Long
+) {
 
   // only non-negative values are allowed
   checkArgument(hitCount >= 0)
@@ -126,7 +124,7 @@ case class CacheStats(
    */
   def hitRate(): Double = requestCount match {
     case 0        => 1
-    case _@ count => hitCount.toDouble / count
+    case _ @count => hitCount.toDouble / count
   }
 
   /**
@@ -139,8 +137,8 @@ case class CacheStats(
    *  concurrent misses for the same key will result in a single load operation.
    */
   def missRate(): Double = requestCount match {
-    case 0        => 0
-    case _@ count => missCount.toDouble / requestCount
+    case 0     => 0
+    case count => missCount.toDouble / count
   }
 
   /**
@@ -157,7 +155,7 @@ case class CacheStats(
    */
   def loadExceptionRate(): Double = loadCount match {
     case 0        => 0
-    case _@ count => loadExceptionCount.toDouble / count
+    case _ @count => loadExceptionCount.toDouble / count
   }
 
   /**
@@ -166,7 +164,7 @@ case class CacheStats(
    */
   def averageLoadPenalty(): Double = loadCount match {
     case 0        => 0
-    case _@ count => totalLoadTime.toDouble / count
+    case _ @count => totalLoadTime.toDouble / count
   }
 
   /**
@@ -175,14 +173,15 @@ case class CacheStats(
    *  rounded up to zero.
    */
   def -(other: CacheStats): CacheStats = {
-    import scala.math._
+    import scala.math.*
     CacheStats(
       max(0, hitCount - other.hitCount),
       max(0, missCount - other.missCount),
       max(0, loadSuccessCount - other.loadSuccessCount),
       max(0, loadExceptionCount - other.loadExceptionCount),
       max(0, totalLoadTime - other.totalLoadTime),
-      max(0, evictionCount - other.evictionCount))
+      max(0, evictionCount - other.evictionCount)
+    )
   }
 
   /**
@@ -196,11 +195,13 @@ case class CacheStats(
       loadSuccessCount + other.loadSuccessCount,
       loadExceptionCount + other.loadExceptionCount,
       totalLoadTime + other.totalLoadTime,
-      evictionCount + other.evictionCount)
+      evictionCount + other.evictionCount
+    )
   }
 
   override def toString = {
-    MoreObjects.toStringHelper(this)
+    MoreObjects
+      .toStringHelper(this)
       .add("hitCount", hitCount)
       .add("missCount", missCount)
       .add("loadSuccessCount", loadSuccessCount)
@@ -226,11 +227,12 @@ final object CacheStats {
    *   view of the argument
    */
   implicit def asMangoCacheStatsConverter(stats: GuavaCacheStats): AsScala[CacheStats] = new AsScala(
-    CacheStats(
-      stats.hitCount(),
-      stats.missCount(),
-      stats.loadSuccessCount(),
-      stats.loadExceptionCount(),
-      stats.totalLoadTime(),
-      stats.evictionCount()))
+    CacheStats(stats.hitCount(),
+               stats.missCount(),
+               stats.loadSuccessCount(),
+               stats.loadExceptionCount(),
+               stats.totalLoadTime(),
+               stats.evictionCount()
+    )
+  )
 }

@@ -22,8 +22,6 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.mutable.Builder
-
 import org.feijoas.mango.common.annotations.Beta
 
 /** A base trait for all `RangeMap`, mutable as well as immutable
@@ -33,9 +31,7 @@ import org.feijoas.mango.common.annotations.Beta
  *  @since 0.9
  */
 @Beta
-trait RangeMap[K, V, O <: Ordering[K]] extends RangeMapLike[K, V, O, RangeMap[K, V, O]] {
-
-}
+trait RangeMap[K, V, O <: Ordering[K]] extends RangeMapLike[K, V, O, RangeMap[K, V, O]] {}
 
 /** Factory for immutable [[RangeMap]]
  */

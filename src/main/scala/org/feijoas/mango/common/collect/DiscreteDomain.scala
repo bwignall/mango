@@ -22,12 +22,11 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.math.BigInt.long2bigInt
-
+import com.google.common.collect.DiscreteDomain as GuavaDiscreteDomain
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.AsOrdered.asOrdered
 
-import com.google.common.collect.{ DiscreteDomain => GuavaDiscreteDomain }
+import scala.math.BigInt.long2bigInt
 
 /** A descriptor for a <i>discrete</i> domain such as all
  *  `Int` instances. A discrete domain is one that supports the three basic
@@ -165,7 +164,7 @@ object DiscreteDomain {
    */
   // Note: This class is package private in Guava so we don't publish it at the moment
   @SerialVersionUID(1L)
-  private[mango] implicit final object BigIntDomain extends DiscreteDomain[BigInt] with Serializable {
+  implicit final private[mango] object BigIntDomain extends DiscreteDomain[BigInt] with Serializable {
     override def next(value: BigInt): Option[BigInt] = Some(value + BigInt(1))
     override def previous(value: BigInt): Option[BigInt] = Some(value - BigInt(1))
 
@@ -180,7 +179,6 @@ object DiscreteDomain {
   private[mango] def asGuavaDiscreteDomain[C: Ordering](dm: DiscreteDomain[C]): GuavaDiscreteDomain[AsOrdered[C]] = {
     new GuavaDiscreteDomain[AsOrdered[C]] {
       // import implicit conversion
-      import org.feijoas.mango.common.collect.Range._
       override def next(value: AsOrdered[C]): AsOrdered[C] = dm.next(value.value) match {
         case Some(value) => value
         case None        => null
@@ -190,8 +188,8 @@ object DiscreteDomain {
         case None        => null
       }
       override def distance(start: AsOrdered[C], end: AsOrdered[C]): Long = dm.distance(start.value, end.value)
-      override def minValue() = dm.minValue.getOrElse(throw new NoSuchElementException())
-      override def maxValue() = dm.maxValue.getOrElse(throw new NoSuchElementException())
+      override def minValue() = dm.minValue().getOrElse(throw new NoSuchElementException())
+      override def maxValue() = dm.maxValue().getOrElse(throw new NoSuchElementException())
       override def toString() = dm.toString()
     }
   }

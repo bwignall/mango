@@ -23,10 +23,10 @@
 package org.feijoas.mango.common.cache
 
 import scala.collection.immutable
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{Future, Promise}
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
-import com.google.common.cache.{ CacheLoader => GuavaCacheLoader }
+import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
 
 /**
  * Computes or retrieves values, based on a key, for use in populating a [[LoadingCache]].
@@ -86,11 +86,12 @@ trait CacheLoader[K, V] {
    *     treated like any other `Exception` in all respects except that, when it is caught,
    *     the thread's interrupt status is set
    */
-  @throws(classOf[Exception])
+  @throws[Exception]
+  @throws[InterruptedException]
   def reload(key: K, oldValue: V): Future[V] = {
     checkNotNull(key)
     checkNotNull(oldValue)
-    Promise successful (load(key)) future
+    Promise.successful(load(key)) future
   }
 
   /**
@@ -114,7 +115,7 @@ trait CacheLoader[K, V] {
    *     treated like any other Exception in all respects except that, when it is caught,
    *     the thread's interrupt status is set
    */
-  def loadAll(keys: Traversable[K]): immutable.Map[K, V] = {
+  def loadAll(keys: Iterable[K]): immutable.Map[K, V] = {
     checkNotNull(keys)
     keys.map { (key: K) => (key, load(key)) }.toMap
   }
@@ -126,23 +127,23 @@ object CacheLoader {
   /**
    * Returns a cache loader based on an <i>existing</i> function.
    *
-   *  @param function the function to be used for loading values; must never return {@code null}
+   *  @param f the function to be used for loading values; must never return {@code null}
    *  @return a cache loader that loads values by passing each key to {@code function}
    */
-  def from[K, V](f: K => V) = new CacheLoader[K, V] {
+  def from[K, V](f: K => V): CacheLoader[K, V] = new CacheLoader[K, V] {
     checkNotNull(f)
-    override def load(key: K) = f(checkNotNull(key))
+    override def load(key: K): V = f(checkNotNull(key))
   }
 
   /**
    * Returns a cache loader based on an <i>existing</i> supplier instance.
    *
-   *  @param supplier the supplier to be used for loading values; must never return {@code null}
+   *  @param f the supplier to be used for loading values; must never return {@code null}
    *  @return a cache loader that loads values irrespective of the key
    */
-  def from[K, V](f: () => V) = new CacheLoader[K, V] {
+  def from[K, V](f: () => V): CacheLoader[K, V] = new CacheLoader[K, V] {
     checkNotNull(f)
-    override def load(key: K) = { checkNotNull(key); f() }
+    override def load(key: K): V = { checkNotNull(key); f() }
   }
 
   /**

@@ -23,11 +23,10 @@
 package org.feijoas.mango.test.collect
 
 import scala.math.Ordering.Int
-
 import org.feijoas.mango.common.collect.BoundType.Closed
 import org.feijoas.mango.common.collect.BoundType.Open
 import org.feijoas.mango.common.collect.Range
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Gen.oneOf
 
@@ -59,19 +58,20 @@ object Ranges {
       i <- minBound to maxBound;
       j <- (i + 1) to maxBound;
       lowerType <- List(Open, Closed);
-      upperType <- List(Open, Closed) if (!(i == j & lowerType == Open & upperType == Open))
+      upperType <- List(Open, Closed) if !(i == j & lowerType == Open & upperType == Open)
     ) {
       builder += Range.range(i, lowerType, j, upperType)
     }
-    builder.result
+    builder.result()
   }
 
   /** A list of pairs of ranges that are not overlaping
    */
-  private lazy val rangeTuples = for (
-    range1 <- ranges;
-    range2 <- ranges if (!range1.isConnected(range2) || range1.intersection(range2).isEmpty())
-  ) yield (range1, range2)
+  private lazy val rangeTuples =
+    for (
+      range1 <- ranges;
+      range2 <- ranges if !range1.isConnected(range2) || range1.intersection(range2).isEmpty()
+    ) yield (range1, range2)
 
   implicit lazy val arbRange: Arbitrary[Range[Int, Int.type]] = Arbitrary {
     oneOf(ranges)
@@ -81,43 +81,43 @@ object Ranges {
     oneOf(rangeTuples)
   }
 
-  implicit lazy val genOpenRange = for {
+  implicit lazy val genOpenRange: Gen[Range[Int, Ordering.Int.type]] = for {
     lower <- arbitrary[Int]
     upper <- arbitrary[Int]
-    if (lower < upper)
+    if lower < upper
   } yield Range.open(lower, upper)
 
-  implicit lazy val genClosedRange = for {
+  implicit lazy val genClosedRange: Gen[Range[Int, Ordering.Int.type]] = for {
     lower <- arbitrary[Int]
     upper <- arbitrary[Int]
-    if (lower <= upper)
+    if lower <= upper
   } yield Range.closed(lower, upper)
 
-  implicit lazy val genOpenClosedRange = for {
+  implicit lazy val genOpenClosedRange: Gen[Range[Int, Ordering.Int.type]] = for {
     lower <- arbitrary[Int]
     upper <- arbitrary[Int]
-    if (lower < upper)
+    if lower < upper
   } yield Range.openClosed(lower, upper)
 
-  implicit lazy val genClosedOpenRange = for {
+  implicit lazy val genClosedOpenRange: Gen[Range[Int, Ordering.Int.type]] = for {
     lower <- arbitrary[Int]
     upper <- arbitrary[Int]
-    if (lower < upper)
+    if lower < upper
   } yield Range.closedOpen(lower, upper)
 
-  implicit lazy val genAtLeastRange = for {
+  implicit lazy val genAtLeastRange: Gen[Range[Int, Ordering.Int.type]] = for {
     endpoint <- arbitrary[Int]
   } yield Range.atLeast(endpoint)
 
-  implicit lazy val genAtMostRange = for {
+  implicit lazy val genAtMostRange: Gen[Range[Int, Ordering.Int.type]] = for {
     endpoint <- arbitrary[Int]
   } yield Range.atMost(endpoint)
 
-  implicit lazy val genLessThanRange = for {
+  implicit lazy val genLessThanRange: Gen[Range[Int, Ordering.Int.type]] = for {
     endpoint <- arbitrary[Int]
   } yield Range.lessThan(endpoint)
 
-  implicit lazy val genGreaterThanRange = for {
+  implicit lazy val genGreaterThanRange: Gen[Range[Int, Ordering.Int.type]] = for {
     endpoint <- arbitrary[Int]
   } yield Range.greaterThan(endpoint)
 }

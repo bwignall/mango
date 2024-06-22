@@ -22,13 +22,12 @@
  */
 package org.feijoas.mango.common.cache
 
-import org.scalatest.FlatSpec
-import org.scalatest.matchers._
+import org.scalatest.flatspec.AnyFlatSpec
 
 import org.feijoas.mango.common.cache.RemovalNotification._
 import org.feijoas.mango.common.cache.RemovalCause._
-import com.google.common.cache.{ RemovalNotification => GuavaRemovalNotification }
-import org.scalatest.Matchers._
+import com.google.common.cache.{RemovalNotification => GuavaRemovalNotification}
+import org.scalatest.matchers.should.Matchers._
 
 /**
  * Tests for [[RemovalNotification]]
@@ -36,7 +35,7 @@ import org.scalatest.Matchers._
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class RemovalNotificationTest extends FlatSpec {
+class RemovalNotificationTest extends AnyFlatSpec {
   behavior of "RemovalNotification"
 
   it should "convert Guava RemovalNotification to Mango RemovalNotification" in {

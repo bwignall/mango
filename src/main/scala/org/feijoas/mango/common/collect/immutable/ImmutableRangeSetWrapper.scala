@@ -33,7 +33,7 @@ import org.feijoas.mango.common.collect.RangeSetFactory
 import org.feijoas.mango.common.collect.RangeSetWrapperLike
 
 import com.google.common.collect.ImmutableRangeSet
-import com.google.common.collect.{ RangeSet => GuavaRangeSet }
+import com.google.common.collect.{RangeSet => GuavaRangeSet}
 
 /** An immutable implementation of RangeSet that delegates to Guava ImmutableRangeSet
  *
@@ -42,20 +42,26 @@ import com.google.common.collect.{ RangeSet => GuavaRangeSet }
  */
 @Beta
 @SerialVersionUID(1L)
-private[mango] class ImmutableRangeSetWrapper[C, O <: Ordering[C]] private (guava: GuavaRangeSet[AsOrdered[C]])(override implicit val ordering: O)
-  extends RangeSet[C, O] with RangeSetWrapperLike[C, O, ImmutableRangeSetWrapper[C, O]] with Serializable {
+private[mango] class ImmutableRangeSetWrapper[C, O <: Ordering[C]] private (guava: GuavaRangeSet[AsOrdered[C]])(implicit
+  override val ordering: O
+) extends RangeSet[C, O]
+    with RangeSetWrapperLike[C, O, ImmutableRangeSetWrapper[C, O]]
+    with Serializable {
 
   override def delegate = guava
-  override def factory: GuavaRangeSet[AsOrdered[C]] => ImmutableRangeSetWrapper[C, O] = new ImmutableRangeSetWrapper(_)(ordering)
+  override def factory: GuavaRangeSet[AsOrdered[C]] => ImmutableRangeSetWrapper[C, O] = new ImmutableRangeSetWrapper(_)(
+    ordering
+  )
   override def newBuilder = ImmutableRangeSetWrapper.newBuilder[C, O](ordering)
 }
 
 /** Factory for ImmutableRangeSetWrapper
  */
-private[mango] final object ImmutableRangeSetWrapper extends RangeSetFactory[ImmutableRangeSetWrapper] {
+final private[mango] object ImmutableRangeSetWrapper extends RangeSetFactory[ImmutableRangeSetWrapper] {
 
   /** Factory method */
-  private[mango] def apply[C, O <: Ordering[C]](guava: GuavaRangeSet[AsOrdered[C]])(implicit ord: O) = new ImmutableRangeSetWrapper(guava)(ord)
+  private[mango] def apply[C, O <: Ordering[C]](guava: GuavaRangeSet[AsOrdered[C]])(implicit ord: O) =
+    new ImmutableRangeSetWrapper(guava)(ord)
 
   /** Returns a [[RangeSet]] initialized with the ranges in the specified range set.
    */
@@ -68,7 +74,7 @@ private[mango] final object ImmutableRangeSetWrapper extends RangeSetFactory[Imm
    */
   def newBuilder[C, O <: Ordering[C]](implicit ord: O) = new Builder[Range[C, O], ImmutableRangeSetWrapper[C, O]]() {
     var builder = ImmutableRangeSet.builder[AsOrdered[C]]()
-    override def +=(range: Range[C, O]): this.type = {
+    override def addOne(range: Range[C, O]): this.type = {
       builder.add(range.asJava)
       this
     }
