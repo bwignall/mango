@@ -40,12 +40,12 @@ class ImmutableRangeSetWrapperTest extends AnyFreeSpec with RangeSetBehaviors wi
   "A ImmutableRangeSetWrapper" - {
     behave.like(rangeSet(ImmutableRangeSetWrapper.newBuilder[Int, Int.type]))
     behave.like(rangeSetWithBuilder(ImmutableRangeSetWrapper.newBuilder[Int, Int.type]))
-    "it should be serializeable" - {
+    "it should be serializable" - {
       "given the RangeSet contains the Ranges {[5,8],[1,3)}" in {
-        val rset = (ImmutableRangeSetWrapper.newBuilder[Int, Int.type] ++= Set(Range.closed(5, 8),
-                                                                               Range.closedOpen(1, 3)
+        val result = (ImmutableRangeSetWrapper.newBuilder[Int, Int.type] ++= Set(Range.closed(5, 8),
+                                                                                 Range.closedOpen(1, 3)
         )).result()
-        reserializeAndAssert(rset)
+        reserializeAndAssert(result)
       }
     }
     "it should not create a copy if RangeSet(same type of immutable range set) is called" in {

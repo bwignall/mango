@@ -208,12 +208,12 @@ case class CacheStats(
       .add("loadExceptionCount", loadExceptionCount)
       .add("totalLoadTime", totalLoadTime)
       .add("evictionCount", evictionCount)
-      .toString();
+      .toString
   }
 }
 
 /** [[CacheStats]] helper functions */
-final object CacheStats {
+private object CacheStats {
 
   /**
    * Adds an `asScala` method that converts Guava `CacheStats` to

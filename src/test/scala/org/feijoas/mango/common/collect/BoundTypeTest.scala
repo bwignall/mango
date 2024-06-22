@@ -61,7 +61,7 @@ class BoundTypeTest extends AnyFunSuite {
     (gClosed should be).theSameInstanceAs(GuavaBoundType.CLOSED)
   }
 
-  test("throws exeption if attemp to convert null") {
+  test("throws exception if attempt to convert null") {
     intercept[NullPointerException] {
       val mBT: BoundType = null
       val _: GuavaBoundType = mBT.asJava
@@ -73,7 +73,7 @@ class BoundTypeTest extends AnyFunSuite {
     }
   }
 
-  test("serializeable") {
+  test("serializable") {
     SerializableTester.reserializeAndAssert(Open)
     SerializableTester.reserializeAndAssert(Closed)
   }

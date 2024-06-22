@@ -137,7 +137,7 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
    *  considered empty, even though they contain no actual values.  In these cases, it may be
    *  helpful to preprocess ranges with `#canonical(DiscreteDomain)`.
    */
-  def isEmpty(): Boolean = range.isEmpty()
+  def isEmpty: Boolean = range.isEmpty
 
   /** Returns {@code true} if {@code value} is within the bounds of this range. For example, on the
    *  range {@code [0..2)}, {@code contains(1)} returns {@code true}, while {@code contains(2)}
@@ -148,7 +148,7 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
   /** Equivalent to `#contains`; provided only to satisfy the Predicate (`T => Boolean`) interface. When
    *  using a reference of type {@code Range}, always invoke `#contains` directly instead.
    */
-  final override def apply(input: T) = contains(input)
+  override def apply(input: T) = contains(input)
 
   /** Returns {@code true} if every element in {@code values} is contained in
    *  this range.
@@ -266,11 +266,11 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
 
   /** Returns {@code true} if this range has a lower endpoint.
    */
-  def hasLowerBound() = range.hasLowerBound
+  def hasLowerBound: Boolean = range.hasLowerBound
 
   /** Returns {@code true} if this range has an upper endpoint.
    */
-  def hasUpperBound() = range.hasUpperBound
+  def hasUpperBound: Boolean = range.hasUpperBound
 
   /** Returns a string representation of this range, such as {@code "[3..5)"} (other examples are
    *  listed in the class documentation).
@@ -373,7 +373,7 @@ final class Range[T, O <: Ordering[T]] private (private val range: GuavaRange[As
  *  @author Markus Schneider
  *  @since 0.8 (copied from Guava-libraries)
  */
-final object Range {
+object Range {
 
   /** Factory method take the Guava delegate
    */
@@ -515,13 +515,15 @@ final object Range {
    */
   def unapply[T, O <: Ordering[T]](range: Range[T, O]): Option[(Bound[T], Bound[T])] = {
     val delegate = range.range
-    val lower = delegate.hasLowerBound match {
-      case true  => FiniteBound(delegate.lowerEndpoint.value, delegate.lowerBoundType.asScala)
-      case false => InfiniteBound
+    val lower = if (delegate.hasLowerBound) {
+      FiniteBound(delegate.lowerEndpoint.value, delegate.lowerBoundType.asScala)
+    } else {
+      InfiniteBound
     }
-    val upper = delegate.hasUpperBound match {
-      case true  => FiniteBound(delegate.upperEndpoint.value, delegate.upperBoundType.asScala)
-      case false => InfiniteBound
+    val upper = if (delegate.hasUpperBound) {
+      FiniteBound(delegate.upperEndpoint.value, delegate.upperBoundType.asScala)
+    } else {
+      InfiniteBound
     }
     Some((lower, upper))
   }

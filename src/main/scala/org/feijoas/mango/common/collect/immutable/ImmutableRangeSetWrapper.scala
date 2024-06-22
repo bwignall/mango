@@ -33,7 +33,7 @@ import org.feijoas.mango.common.collect.RangeSetFactory
 import org.feijoas.mango.common.collect.RangeSetWrapperLike
 
 import com.google.common.collect.ImmutableRangeSet
-import com.google.common.collect.{RangeSet => GuavaRangeSet}
+import com.google.common.collect.{RangeSet as GuavaRangeSet}
 
 /** An immutable implementation of RangeSet that delegates to Guava ImmutableRangeSet
  *
@@ -57,7 +57,7 @@ private[mango] class ImmutableRangeSetWrapper[C, O <: Ordering[C]] private (guav
 
 /** Factory for ImmutableRangeSetWrapper
  */
-final private[mango] object ImmutableRangeSetWrapper extends RangeSetFactory[ImmutableRangeSetWrapper] {
+private[mango] object ImmutableRangeSetWrapper extends RangeSetFactory[ImmutableRangeSetWrapper] {
 
   /** Factory method */
   private[mango] def apply[C, O <: Ordering[C]](guava: GuavaRangeSet[AsOrdered[C]])(implicit ord: O) =

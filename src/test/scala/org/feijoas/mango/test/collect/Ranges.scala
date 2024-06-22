@@ -65,12 +65,12 @@ object Ranges {
     builder.result()
   }
 
-  /** A list of pairs of ranges that are not overlaping
+  /** A list of pairs of ranges that are not overlapping
    */
   private lazy val rangeTuples =
     for (
       range1 <- ranges;
-      range2 <- ranges if !range1.isConnected(range2) || range1.intersection(range2).isEmpty()
+      range2 <- ranges if !range1.isConnected(range2) || range1.intersection(range2).isEmpty
     ) yield (range1, range2)
 
   implicit lazy val arbRange: Arbitrary[Range[Int, Int.type]] = Arbitrary {

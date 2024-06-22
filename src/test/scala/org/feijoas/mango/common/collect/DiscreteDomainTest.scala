@@ -36,11 +36,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
  *  @author Markus Schneider
  *  @since 0.8
  */
-class DiscreteDomainTestextends
-    extends AnyFlatSpec
-    with Matchers
-    with ScalaCheckPropertyChecks
-    with DiscreteDomainBehaviors {
+class DiscreteDomainTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks with DiscreteDomainBehaviors {
 
   ("IntDomain" should behave).like(guavaDomain(IntDomain, GuavaDiscreteDomain.integers()))
   ("LongDomain" should behave).like(guavaDomain(LongDomain, GuavaDiscreteDomain.longs()))
@@ -50,7 +46,7 @@ class DiscreteDomainTestextends
 private[mango] trait DiscreteDomainBehaviors extends ScalaCheckPropertyChecks with Matchers {
   this: AnyFlatSpec =>
 
-  def guavaDomain[C <: Comparable[_], T: Arbitrary: Shrink](domain: DiscreteDomain[T], guava: GuavaDiscreteDomain[C])(
+  def guavaDomain[C <: Comparable[?], T: Arbitrary: Shrink](domain: DiscreteDomain[T], guava: GuavaDiscreteDomain[C])(
     implicit view: T => C
   ) = {
 
@@ -85,7 +81,7 @@ private[mango] trait DiscreteDomainBehaviors extends ScalaCheckPropertyChecks wi
       domain.minValue() should be(Option(guava.minValue()))
     }
 
-    it should "be serializeable" in {
+    it should "be serializable" in {
       reserializeAndAssert(domain)
     }
   }

@@ -72,7 +72,7 @@ class FunctionsTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChe
     (wrappedTwice should be).theSameInstanceAs(gf)
   }
 
-  it should "be serializeable" in {
+  it should "be serializable" in {
     val gf1 = SomeFunction
     val cf1: Int => String = gf1.asScala
     SerializableTester.reserialize(cf1)

@@ -25,7 +25,7 @@ package org.feijoas.mango.common.cache
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
+import com.google.common.cache.{RemovalCause as GuavaRemovalCause}
 
 /** The reason why a cached entry was removed. See the companion object for
  *  the individual RemovalCause cases.
@@ -44,7 +44,7 @@ sealed trait RemovalCause extends Serializable {
 
 /** Available RemovalCauses
  */
-final object RemovalCause {
+object RemovalCause {
 
   /** The entry was manually removed by the user. This can result from the user invoking
    *  `Cache#invalidate, `Cache#invalidateAll(Traversable)` or `Cache#invalidateAll()`
@@ -92,7 +92,7 @@ final object RemovalCause {
    *  @return An object with an `asJava` method that returns a Guava `RemovalCause`
    *   view of the argument
    */
-  implicit final def asGuavaRemovalCauseConverter(cause: RemovalCause): AsJava[GuavaRemovalCause] = new AsJava(
+  implicit def asGuavaRemovalCauseConverter(cause: RemovalCause): AsJava[GuavaRemovalCause] = new AsJava(
     cause match {
       case RemovalCause.Explicit  => GuavaRemovalCause.EXPLICIT
       case RemovalCause.Replaced  => GuavaRemovalCause.REPLACED
@@ -112,7 +112,7 @@ final object RemovalCause {
    *  @return An object with an `asScala` method that returns a Mango `RemovalCause`
    *   view of the argument
    */
-  implicit final def asMangoRemovalCauseConverter(cause: GuavaRemovalCause): AsScala[RemovalCause] = new AsScala(
+  implicit def asMangoRemovalCauseConverter(cause: GuavaRemovalCause): AsScala[RemovalCause] = new AsScala(
     cause match {
       case GuavaRemovalCause.EXPLICIT  => Explicit
       case GuavaRemovalCause.REPLACED  => Replaced

@@ -33,7 +33,7 @@ import com.google.common.collect as gcc
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /**
- * Behavior which all [[RangeMapWrappers]] have in common
+ * Behavior which all [[RangeMapWrapperLike]]s have in common
  */
 private[mango] trait RangeMapWrapperBehaviours extends AnyFreeSpec with ScalaCheckPropertyChecks with MockitoSugar {
   this: AnyFreeSpec =>
@@ -127,7 +127,7 @@ private[mango] trait RangeMapWrapperBehaviours extends AnyFreeSpec with ScalaChe
       "should forward #clear" in {
         val (mocked, withMock) = fixture
         withMock.clear()
-        verify(mocked).clear
+        verify(mocked).clear()
       }
     }
   }

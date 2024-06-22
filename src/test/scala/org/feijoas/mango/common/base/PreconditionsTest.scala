@@ -127,7 +127,7 @@ class PreconditionsTest extends AnyFlatSpec with Matchers {
     an[NullPointerException] should be thrownBy checkNotNull(null)
   }
 
-  "successfull checkNotNull" should "ignore the second arg" in {
+  "successful checkNotNull" should "ignore the second arg" in {
     checkNotNull(NON_NULL_STRING, IGNORE_ME) should equal(NON_NULL_STRING)
   }
 
@@ -137,7 +137,7 @@ class PreconditionsTest extends AnyFlatSpec with Matchers {
     } should have).message("A message")
   }
 
-  "successfull checkNotNull" should "ignore the third arg" in {
+  "successful checkNotNull" should "ignore the third arg" in {
     checkNotNull(NON_NULL_STRING, "%s", IGNORE_ME) should equal(NON_NULL_STRING)
   }
 
@@ -243,7 +243,7 @@ class PreconditionsTest extends AnyFlatSpec with Matchers {
     } should have).message("end index (0) must not be less than start index (1)")
   }
 
-  "vararg functions" should "work with anyval and anyref" in {
+  "vararg functions" should "work with AnyVal and AnyRef" in {
     val value: AnyVal = 1
     val ref: AnyRef = new Object
     // this must compile

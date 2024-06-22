@@ -24,7 +24,7 @@ package org.feijoas.mango.common.cache
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.feijoas.mango.common.cache.Weigher._
-import com.google.common.cache.{Weigher => GuavaWeigher}
+import com.google.common.cache.{Weigher as GuavaWeigher}
 import org.scalatest.matchers.should.Matchers._
 
 /**

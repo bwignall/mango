@@ -52,7 +52,7 @@ import javax.annotation.Nullable
  *  UnsupportedOperationException} and others -- are used to signal that the
  *  <i>calling method</i> has made an error. This tells the caller that it should
  *  not have invoked the method when it did, with the arguments it did, or
- *  perhaps ever. Postcondition or other invariant failures should not throw
+ *  perhaps ever. Post-condition or other invariant failures should not throw
  *  these types of exceptions.
  *
  *  See also <a href=

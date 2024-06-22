@@ -413,14 +413,14 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
       "given the RangeSet is empty" - {
         val rangeSet = newBuilder.result()
         "all ranges must be non-empty" in {
-          rangeSet.asRanges().foreach { range => range.isEmpty() should be(false) }
+          rangeSet.asRanges().foreach { range => range.isEmpty should be(false) }
         }
       }
       "given an empty range is added" - {
         val rangeSet = newBuilder.result()
         rangeSet.add(Range.openClosed(3, 3))
         "all ranges must be non-empty" in {
-          rangeSet.asRanges().foreach { range => range.isEmpty() should be(false) }
+          rangeSet.asRanges().foreach { range => range.isEmpty should be(false) }
         }
         "the range set must be empty" in {
           rangeSet.isEmpty should be(true)
@@ -1059,7 +1059,7 @@ private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckProper
           builder.result().isEmpty should be(true)
         }
       }
-      "when values are aded to the builder" - {
+      "when values are added to the builder" - {
         val builder = newBuilder
         builder += Range.open(4, 7)
         builder += Range.open(8, 9)

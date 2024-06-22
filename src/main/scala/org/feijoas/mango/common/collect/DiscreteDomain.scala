@@ -48,7 +48,7 @@ import scala.math.BigInt.long2bigInt
 @Beta
 trait DiscreteDomain[C] {
 
-  /** Returns a `Some` wiht the unique least value of type `C` that is greater than
+  /** Returns a `Some` with the unique least value of type `C` that is greater than
    *  `value`, or `None` if none exists. Inverse operation to
    *  `#previous`.
    *
@@ -125,10 +125,10 @@ object DiscreteDomain {
     override def distance(start: Int, end: Int): Long = end.toLong - start
     override def minValue() = Some(Int.MinValue)
     override def maxValue() = Some(Int.MaxValue)
-    override def toString() = "DiscreteDomains.ints()"
+    override def toString = "DiscreteDomains.ints()"
   }
 
-  /** Returns the discrete domaipppn for values of type {@code Long}.
+  /** Returns the discrete domain for values of type {@code Long}.
    *
    */
   @SerialVersionUID(1L)
@@ -157,7 +157,7 @@ object DiscreteDomain {
 
     override def minValue() = Some(Long.MinValue)
     override def maxValue() = Some(Long.MaxValue)
-    override def toString() = "DiscreteDomains.longs()"
+    override def toString = "DiscreteDomains.longs()"
   }
 
   /** Returns the discrete domain for values of type {@code BigInteger}.
@@ -171,7 +171,7 @@ object DiscreteDomain {
     override def distance(start: BigInt, end: BigInt): Long = {
       (end - start).max(Long.MinValue).min(Long.MaxValue).toLong
     }
-    override def toString() = "DiscreteDomains.bigInts()"
+    override def toString = "DiscreteDomains.bigInts()"
   }
 
   /** Conversion from Mango `DiscreteDomain` to Guava `DiscreteDomain`
@@ -190,7 +190,7 @@ object DiscreteDomain {
       override def distance(start: AsOrdered[C], end: AsOrdered[C]): Long = dm.distance(start.value, end.value)
       override def minValue() = dm.minValue().getOrElse(throw new NoSuchElementException())
       override def maxValue() = dm.maxValue().getOrElse(throw new NoSuchElementException())
-      override def toString() = dm.toString()
+      override def toString: String = dm.toString
     }
   }
 }

@@ -37,9 +37,9 @@ import scala.concurrent.duration.*
  *  <li>automatic loading of entries into the cache
  *  <li>least-recently-used eviction when a maximum size is exceeded
  *  <li>time-based expiration of entries, measured since last access or last write
- *  <li>keys automatically wrapped in {@linkplain WeakReference weak} references
- *  <li>values automatically wrapped in {@linkplain WeakReference weak} or
- *     {@linkplain SoftReference soft} references
+ *  <li>keys automatically wrapped in {@linkplain scala.ref.WeakReference weak} references
+ *  <li>values automatically wrapped in {@linkplain scala.ref.WeakReference weak} or
+ *     {@linkplain scala.ref.SoftReference soft} references
  *  <li>notification of evicted (or otherwise removed) entries
  *  <li>accumulation of cache access statistics
  *  </ul>
@@ -201,8 +201,8 @@ final case class CacheBuilder[-K, -V] private (
    */
   def weigher[K1 <: K, V1 <: V](weigher: (K1, V1) => Int): CacheBuilder[K1, V1] = {
     checkNotNull(weigher)
-    checkState(withWeigher == None, "weigher was already set")
-    checkState(withMaximumSize == None, "weigher can not be combined with maximum size")
+    checkState(withWeigher.isEmpty, "weigher was already set")
+    checkState(withMaximumSize.isEmpty, "weigher can not be combined with maximum size")
     copy(withWeigher = Some(weigher))
   }
 
@@ -216,9 +216,9 @@ final case class CacheBuilder[-K, -V] private (
    *  @return the cache builder reference that should be used instead of {@code this} for any
    *     remaining configuration and cache building
    */
-  def removalListener[K1 <: K, V1 <: V](listener: (RemovalNotification[K1, V1]) => Unit): CacheBuilder[K1, V1] = {
+  def removalListener[K1 <: K, V1 <: V](listener: RemovalNotification[K1, V1] => Unit): CacheBuilder[K1, V1] = {
     checkNotNull(listener)
-    checkState(withRemovalListener == None, "removal listener was already set")
+    checkState(withRemovalListener.isEmpty, "removal listener was already set")
     copy(withRemovalListener = Some(listener))
   }
 
@@ -232,7 +232,7 @@ final case class CacheBuilder[-K, -V] private (
    */
   def initialCapacity(initialCapacity: Int): CacheBuilder[K, V] = {
     checkNotNull(initialCapacity)
-    checkState(withInitialCapacity == None, "initial capacity was already set to %s", withInitialCapacity)
+    checkState(withInitialCapacity.isEmpty, "initial capacity was already set to %s", withInitialCapacity)
     checkArgument(initialCapacity >= 0)
     copy(withInitialCapacity = Some(initialCapacity))
   }
@@ -263,11 +263,11 @@ final case class CacheBuilder[-K, -V] private (
    *  <p>Note that future implementations may abandon segment locking in favor of more advanced
    *  concurrency controls.
    *
-   *  @throws IllegalArgumentException if {@code concurrencyLevel} is nonpositive
+   *  @throws IllegalArgumentException if {@code concurrencyLevel} is non-positive
    */
   def concurrencyLevel(concurrencyLevel: Int): CacheBuilder[K, V] = {
     checkNotNull(concurrencyLevel)
-    checkState(withConcurrencyLevel == None, "concurrency level was already set to %s", withConcurrencyLevel)
+    checkState(withConcurrencyLevel.isEmpty, "concurrency level was already set to %s", withConcurrencyLevel)
     checkArgument(concurrencyLevel > 0)
     copy(withConcurrencyLevel = Some(concurrencyLevel))
   }
@@ -287,9 +287,9 @@ final case class CacheBuilder[-K, -V] private (
    */
   def maximumSize(size: Long): CacheBuilder[K, V] = {
     checkNotNull(size)
-    checkState(withMaximumSize == None, "maximum size was already set to %s", withMaximumSize)
-    checkState(withMaximumWeight == None, "maximum weight was already set to %s", withMaximumWeight)
-    checkState(withWeigher == None, "maximum size can not be combined with weigher")
+    checkState(withMaximumSize.isEmpty, "maximum size was already set to %s", withMaximumSize)
+    checkState(withMaximumWeight.isEmpty, "maximum weight was already set to %s", withMaximumWeight)
+    checkState(withWeigher.isEmpty, "maximum size can not be combined with weigher")
     checkArgument(size >= 0, "maximum size must not be negative")
     copy(withMaximumSize = Some(size))
   }
@@ -317,8 +317,8 @@ final case class CacheBuilder[-K, -V] private (
    */
   def maximumWeight(weight: Long): CacheBuilder[K, V] = {
     checkNotNull(weight)
-    checkState(withMaximumWeight == None, "maximum weight was already set to %s", withMaximumWeight)
-    checkState(withMaximumSize == None, "maximum size was already set to %s", withMaximumSize)
+    checkState(withMaximumWeight.isEmpty, "maximum weight was already set to %s", withMaximumWeight)
+    checkState(withMaximumSize.isEmpty, "maximum size was already set to %s", withMaximumSize)
     checkArgument(weight >= 0, "maximum weight must not be negative")
     copy(withMaximumWeight = Some(weight))
   }
@@ -336,7 +336,7 @@ final case class CacheBuilder[-K, -V] private (
    *  @throws IllegalStateException if the key strength was already set
    */
   def weakKeys(): CacheBuilder[K, V] = {
-    checkState(withWeakKeys == None, "Key strength was already set")
+    checkState(withWeakKeys.isEmpty, "Key strength was already set")
     copy(withWeakKeys = Some(true))
   }
 
@@ -354,8 +354,8 @@ final case class CacheBuilder[-K, -V] private (
    *  the routine maintenance described in the class doc.
    */
   def weakValues(): CacheBuilder[K, V] = {
-    checkState(withWeakValues == None, "Value strength was already set")
-    checkState(withSoftValues == None, "Value strength was already set")
+    checkState(withWeakValues.isEmpty, "Value strength was already set")
+    checkState(withSoftValues.isEmpty, "Value strength was already set")
     copy(withWeakValues = Some(true))
   }
 
@@ -376,8 +376,8 @@ final case class CacheBuilder[-K, -V] private (
    *  the routine maintenance described in the class doc.
    */
   def softValues(): CacheBuilder[K, V] = {
-    checkState(withWeakValues == None, "Value strength was already set")
-    checkState(withSoftValues == None, "Value strength was already set")
+    checkState(withWeakValues.isEmpty, "Value strength was already set")
+    checkState(withSoftValues.isEmpty, "Value strength was already set")
     copy(withSoftValues = Some(true))
   }
 
@@ -385,7 +385,7 @@ final case class CacheBuilder[-K, -V] private (
    *  has elapsed after the entry's creation, or the most recent replacement of its value.
    *
    *  <p>When `duration` is zero, this method hands off to
-   *  `maximumSize(Long)` `(0)`, ignoring any otherwise-specificed maximum
+   *  `maximumSize(Long)` `(0)`, ignoring any otherwise-specified maximum
    *  size or weight. This can be useful in testing, or to disable caching temporarily without a code
    *  change.
    *
@@ -401,7 +401,7 @@ final case class CacheBuilder[-K, -V] private (
   def expireAfterWrite(duration: Long, unit: TimeUnit): CacheBuilder[K, V] = {
     checkNotNull(duration)
     checkNotNull(unit)
-    checkState(withExpireAfterWrite == None, "expireAfterWrite was already set to %s", withExpireAfterWrite)
+    checkState(withExpireAfterWrite.isEmpty, "expireAfterWrite was already set to %s", withExpireAfterWrite)
     checkArgument(duration >= 0, "duration cannot be negative: %s %s", duration, unit)
     copy(withExpireAfterWrite = Some((duration, unit)))
   }
@@ -411,7 +411,7 @@ final case class CacheBuilder[-K, -V] private (
    *  access. Access time is reset by all cache read and write operations.
    *
    *  <p>When `duration` is zero, this method hands off to
-   *  `maximumSize(Long)` `(0)`, ignoring any otherwise-specificed maximum
+   *  `maximumSize(Long)` `(0)`, ignoring any otherwise-specified maximum
    *  size or weight. This can be useful in testing, or to disable caching temporarily without a code
    *  change.
    *
@@ -427,7 +427,7 @@ final case class CacheBuilder[-K, -V] private (
   def expireAfterAccess(duration: Long, unit: TimeUnit): CacheBuilder[K, V] = {
     checkNotNull(duration)
     checkNotNull(unit)
-    checkState(withExpireAfterAccess == None, "expireAfterAccess was already set to %s ns", withExpireAfterAccess)
+    checkState(withExpireAfterAccess.isEmpty, "expireAfterAccess was already set to %s ns", withExpireAfterAccess)
     checkArgument(duration >= 0, "duration cannot be negative: %s %s", duration, unit)
     copy(withExpireAfterAccess = Some((duration, unit)))
   }
@@ -457,7 +457,7 @@ final case class CacheBuilder[-K, -V] private (
   def refreshAfterWrite(duration: Long, unit: TimeUnit): CacheBuilder[K, V] = {
     checkNotNull(duration)
     checkNotNull(unit)
-    checkState(withRefreshAfterWrite == None, "refresh was already set to %s", withRefreshAfterWrite)
+    checkState(withRefreshAfterWrite.isEmpty, "refresh was already set to %s", withRefreshAfterWrite)
     checkArgument(duration > 0, "duration must be positive: %s %s", duration, unit)
     copy(withRefreshAfterWrite = Some((duration, unit)))
   }
@@ -471,7 +471,7 @@ final case class CacheBuilder[-K, -V] private (
   @throws[IllegalStateException]
   def ticker(ticker: Ticker): CacheBuilder[K, V] = {
     checkNotNull(ticker)
-    checkState(withTicker == None)
+    checkState(withTicker.isEmpty)
     copy(withTicker = Some(ticker))
   }
 
@@ -484,7 +484,7 @@ final case class CacheBuilder[-K, -V] private (
 }
 
 /** Factory for [[CacheBuilder]] instances. */
-final object CacheBuilder {
+object CacheBuilder {
 
   /** Creates a new [[LoadingCache]] which caches the values from the function `f`
    *  with default settings, including strong keys, strong values,
@@ -506,7 +506,7 @@ final object CacheBuilder {
   /** Creates a Guava CacheBuilder and sets the all properties from this
    *  CacheBuilder that are not `None`
    *
-   *  @return a Guava CacheBuilder with the properties mapped from this CachBuilder
+   *  @return a Guava CacheBuilder with the properties mapped from this CacheBuilder
    */
   private[mango] def createGuavaBuilder[K, V](builder: CacheBuilder[K, V]): GuavaCacheBuilder[K, V] = {
     var gb = GuavaCacheBuilder.newBuilder().asInstanceOf[GuavaCacheBuilder[K, V]]
@@ -524,6 +524,6 @@ final object CacheBuilder {
     builder.withRefreshAfterWrite.foreach { case (duration, unit) => gb = gb.refreshAfterWrite(duration, unit) }
     builder.withTicker.foreach { ticker => gb = gb.ticker(ticker.asJava) }
     builder.withRecordStats.foreach { _ => gb = gb.recordStats() }
-    return gb
+    gb
   }
 }

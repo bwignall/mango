@@ -22,10 +22,11 @@ This is a beta version of the library. Many modules are not published yet becaus
 Mango is programmed against `guava-20.0` using Scala 2.12. If you want to run the tests you will also need the `guava-testlib-20.0`.
 
 To use the Mango library in [sbt](http://www.scala-sbt.org/) add the following dependency to your project file:
+
 ```Scala
 resolvers ++= Seq(
-    "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-    "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases"
+  "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases"
 )
 
 libraryDependencies += "org.feijoas" %% "mango" % "0.14"
@@ -108,7 +109,7 @@ if (friends.mightContain(dude)) {
 
   // Pattern match using extractor
   range match {
-    case Range(FiniteBound(lower, lowerType), InfiniteBound) => ...
+    case Range(FiniteBound(lower, lowerType), InfiniteBound) => ???
   }
 
   // immutable range set:

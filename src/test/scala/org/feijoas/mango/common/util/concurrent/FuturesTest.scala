@@ -70,7 +70,7 @@ class FuturesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCheck
     listFut.get(100, TimeUnit.MILLISECONDS) should be(5)
   }
 
-  it should "call onSucces if it succeeds" in {
+  it should "call onSuccess if it succeeds" in {
     val finished = new CountDownLatch(1)
     val start = new CountDownLatch(1)
     val scalaFuture = Future { start.await(); 5 }
@@ -256,7 +256,7 @@ class FuturesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyCheck
     delegate.isDone should be(false)
     future.isCompleted should be(false)
 
-    // calculation will need 5 mins but we wait only 100 ms
+    // calculation will need 5 minutes but we wait only 100 ms
     try {
       Await.ready(future, Duration(100, MILLISECONDS))
       fail()

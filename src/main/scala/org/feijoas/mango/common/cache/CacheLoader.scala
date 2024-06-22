@@ -26,7 +26,7 @@ import scala.collection.immutable
 import scala.concurrent.{Future, Promise}
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
-import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
+import com.google.common.cache.CacheLoader as GuavaCacheLoader
 
 /**
  * Computes or retrieves values, based on a key, for use in populating a [[LoadingCache]].

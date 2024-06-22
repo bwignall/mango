@@ -28,8 +28,8 @@ import org.feijoas.mango.common.cache.CacheLoader._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import com.google.common.{cache => cgcc}
-import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
+import com.google.common.cache as cgcc
+import com.google.common.cache.CacheLoader as GuavaCacheLoader
 import com.google.common.collect.{ImmutableMap, Lists}
 import org.junit.Assert._
 import org.feijoas.mango.common.util.concurrent.Futures._
@@ -82,36 +82,36 @@ class CacheLoaderWrapperTest extends AnyFlatSpec with Matchers {
     }
 
     val wrapper: GuavaCacheLoader[AnyRef, AnyRef] = asGuavaCacheLoaderConverter(loader).asJava
-    val cache: cgcc.LoadingCache[AnyRef, AnyRef] = cgcc.CacheBuilder.newBuilder().recordStats().build(wrapper);
+    val cache: cgcc.LoadingCache[AnyRef, AnyRef] = cgcc.CacheBuilder.newBuilder().recordStats().build(wrapper)
 
     var stats: cgcc.CacheStats = cache.stats()
-    assertEquals(0, stats.missCount());
-    assertEquals(0, stats.loadSuccessCount());
-    assertEquals(0, stats.loadExceptionCount());
-    assertEquals(0, stats.hitCount());
+    assertEquals(0, stats.missCount())
+    assertEquals(0, stats.loadSuccessCount())
+    assertEquals(0, stats.loadExceptionCount())
+    assertEquals(0, stats.hitCount())
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
 
-    stats = cache.stats();
-    assertEquals(1, stats.missCount());
-    assertEquals(1, stats.loadSuccessCount());
-    assertEquals(0, stats.loadExceptionCount());
-    assertEquals(0, stats.hitCount());
+    stats = cache.stats()
+    assertEquals(1, stats.missCount())
+    assertEquals(1, stats.loadSuccessCount())
+    assertEquals(0, stats.loadExceptionCount())
+    assertEquals(0, stats.hitCount())
 
-    cache.refresh(key);
-    stats = cache.stats();
-    assertEquals(1, stats.missCount());
-    assertEquals(1, stats.loadSuccessCount());
-    assertEquals(1, stats.loadExceptionCount());
-    assertEquals(0, stats.hitCount());
+    cache.refresh(key)
+    stats = cache.stats()
+    assertEquals(1, stats.missCount())
+    assertEquals(1, stats.loadSuccessCount())
+    assertEquals(1, stats.loadExceptionCount())
+    assertEquals(0, stats.hitCount())
 
-    assertSame(one, cache.getUnchecked(key));
-    stats = cache.stats();
-    assertEquals(1, stats.missCount());
-    assertEquals(1, stats.loadSuccessCount());
-    assertEquals(1, stats.loadExceptionCount());
-    assertEquals(1, stats.hitCount());
+    assertSame(one, cache.getUnchecked(key))
+    stats = cache.stats()
+    assertEquals(1, stats.missCount())
+    assertEquals(1, stats.loadSuccessCount())
+    assertEquals(1, stats.loadExceptionCount())
+    assertEquals(1, stats.hitCount())
   }
 
   it should "wrap futures" in {
@@ -122,36 +122,36 @@ class CacheLoaderWrapperTest extends AnyFlatSpec with Matchers {
       override def reload(key: AnyRef, oldValue: AnyRef) = Future.failed(e).asJava
     }
 
-    val cache: cgcc.LoadingCache[AnyRef, AnyRef] = cgcc.CacheBuilder.newBuilder().recordStats().build(loader);
+    val cache: cgcc.LoadingCache[AnyRef, AnyRef] = cgcc.CacheBuilder.newBuilder().recordStats().build(loader)
 
     var stats: cgcc.CacheStats = cache.stats()
-    assertEquals(0, stats.missCount());
-    assertEquals(0, stats.loadSuccessCount());
-    assertEquals(0, stats.loadExceptionCount());
-    assertEquals(0, stats.hitCount());
+    assertEquals(0, stats.missCount())
+    assertEquals(0, stats.loadSuccessCount())
+    assertEquals(0, stats.loadExceptionCount())
+    assertEquals(0, stats.hitCount())
 
     val key = new Object
     assertSame(one, cache.getUnchecked(key))
 
-    stats = cache.stats();
-    assertEquals(1, stats.missCount());
-    assertEquals(1, stats.loadSuccessCount());
-    assertEquals(0, stats.loadExceptionCount());
-    assertEquals(0, stats.hitCount());
+    stats = cache.stats()
+    assertEquals(1, stats.missCount())
+    assertEquals(1, stats.loadSuccessCount())
+    assertEquals(0, stats.loadExceptionCount())
+    assertEquals(0, stats.hitCount())
 
-    cache.refresh(key);
-    stats = cache.stats();
-    assertEquals(1, stats.missCount());
-    assertEquals(1, stats.loadSuccessCount());
-    assertEquals(1, stats.loadExceptionCount());
-    assertEquals(0, stats.hitCount());
+    cache.refresh(key)
+    stats = cache.stats()
+    assertEquals(1, stats.missCount())
+    assertEquals(1, stats.loadSuccessCount())
+    assertEquals(1, stats.loadExceptionCount())
+    assertEquals(0, stats.hitCount())
 
-    assertSame(one, cache.getUnchecked(key));
-    stats = cache.stats();
-    assertEquals(1, stats.missCount());
-    assertEquals(1, stats.loadSuccessCount());
-    assertEquals(1, stats.loadExceptionCount());
-    assertEquals(1, stats.hitCount());
+    assertSame(one, cache.getUnchecked(key))
+    stats = cache.stats()
+    assertEquals(1, stats.missCount())
+    assertEquals(1, stats.loadSuccessCount())
+    assertEquals(1, stats.loadExceptionCount())
+    assertEquals(1, stats.hitCount())
   }
 
 }

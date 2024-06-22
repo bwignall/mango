@@ -28,14 +28,14 @@ import org.feijoas.mango.common.base.Preconditions._
  *  This class converts a value `T` to a class `AsOrdered[T]` which implements `Ordered[AsOrdered[T]]`.
  *  Internally we end up with a Guava `Range[AsOrdered[T]]`.
  */
-private[mango] case class AsOrdered[T](val value: T)(implicit ord: Ordering[T]) extends Ordered[AsOrdered[T]] {
-  override def compare(that: AsOrdered[T]) = ord.compare(value, that.value)
-  override def toString = value.toString
+private[mango] case class AsOrdered[T](value: T)(implicit ord: Ordering[T]) extends Ordered[AsOrdered[T]] {
+  override def compare(that: AsOrdered[T]): Int = ord.compare(value, that.value)
+  override def toString: String = value.toString
 }
 
 /** Factory for AsOrdered
  */
-final private[mango] object AsOrdered {
+private[mango] object AsOrdered {
 
   /** Implicit conversion from `Ordering[T]` to `AsOrdered[T]`
    */

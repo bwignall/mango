@@ -49,7 +49,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    *  the range set that are {@linkplain Range#isConnected(Range) connected} with it.  Moreover,
    *  if {@code range} is empty, this is a no-op.
    */
-  def add(range: Range[C, O])
+  def add(range: Range[C, O]): Unit
 
   /** Alias for `#add(range)` */
   final override def addOne(range: Range[C, O]): this.type = {
@@ -62,7 +62,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    *
    *  <p>If {@code range} is empty, this is a no-op.
    */
-  def remove(range: Range[C, O])
+  def remove(range: Range[C, O]): Unit
 
   /** Alias for `#remove(range)` */
   final override def subtractOne(range: Range[C, O]): this.type = {
@@ -75,7 +75,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    *
    *  <p>This is equivalent to {@code remove(Range.all())}.
    */
-  def clear()
+  def clear(): Unit
 
   /** Adds all of the ranges from the specified range set to this range set (optional operation).
    *  After this operation, this range set is the minimal range set that

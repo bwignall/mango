@@ -42,7 +42,7 @@ import com.google.common.primitives.UnsignedInts
  *  @author Markus Schneider
  *  @since 0.10 (copied from Guava-libraries)
  */
-final object UInt {
+object UInt {
   private val intMask = 0xffffffffL
 
   /** Maximum value an UInt can represent
@@ -69,7 +69,7 @@ final object UInt {
    *  The argument is interpreted as an unsigned 32-bit value. Specifically, the sign bit
    *  of {@code bits} is interpreted as a normal bit, and all other bits are treated as usual.
    *
-   *  <p>If the argument is nonnegative, the returned result will be equal to {@code bits},
+   *  <p>If the argument is non-negative, the returned result will be equal to {@code bits},
    *  otherwise, the result will be equal to {@code 2^32 + bits}.
    *
    *  <p>To represent unsigned decimal constants, consider {@code #valueOf(Long)} instead.
@@ -148,7 +148,7 @@ final object UInt {
    *  @throws IllegalArgumentException if {@code array} is empty
    */
   def min(array: UInt*): UInt = {
-    checkArgument(array.length > 0)
+    checkArgument(array.nonEmpty)
     val it = array.iterator
     var min = flip(it.next().value)
     while (it.hasNext) {
@@ -167,7 +167,7 @@ final object UInt {
    *  @throws IllegalArgumentException if {@code array} is empty
    */
   def max(array: UInt*): UInt = {
-    checkArgument(array.length > 0)
+    checkArgument(array.nonEmpty)
     val it = array.iterator
     var max = flip(it.next().value)
     while (it.hasNext) {
@@ -188,14 +188,14 @@ final object UInt {
    */
   def join(separator: String, array: UInt*): String = {
     checkNotNull(separator)
-    if (array.length == 0) {
+    if (array.isEmpty) {
       ""
     } else {
       val it = array.iterator
       val builder = new StringBuilder(array.length * 5)
-      builder.append(it.next().toString)
+      builder.append(it.next().toString())
       while (it.hasNext) {
-        builder.append(separator).append(it.next().toString)
+        builder.append(separator).append(it.next().toString())
       }
       builder.toString
     }
@@ -224,7 +224,7 @@ final object UInt {
         }
         i = i + 1
       }
-      return left.length - right.length
+      left.length - right.length
     }
   }
 
@@ -318,7 +318,7 @@ final class UInt private (val value: Int) extends AnyVal with Ordered[UInt] with
 
   /** Returns a string representation of the {@code UInt} value, in base 10.
    */
-  override def toString() = UnsignedInts.toString(value)
+  override def toString: String = UnsignedInts.toString(value)
 
   /** Returns a string representation of the {@code UInt} value, in base {@code radix}.
    *  If {@code radix < Character.MIN_RADIX} or {@code radix > Character.MAX_RADIX}, the radix
@@ -328,7 +328,7 @@ final class UInt private (val value: Int) extends AnyVal with Ordered[UInt] with
 
   /** Returns the value of this {@code UInt} as a {@code Long}, when treated as unsigned.
    */
-  def toLong(): Long = value & intMask
+  def toLong: Long = value & intMask
 
   /** Returns the value of this {@code UInt} as an {@code Int}. This is an inverse
    *  operation to {@code #fromIntBits}.
@@ -336,19 +336,19 @@ final class UInt private (val value: Int) extends AnyVal with Ordered[UInt] with
    *  <p>Note that if this {@code UInt} holds a value {@code >= 2^31}, the returned value
    *  will be equal to {@code this - 2^32}.
    */
-  def toInt(): Int = value
+  def toInt: Int = value
 
   /** Returns the value of this {@code UInt} as a {@code Float}, analogous to a widening
    *  primitive conversion from {@code Int} to {@code Float}, and correctly rounded.
    */
-  def toFloat(): Float = toLong().toFloat
+  def toFloat: Float = toLong.toFloat
 
   /** Returns the value of this {@code UInt} as a {@code Double}, analogous to a widening
    *  primitive conversion from {@code Int} to {@code Double}, and correctly rounded.
    */
-  def toDouble(): Double = toLong().toDouble
+  def toDouble: Double = toLong.toDouble
 
   /** Returns the value of this {@code UInt} as a {@code BigInt}.
    */
-  def toBigInt(): BigInt = BigInt(toLong())
+  def toBigInt: BigInt = BigInt(toLong)
 }

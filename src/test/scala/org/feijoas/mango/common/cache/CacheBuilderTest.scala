@@ -33,7 +33,7 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatest.matchers.should.Matchers.not
 import org.scalatest.PrivateMethodTester
 
-import com.google.common.cache.{CacheBuilder => GuavaCacheBuilder}
+import com.google.common.cache.CacheBuilder as GuavaCacheBuilder
 
 /**
  * Tests for [[CacheBuilder]]
@@ -326,15 +326,15 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
 
   // check that all method calls are properly forwarded
   // unfortunately we cannot mock Guava CacheBuilder
-  import scala.reflect.runtime.{universe => ru}
+  import scala.reflect.runtime.universe as ru
 
   behavior of "CacheBuilder#createGuavaBuilder"
 
-  def getMember[T](builder: GuavaCacheBuilder[_, _], name: String): T = {
+  def getMember[T](builder: GuavaCacheBuilder[?, ?], name: String): T = {
     val m = ru.runtimeMirror(builder.getClass.getClassLoader)
     val im = m.reflect(builder)
-    val symb = ru.typeOf[GuavaCacheBuilder[_, _]].decl(ru.TermName(name)).asTerm
-    im.reflectField(symb).get.asInstanceOf[T]
+    val symbol = ru.typeOf[GuavaCacheBuilder[?, ?]].decl(ru.TermName(name)).asTerm
+    im.reflectField(symbol).get.asInstanceOf[T]
   }
 
   def testHasValue[T](method: String, value: T, cacheBuilder: CacheBuilder[Any, Any]): Unit = {
@@ -424,7 +424,7 @@ class CacheBuilderTest extends AnyFlatSpec with PrivateMethodTester {
  */
 private case class CountingRemovalListener[K, V](count: AtomicInteger = new AtomicInteger)
     extends (RemovalNotification[K, V] => Unit) {
-  @volatile var lastNotification: RemovalNotification[K, V] = null
+  @volatile var lastNotification: RemovalNotification[K, V] = _
 
   override def apply(notification: RemovalNotification[K, V]): Unit = onRemoval(notification)
 

@@ -27,7 +27,7 @@ import java.util.concurrent.Callable
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.base.{Function => GuavaFunction}
+import com.google.common.base.{Function as GuavaFunction}
 
 /** Utility functions for the work with Guava `Function[T, R]`
  *
@@ -42,7 +42,7 @@ import com.google.common.base.{Function => GuavaFunction}
  *  // convert a Scala function to a Callable
  *  val callable: Callable[R] = { () => n }.asJava
  *
- *  // convert a Scala functio to a Runnable
+ *  // convert a Scala function to a Runnable
  *  val runnable: Runnable = { () => ... }.asJava
  *  }}}
  *
@@ -55,7 +55,7 @@ object Functions {
    *  a Scala function `T => R`.
    *
    *  All calls to the Scala function are forwarded to the provided Guava function.
-   *  @param fnc the Guava `Function[T, R]` to wrap in a Scala funcion `T => R`
+   *  @param fnc the Guava `Function[T, R]` to wrap in a Scala function `T => R`
    *  @return An object with an `asScala` method that returns a Scala
    *          `T => R` view of the argument.
    */
@@ -110,9 +110,7 @@ object Functions {
 
 /** Wraps a Guava `Function` in a Scala function */
 @SerialVersionUID(1L)
-private[mango] case class AsMangoFunction[R, T](delegate: GuavaFunction[R, T])
-    extends Function1[R, T]
-    with Serializable {
+private[mango] case class AsMangoFunction[R, T](delegate: GuavaFunction[R, T]) extends ((R) => T) with Serializable {
   checkNotNull(delegate)
   override def apply(input: R): T = delegate.apply(input)
 }

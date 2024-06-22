@@ -22,7 +22,7 @@
  */
 package org.feijoas.mango.common.cache
 
-import com.google.common.cache.{Weigher => GuavaWeigher}
+import com.google.common.cache.{Weigher as GuavaWeigher}
 import org.feijoas.mango.common.convert.AsJava
 
 /** Calculates the weights of cache entries.
@@ -30,7 +30,7 @@ import org.feijoas.mango.common.convert.AsJava
  *  @author Markus Schneider
  *  @since 0.7
  */
-final object Weigher {
+object Weigher {
 
   /** Adds an `asJava` method that wraps a function `(K, V) => Int` in a
    *  Guava `Weigher[K, V]`.

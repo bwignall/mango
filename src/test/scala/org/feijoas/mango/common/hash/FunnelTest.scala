@@ -29,7 +29,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.matchers.should.Matchers._
 
-import com.google.common.hash.{Funnel => GuavaFunnel, Funnels => GuavaFunnels, PrimitiveSink}
+import com.google.common.hash.{Funnel as GuavaFunnel, Funnels as GuavaFunnels, PrimitiveSink}
 
 /**
  * Tests for [[Funnel]]

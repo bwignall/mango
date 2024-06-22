@@ -76,9 +76,10 @@ private[mango] class DummyRangeSet[C, O <: Ordering[C]] private[mango] (
 )(implicit protected val ord: O)
     extends RangeSet[C, O] {
 
-  override def span(): Option[Range[C, O]] = rset.isEmpty match {
-    case true  => None
-    case false => Some(Range(rset.span))
+  override def span(): Option[Range[C, O]] = if (rset.isEmpty) {
+    None
+  } else {
+    Some(Range(rset.span))
   }
 
   override def asRanges(): Set[Range[C, O]] = {

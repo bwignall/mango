@@ -55,7 +55,7 @@ class RemovalListenerTest extends AnyFlatSpec {
   }
 
   def check(key: String, value: String, cause: RemovalCause): Assertion = {
-    // assert that the call to the gauva listener was forwarded to listener
+    // assert that the call to the Guava listener was forwarded to listener
     var called = false
 
     // create a which checks that the notification is the one we give

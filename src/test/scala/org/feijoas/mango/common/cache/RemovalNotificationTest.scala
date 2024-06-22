@@ -26,7 +26,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 
 import org.feijoas.mango.common.cache.RemovalNotification._
 import org.feijoas.mango.common.cache.RemovalCause._
-import com.google.common.cache.{RemovalNotification => GuavaRemovalNotification}
+import com.google.common.cache.{RemovalNotification as GuavaRemovalNotification}
 import org.scalatest.matchers.should.Matchers._
 
 /**
@@ -62,7 +62,7 @@ class RemovalNotificationTest extends AnyFlatSpec {
    * create a guava GuavaRemovalNotification via reflection
    */
   def guavaNotification[K, V](key: K, value: V, cause: RemovalCause) = {
-    val ctors = classOf[GuavaRemovalNotification[K, V]].getDeclaredConstructors()
+    val ctors = classOf[GuavaRemovalNotification[K, V]].getDeclaredConstructors
     ctors.length should be(1)
     val ctor = ctors(0)
     ctor.setAccessible(true)

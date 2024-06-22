@@ -32,7 +32,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import scala.math.Ordering.Int
 
 /**
- * Behavior which all [[RangeSetWrapper]]s have in common
+ * Behavior which all [[RangeMapWrapperLike]]s have in common
  */
 private[mango] trait RangeSetWrapperBehaviours extends AnyFreeSpec with ScalaCheckPropertyChecks with MockitoSugar {
   this: AnyFreeSpec =>

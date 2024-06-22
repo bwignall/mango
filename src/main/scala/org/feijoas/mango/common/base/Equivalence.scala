@@ -26,7 +26,7 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
 import org.feijoas.mango.common.convert.AsJava
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.{base => gcm}
+import com.google.common.{base as gcm}
 
 /** Utility functions to convert from Scala `Equiv[T]` to Guava `Equivalence[T]` and vice versa.
  *
@@ -46,7 +46,7 @@ import com.google.common.{base => gcm}
  *  @author Markus Schneider
  *  @since 0.10
  */
-final object Equivalence {
+object Equivalence {
 
   /** Adds an `asScala` method that wraps a Guava `Equivalence[T]` in
    *  a Scala `Equiv[T]`.

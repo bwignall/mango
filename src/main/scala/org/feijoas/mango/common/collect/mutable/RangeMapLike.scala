@@ -48,7 +48,7 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
    *
    *  <p>If `range` is empty, then this is a no-op.
    */
-  def put(range: Range[K, O], value: V)
+  def put(range: Range[K, O], value: V): Unit
 
   /** Puts all the associations from `rangeMap` into this range map.
    */
@@ -58,7 +58,7 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
 
   /** Removes all associations from this range map.
    */
-  def clear()
+  def clear(): Unit
 
   /** Removes all associations from this range map in the specified range.
    *
@@ -66,7 +66,7 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
    *  before and after a call to {@code remove(range)}.  If {@code range.contains(k)}, then
    *  after a call to {@code remove(range)}, {@code get(k)} will return {@code None}.
    */
-  def remove(range: Range[K, O])
+  def remove(range: Range[K, O]): Unit
 
   /** Returns a view of the part of this range map that intersects with `range`.
    *

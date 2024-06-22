@@ -51,7 +51,7 @@ private[mango] case class CacheLoaderWrapper[K, V](private val delegate: CacheLo
     }
   }
 
-  override def loadAll(keys: JIterable[_ <: K]): JMap[K, V] =
+  override def loadAll(keys: JIterable[? <: K]): JMap[K, V] =
     delegate.loadAll(checkNotNull(keys).asScala) match {
       case null      => null
       case _ @result => result.asJava

@@ -30,7 +30,7 @@ import org.feijoas.mango.common.cache.RemovalNotification.*
 import org.feijoas.mango.common.convert.AsJava
 
 /** A function `RemovalNotification[K, V] => Unit` that can receive a notification when an entry is
- *  removed from a cache. The removal resulting in notification could have occured to an entry being
+ *  removed from a cache. The removal resulting in notification could have occurred to an entry being
  *  manually removed or replaced, or due to eviction resulting from timed expiration, exceeding a
  *  maximum size, or garbage collection.
  *
@@ -41,7 +41,7 @@ import org.feijoas.mango.common.convert.AsJava
  *  @author Markus Schneider
  *  @since 0.7
  */
-final object RemovalListener {
+object RemovalListener {
 
   /** Adds an `asJava` method that wraps a Mango `RemovalNotification[K, V] => Unit` in a
    *  Guava `RemovalListener[K, V]`.
