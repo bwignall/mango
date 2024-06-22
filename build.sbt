@@ -10,6 +10,12 @@ ThisBuild / developers := List(
   tlGitHubDev("bwignall", "Brian Wignall")
 )
 
+val PrimaryJava = JavaSpec.temurin("11")
+val LTSJava = JavaSpec.temurin("17")
+val GraalVM = JavaSpec.graalvm("17")
+
+ThisBuild / githubWorkflowJavaVersions := Seq(PrimaryJava, LTSJava, GraalVM)
+
 // publish website from this branch
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
