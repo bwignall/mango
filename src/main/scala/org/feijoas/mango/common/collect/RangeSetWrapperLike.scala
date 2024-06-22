@@ -22,13 +22,12 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.convert.decorateAll.asScalaSetConverter
-
+import com.google.common.collect.RangeSet as GuavaRangeSet
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.AsOrdered.asOrdered
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 
-import com.google.common.collect.{RangeSet => GuavaRangeSet}
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 /** Implementation trait for [[RangeSet]] that delegates to Guava
  *

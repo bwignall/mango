@@ -22,39 +22,30 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.annotation.meta.beanGetter
-import scala.annotation.meta.beanSetter
-import scala.annotation.meta.field
-import scala.annotation.meta.getter
-import scala.annotation.meta.setter
 import scala.math.Ordering.Int
-
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.AsOrdered.asOrdered
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.when
-import org.scalatest.FreeSpec
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
-
-import com.google.common.{collect => gcc}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatestplus.mockito.MockitoSugar
+import com.google.common.collect as gcc
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /**
  * Behavior which all [[RangeMapWrappers]] have in common
  */
-private[mango] trait RangeMapWrapperBehaviours extends FreeSpec with PropertyChecks with MockitoSugar {
-  this: FreeSpec =>
+private[mango] trait RangeMapWrapperBehaviours extends AnyFreeSpec with ScalaCheckPropertyChecks with MockitoSugar {
+  this: AnyFreeSpec =>
 
   def immutableWrapper[Repr <: RangeMapWrapperLike[Int, String, Int.type, Repr] with RangeMap[Int, String, Int.type]](
-    constructor: (gcc.RangeMap[AsOrdered[Int], String]) => Repr
-  ) = {
+    constructor: gcc.RangeMap[AsOrdered[Int], String] => Repr
+  ): Unit = {
     val mocked = mock[gcc.RangeMap[AsOrdered[Int], String]]
     val withMock = constructor(mocked)
     "it should forward all immutable methods to guava " - {
       "should forward #asMapOfRanges" in {
-        withMock.asMapOfRanges
+        withMock.asMapOfRanges()
         verify(mocked).asMapOfRanges()
       }
       "should forward #get" in {
@@ -68,8 +59,8 @@ private[mango] trait RangeMapWrapperBehaviours extends FreeSpec with PropertyChe
       "should forward #span" in {
         val nonEmpty = gcc.Maps.newHashMap[gcc.Range[AsOrdered[Int]], String]
         nonEmpty.put(Range.open(3, 4).asJava, "a")
-        when(mocked.asMapOfRanges).thenReturn(nonEmpty)
-        withMock.span
+        when(mocked.asMapOfRanges()).thenReturn(nonEmpty)
+        withMock.span()
         verify(mocked, times(1)).span()
       }
       "should forward #subRangeMap" in {
@@ -81,7 +72,7 @@ private[mango] trait RangeMapWrapperBehaviours extends FreeSpec with PropertyChe
 
   def mutableWrapper[
     Repr <: mutable.RangeMapWrapperLike[Int, String, Int.type, Repr] with mutable.RangeMap[Int, String, Int.type]
-  ](constructor: (gcc.RangeMap[AsOrdered[Int], String]) => Repr) = {
+  ](constructor: gcc.RangeMap[AsOrdered[Int], String] => Repr): Unit = {
     // forward all methods like immutable RangeMapWrapperLike
     immutableWrapper(constructor)
 
@@ -135,7 +126,7 @@ private[mango] trait RangeMapWrapperBehaviours extends FreeSpec with PropertyChe
       }
       "should forward #clear" in {
         val (mocked, withMock) = fixture
-        withMock.clear
+        withMock.clear()
         verify(mocked).clear
       }
     }

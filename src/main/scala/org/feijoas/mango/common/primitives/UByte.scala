@@ -45,25 +45,25 @@ final class UByte private (val value: Byte) extends AnyVal with Ordered[UByte] w
 
   /** Returns the value of this {@code UByte} as a {@code Long}. This is an inverse operation.
    */
-  def toLong(): Long = toInt
+  def toLong(): Long = toInt().toLong
 
   /** Returns the value of this {@code UByte} as a {@code Float}, analogous to a widening
    *  primitive conversion from {@code Byte} to {@code Float}, and correctly rounded.
    */
-  def toFloat(): Float = toLong
+  def toFloat(): Float = toLong().toFloat
 
   /** Returns the value of this {@code UByte} as a {@code Double}, analogous to a widening
    *  primitive conversion from {@code Byte} to {@code Double}, and correctly rounded.
    */
-  def toDouble(): Double = toLong
+  def toDouble(): Double = toLong().toDouble
 
   /** Returns the value of this {@code UInt} as a {@code BigInt}.
    */
-  def toBigInt() = BigInt(toLong)
+  def toBigInt(): BigInt = BigInt(toLong())
 
   /** Returns a string representation of x, where x is treated as unsigned.
    */
-  override def toString() = UnsignedBytes.toString(value)
+  override def toString(): String = UnsignedBytes.toString(value)
 
   /** Returns a string representation of {@code x} for the given radix, where {@code x} is treated
    *  as unsigned.
@@ -188,13 +188,13 @@ final object UByte {
   def min(array: UByte*): UByte = {
     checkArgument(array.length > 0)
     val it = array.iterator
-    var min = it.next.toInt
+    var min = it.next().toInt()
     while (it.hasNext) {
-      val next = it.next.toInt
+      val next = it.next().toInt()
       if (next < min)
         min = next
     }
-    valueOf(min)
+    valueOf(min.toLong)
   }
 
   /** Returns the greatest value present in {@code array}.
@@ -207,13 +207,13 @@ final object UByte {
   def max(array: UByte*): UByte = {
     checkArgument(array.length > 0)
     val it = array.iterator
-    var max = it.next.toInt
+    var max = it.next().toInt()
     while (it.hasNext) {
-      val next = it.next.toInt
+      val next = it.next().toInt()
       if (next > max)
         max = next
     }
-    UByte(max)
+    UByte(max.toLong)
   }
 
   /** Returns a string containing the supplied {@code UByte} values separated by
@@ -231,9 +231,9 @@ final object UByte {
     } else {
       val it = array.iterator
       val builder = new StringBuilder(array.length * (3 + separator.length()))
-      builder.append(it.next.toString)
+      builder.append(it.next().toString)
       while (it.hasNext) {
-        builder.append(separator).append(it.next.toString)
+        builder.append(separator).append(it.next().toString)
       }
       builder.toString
     }

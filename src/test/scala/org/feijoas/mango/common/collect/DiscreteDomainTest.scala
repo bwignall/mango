@@ -22,14 +22,13 @@
  */
 package org.feijoas.mango.common.collect
 
-import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.DiscreteDomain.{IntDomain, LongDomain}
 import org.scalacheck.{Arbitrary, Shrink}
-import org.scalatest._
-import org.scalatest.prop.PropertyChecks
-
-import com.google.common.collect.{DiscreteDomain => GuavaDiscreteDomain}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import com.google.common.collect.DiscreteDomain as GuavaDiscreteDomain
 import com.google.common.testing.SerializableTester.reserializeAndAssert
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /**
  * Tests for [[Range]]
@@ -37,15 +36,19 @@ import com.google.common.testing.SerializableTester.reserializeAndAssert
  *  @author Markus Schneider
  *  @since 0.8
  */
-class DiscreteDomainTestextends extends FlatSpec with Matchers with PropertyChecks with DiscreteDomainBehaviors {
+class DiscreteDomainTestextends
+    extends AnyFlatSpec
+    with Matchers
+    with ScalaCheckPropertyChecks
+    with DiscreteDomainBehaviors {
 
   ("IntDomain" should behave).like(guavaDomain(IntDomain, GuavaDiscreteDomain.integers()))
   ("LongDomain" should behave).like(guavaDomain(LongDomain, GuavaDiscreteDomain.longs()))
 
 }
 
-private[mango] trait DiscreteDomainBehaviors extends PropertyChecks with Matchers {
-  this: FlatSpec =>
+private[mango] trait DiscreteDomainBehaviors extends ScalaCheckPropertyChecks with Matchers {
+  this: AnyFlatSpec =>
 
   def guavaDomain[C <: Comparable[_], T: Arbitrary: Shrink](domain: DiscreteDomain[T], guava: GuavaDiscreteDomain[C])(
     implicit view: T => C
@@ -78,8 +81,8 @@ private[mango] trait DiscreteDomainBehaviors extends PropertyChecks with Matcher
     }
 
     it should "implement minValue and maxValue" in {
-      domain.maxValue should be(Option(guava.maxValue()))
-      domain.minValue should be(Option(guava.minValue()))
+      domain.maxValue() should be(Option(guava.maxValue()))
+      domain.minValue() should be(Option(guava.minValue()))
     }
 
     it should "be serializeable" in {

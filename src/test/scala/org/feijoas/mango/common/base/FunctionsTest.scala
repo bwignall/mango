@@ -22,11 +22,10 @@
  */
 package org.feijoas.mango.common.base
 
-import java.util.concurrent.Callable
-
 import org.feijoas.mango.common.base.Functions._
-import org.scalatest._
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import org.scalatest.matchers.should.Matchers
 
 import com.google.common.base.{Function => GuavaFunction}
 import com.google.common.testing.SerializableTester
@@ -37,18 +36,18 @@ import com.google.common.testing.SerializableTester
  *  @author Markus Schneider
  *  @since 0.7
  */
-class FunctionsTest extends FlatSpec with Matchers with PropertyChecks {
+class FunctionsTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   behavior of "implicits"
 
   it should "be variant" in {
-    val cf: (C => A) = new GuavaFunction[B, B]() {
-      override def apply(i: B) = null
+    val _: C => A = new GuavaFunction[B, B]() {
+      override def apply(i: B): Null = null
     }.asScala
   }
 
   it should "map a Guava Function to a Scala Function" in {
-    val cf: (Int => String) = SomeFunction.asScala
+    val cf: Int => String = SomeFunction.asScala
     forAll { (n: Int) => cf(n) should be(n.toString) }
   }
 
@@ -114,7 +113,7 @@ class FunctionsTest extends FlatSpec with Matchers with PropertyChecks {
 }
 
 private case object SomeFunction extends GuavaFunction[Int, String] {
-  override def apply(i: Int) = i.toString
+  override def apply(i: Int): String = i.toString
 }
 
 private trait A

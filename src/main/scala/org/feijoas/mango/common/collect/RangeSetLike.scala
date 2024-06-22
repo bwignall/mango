@@ -22,10 +22,10 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.generic.HasNewBuilder
-
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
+
+import scala.collection.mutable
 
 /**
  * Implementation trait for [[RangeSet]]
@@ -36,15 +36,15 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
  *
  *  @define rangeSetNote
  *
- *  A range set is a set comprising zero or more nonempty, disconnected ranges of type `C`
- *  for which an `Ordering[C]` is defined.
+ * A range set is a set comprising zero or more nonempty, disconnected ranges of type `C`
+ * for which an `Ordering[C]` is defined.
  *
- *  <p>Note that the behavior of `Range#isEmpty()` and `Range#isConnected(Range)` may
- *  not be as expected on discrete ranges.  See the Scaladoc of those methods for details.
+ * <p>Note that the behavior of `Range#isEmpty()` and `Range#isConnected(Range)` may
+ * not be as expected on discrete ranges.  See the Scaladoc of those methods for details.
  *
- *  <p>For a `Set` whose contents are specified by a [[Range]], see [[ContiguousSet]].
+ * <p>For a `Set` whose contents are specified by a [[Range]], see [[com.google.common.collect.ContiguousSet]].
  *
- *  Usage example:
+ * Usage example:
  *
  *  {{{
  *  import org.feijoas.mango.common.collect.Bound._
@@ -68,14 +68,12 @@ import org.feijoas.mango.common.base.Preconditions.checkNotNull
  *  @tparam Repr the type of the set itself.
  */
 @Beta
-trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with RangeSet[C, O]]
-    extends HasNewBuilder[Range[C, O], Repr] {
-  self =>
+trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with RangeSet[C, O]] {
 
   /**
    * Determines whether any of this range set's member ranges contains `value`.
    */
-  def contains(value: C): Boolean = rangeContaining(value) != None
+  def contains(value: C): Boolean = rangeContaining(value).isDefined
 
   /**
    * Returns the unique range from this range set that contains
@@ -83,7 +81,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    */
   def rangeContaining(value: C): Option[Range[C, O]] = {
     checkNotNull(value)
-    asRanges.find { _.contains(value) }
+    asRanges().find { _.contains(value) }
   }
 
   /**
@@ -92,7 +90,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    */
   def encloses(otherRange: Range[C, O]): Boolean = {
     checkNotNull(otherRange)
-    asRanges.find { _.encloses(otherRange) }.isDefined
+    asRanges().exists(_.encloses(otherRange))
   }
 
   /**
@@ -105,7 +103,7 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    */
   def enclosesAll(other: RangeSet[C, O]): Boolean = {
     checkNotNull(other)
-    other.asRanges.find { !this.encloses(_) }.isEmpty
+    other.asRanges().forall(this.encloses)
   }
 
   /**
@@ -142,25 +140,27 @@ trait RangeSetLike[C, O <: Ordering[C], +Repr <: RangeSetLike[C, O, Repr] with R
    *  according to `Range#equals(Any)`.
    */
   override def equals(obj: Any): Boolean = obj match {
-    case other: RangeSet[_, _] => asRanges == other.asRanges
+    case other: RangeSet[_, _] => asRanges() == other.asRanges()
     case _                     => false
   }
 
   /**
    * Returns `asRanges().hashCode()`.
    */
-  override def hashCode(): Int = asRanges.hashCode
+  override def hashCode(): Int = asRanges().hashCode
 
   /**
    * Returns a readable string representation of this range set. For example, if this
    *  `RangeSet` consisted of `Ranges.closed(1, 3)` and `Ranges.greaterThan(4)`,
    *  this might return `"{[1‥3](4‥+∞)}"`.
    */
-  override def toString(): String = {
+  override def toString: String = {
     val builder = new StringBuilder()
     builder.append('{')
-    asRanges.foreach { builder.append(_) }
+    asRanges().foreach { builder.append(_) }
     builder.append('}')
     builder.toString()
   }
+
+  def newBuilder: mutable.Builder[Range[C, O], Repr]
 }

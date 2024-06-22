@@ -22,15 +22,13 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
-import scala.collection.immutable
-import scala.util.{Failure, Success, Try}
-
+import com.google.common.cache.LoadingCache as GuavaLoadingCache
+import com.google.common.util.concurrent.UncheckedExecutionException
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.convert.AsScala
 
-import com.google.common.cache.{LoadingCache => GuavaLoadingCache}
-import com.google.common.util.concurrent.UncheckedExecutionException
+import scala.collection.immutable
+import scala.util.{Failure, Success, Try}
 
 /** A semi-persistent mapping from keys to values. Values are automatically loaded by the cache,
  *  and are stored in the cache until either evicted or manually invalidated.
@@ -141,7 +139,7 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
    *     values
    *  @throws ExecutionError if an error was thrown while loading the values
    */
-  def getAll(keys: Traversable[K]): Try[immutable.Map[K, V]] = {
+  def getAll(keys: Iterable[K]): Try[immutable.Map[K, V]] = {
     /*keys.foldLeft(Try(Map.empty[K, V])) {
       case (tmap, key) => for {
         map <- tmap
@@ -165,7 +163,7 @@ trait LoadingCache[K, V] extends Cache[K, V] with (K => V) {
    *  loaded entries; it will never contain null keys or values.
    *  The method simply forwards to `getAll(keys)`.
    */
-  final def apply(keys: Traversable[K]): immutable.Map[K, V] = getAll(keys).get
+  final def apply(keys: Iterable[K]): immutable.Map[K, V] = getAll(keys).get
 }
 
 /** Utility functions to convert between Guava `LoadingCache[K, V]` and `LoadingCache[K, V]`

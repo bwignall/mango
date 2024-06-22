@@ -140,8 +140,8 @@ final object Funnel {
    */
   implicit final def asGuavaFunnel[T](funnel: Funnel[T]): AsJava[cgch.Funnel[T]] = {
     def convert(f: Funnel[T]): cgch.Funnel[T] = f match {
-      case AsScalaFunnel(funnel) => funnel
-      case _                     => AsGuavaFunnel(funnel)
+      case AsScalaFunnel(internal_funnel) => internal_funnel
+      case _                              => AsGuavaFunnel(funnel)
     }
     new AsJava(convert(funnel))
   }
@@ -159,8 +159,8 @@ final object Funnel {
    */
   implicit final def asScalaFunnel[T](funnel: cgch.Funnel[T]): AsScala[Funnel[T]] = {
     def convert(f: cgch.Funnel[T]): Funnel[T] = f match {
-      case AsGuavaFunnel(funnel) => funnel
-      case _                     => AsScalaFunnel(funnel)
+      case AsGuavaFunnel(internal_funnel) => internal_funnel
+      case _                              => AsScalaFunnel(funnel)
     }
     new AsScala(convert(funnel))
   }

@@ -22,24 +22,19 @@
  */
 package org.feijoas.mango.common.primitives
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.Matchers.convertToStringShouldWrapper
-import org.scalatest.prop.PropertyChecks
-
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers.be
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.convertToStringShouldWrapper
 import com.google.common.primitives.UnsignedBytes
-
-import UByte.join
-import UByte.max
-import UByte.min
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /** Tests for [[UByte]]
  *
  *  @author Markus Schneider
  *  @since 0.10
  */
-class UByteTest extends FreeSpec with PropertyChecks {
+class UByteTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
   val least: Byte = 0
   val greatest: Byte = 255.toByte
   val values: List[Byte] = List(least, 127, 128.toByte, 129.toByte, greatest)
@@ -47,32 +42,32 @@ class UByteTest extends FreeSpec with PropertyChecks {
   "An UByte" - {
     "should implement #toInt" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value).toInt should be(value)
+        UByte.valueOf(value.toLong).toInt() should be(value)
       }
     }
     "should implement #toLong" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value).toLong should be(value.toLong)
+        UByte.valueOf(value.toLong).toLong() should be(value.toLong)
       }
     }
     "should implement #toFloat" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value).toFloat should be(value.toFloat)
+        UByte.valueOf(value.toLong).toFloat() should be(value.toFloat)
       }
     }
     "should implement #toDouble" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value).toDouble should be(value.toDouble)
+        UByte.valueOf(value.toLong).toDouble() should be(value.toDouble)
       }
     }
     "should implement #toBigInt" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value).toBigInt should be(BigInt(value))
+        UByte.valueOf(value.toLong).toBigInt() should be(BigInt(value))
       }
     }
     "should implement #UByte(Long)" in {
       for (value <- 0 to 255) {
-        UByte(value).toInt should be(value)
+        UByte(value.toLong).toInt() should be(value)
       }
       intercept[IllegalArgumentException] {
         UByte(256)
@@ -83,7 +78,7 @@ class UByteTest extends FreeSpec with PropertyChecks {
     }
     "should implement #valueOf(Long)" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value).toInt should be(value)
+        UByte.valueOf(value.toLong).toInt() should be(value)
       }
       intercept[IllegalArgumentException] {
         UByte.valueOf(256)
@@ -94,7 +89,7 @@ class UByteTest extends FreeSpec with PropertyChecks {
     }
     "should implement #valueOf(String)" in {
       for (value <- 0 to 255) {
-        UByte.valueOf(value.toString).toInt should be(value)
+        UByte.valueOf(value.toString).toInt() should be(value)
       }
       intercept[IllegalArgumentException] {
         UByte.valueOf("256")
@@ -125,7 +120,7 @@ class UByteTest extends FreeSpec with PropertyChecks {
     }
     "should implement #saturatedValueOf(Long)" in {
       for (value <- 0 to 255) {
-        UByte.saturatedValueOf(value).toInt should be(value)
+        UByte.saturatedValueOf(value.toLong).toInt() should be(value)
       }
       UByte.saturatedValueOf(256L).value should be(greatest)
       UByte.saturatedValueOf(-1L).value should be(least)
@@ -134,10 +129,12 @@ class UByteTest extends FreeSpec with PropertyChecks {
     }
     "should implement #compare" in {
       for (x <- 0 to 255; y <- 0 to 255) {
-        Math.signum(UByte.compare(UByte(x), UByte(y))) should be(Math.signum(x.compare(y)))
+        Math.signum(UByte.compare(UByte(x.toLong), UByte(y.toLong)).toFloat) should be(
+          Math.signum(x.compare(y).toFloat)
+        )
       }
       for (x <- 0 to 255; y <- 0 to 255) {
-        Math.signum(UByte(x).compare(UByte(y))) should be(Math.signum(x.compare(y)))
+        Math.signum(UByte(x.toLong).compare(UByte(y.toLong)).toFloat) should be(Math.signum(x.compare(y).toFloat))
       }
     }
     "should implement #max" in {
@@ -162,12 +159,12 @@ class UByteTest extends FreeSpec with PropertyChecks {
     }
     "should implement #toSting" in {
       for (value <- 0 to 255) {
-        UByte(value).toString should be(UnsignedBytes.toString(value.toByte))
+        UByte(value.toLong).toString() should be(UnsignedBytes.toString(value.toByte))
       }
     }
     "should implement #toSting(radix)" in {
       for (value <- 0 to 255; radix <- Character.MIN_RADIX until Character.MAX_RADIX) {
-        UByte(value).toString(radix) should be(UnsignedBytes.toString(value.toByte, radix))
+        UByte(value.toLong).toString(radix) should be(UnsignedBytes.toString(value.toByte, radix))
       }
     }
     "should implement #MaxPowerOfTwo" in {
@@ -196,7 +193,7 @@ class UByteTest extends FreeSpec with PropertyChecks {
         Array[UByte](UByte(255), UByte(255), UByte(255))
       )
 
-      val comparator = UByte.lexicographicalComparator
+      val comparator = UByte.lexicographicalComparator()
 
       for (i <- 0 until valuesInExpectedOrder.size) {
         val t = valuesInExpectedOrder(i)

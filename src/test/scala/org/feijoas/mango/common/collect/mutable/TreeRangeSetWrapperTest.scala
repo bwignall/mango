@@ -24,11 +24,10 @@ package org.feijoas.mango.common.collect.mutable
 
 import scala.math.Ordering.Int
 
-import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.AsOrdered
 import org.feijoas.mango.common.collect.RangeSetBehaviors
 import org.feijoas.mango.common.collect.RangeSetWrapperBehaviours
-import org.scalatest.FreeSpec
+import org.scalatest.freespec.AnyFreeSpec
 
 import com.google.common.collect.{RangeSet => GuavaRangeSet}
 
@@ -37,7 +36,7 @@ import com.google.common.collect.{RangeSet => GuavaRangeSet}
  *  @author Markus Schneider
  *  @since 0.8
  */
-class TreeRangeSetWrapperTest extends FreeSpec with RangeSetBehaviors with RangeSetWrapperBehaviours {
+class TreeRangeSetWrapperTest extends AnyFreeSpec with RangeSetBehaviors with RangeSetWrapperBehaviours {
 
   "A TreeRangeSetWrapper" - {
     behave.like(rangeSet(TreeRangeSetWrapper.newBuilder[Int, Int.type]))

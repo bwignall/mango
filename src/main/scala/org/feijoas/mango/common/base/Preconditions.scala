@@ -63,7 +63,7 @@ import javax.annotation.Nullable
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-final object Preconditions {
+object Preconditions {
 
   /** Ensures the truth of an expression involving one or more parameters to the
    *  calling method.
@@ -71,7 +71,7 @@ final object Preconditions {
    *  @param expression an expression: Boolean
    *  @throws IllegalArgumentException if {@code expression} is false
    */
-  def checkArgument(expression: Boolean) = {
+  def checkArgument(expression: Boolean): Unit = {
     if (!expression)
       throw new IllegalArgumentException()
   }
@@ -84,7 +84,7 @@ final object Preconditions {
    *     be converted to a string using `String#valueOf(Any)`
    *  @throws IllegalArgumentException if {@code expression} is false
    */
-  def checkArgument(expression: Boolean, errorMessage: Any) = {
+  def checkArgument(expression: Boolean, errorMessage: Any): Unit = {
     if (!expression)
       throw new IllegalArgumentException(String.valueOf(errorMessage))
   }
@@ -109,7 +109,7 @@ final object Preconditions {
    *     errorMessageTemplate} or {@code errorMessageArgs} is null (don't let
    *     this happen)
    */
-  def checkArgument(expression: Boolean, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*) = {
+  def checkArgument(expression: Boolean, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*): Unit = {
     if (!expression)
       throw new IllegalArgumentException(format(errorMessageTemplate, errorMessageArg +: moreArgs: _*))
   }
@@ -120,7 +120,7 @@ final object Preconditions {
    *  @param expression an expression: Boolean
    *  @throws IllegalStateException if {@code expression} is false
    */
-  def checkState(expression: Boolean) = {
+  def checkState(expression: Boolean): Unit = {
     if (!expression)
       throw new IllegalStateException()
   }
@@ -133,7 +133,7 @@ final object Preconditions {
    *     be converted to a string using `String#valueOf(Any)`
    *  @throws IllegalStateException if {@code expression} is false
    */
-  def checkState(expression: Boolean, errorMessage: Any) = {
+  def checkState(expression: Boolean, errorMessage: Any): Unit = {
     if (!expression)
       throw new IllegalStateException(String.valueOf(errorMessage))
   }
@@ -158,7 +158,7 @@ final object Preconditions {
    *     errorMessageTemplate} or {@code errorMessageArgs} is null (don't let
    *     this happen)
    */
-  def checkState(expression: Boolean, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*) = {
+  def checkState(expression: Boolean, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*): Unit = {
     if (!expression)
       throw new IllegalStateException(format(errorMessageTemplate, errorMessageArg +: moreArgs: _*))
   }
@@ -174,7 +174,7 @@ final object Preconditions {
     if (reference == null) {
       throw new NullPointerException()
     }
-    return reference
+    reference
   }
 
   /** Ensures that an objecreference: T passed as a parameter to the calling
@@ -190,7 +190,7 @@ final object Preconditions {
     if (reference == null) {
       throw new NullPointerException(String.valueOf(errorMessage))
     }
-    return reference
+    reference
   }
 
   /** Ensures that an objecreference: T passed as a parameter to the calling
@@ -209,13 +209,13 @@ final object Preconditions {
    *  @param moreArgs the other arguments to be substituted into the message
    *     template.
    *  @return the non-null reference that was validated
-   *  @throws NullPointerException if {@code reference} is null
    */
+  @throws[NullPointerException]
   def checkNotNull[T](reference: T, errorMessageTemplate: String, errorMessageArg: Any, moreArgs: Any*): T = {
     if (reference == null) {
       throw new NullPointerException(format(errorMessageTemplate, errorMessageArg +: moreArgs: _*))
     }
-    return reference
+    reference
   }
 
   /** Ensures that {@code index} specifies a valid <i>element</i> in an array,
@@ -231,7 +231,7 @@ final object Preconditions {
    *  @throws IllegalArgumentException if {@code size} is negative
    */
   def checkElementIndex(index: Int, size: Int): Int = {
-    return checkElementIndex(index, size, "index")
+    checkElementIndex(index, size, "index")
   }
 
   /** Ensures that {@code index} specifies a valid <i>element</i> in an array,
@@ -251,16 +251,16 @@ final object Preconditions {
     if (index < 0 || index >= size) {
       throw new IndexOutOfBoundsException(badElementIndex(index, size, desc))
     }
-    return index
+    index
   }
 
   private def badElementIndex(index: Int, size: Int, desc: String): String = {
     if (index < 0) {
-      return format("%s (%s) must not be negative", desc, index)
+      format("%s (%s) must not be negative", desc, index)
     } else if (size < 0) {
       throw new IllegalArgumentException("negative size: " + size)
     } else { // index >= size
-      return format("%s (%s) must be less than size (%s)", desc, index, size)
+      format("%s (%s) must be less than size (%s)", desc, index, size)
     }
   }
 
@@ -297,16 +297,16 @@ final object Preconditions {
     if (index < 0 || index > size) {
       throw new IndexOutOfBoundsException(badPositionIndex(index, size, desc))
     }
-    return index
+    index
   }
 
   private def badPositionIndex(index: Int, size: Int, desc: String): String = {
     if (index < 0) {
-      return format("%s (%s) must not be negative", desc, index)
+      format("%s (%s) must not be negative", desc, index)
     } else if (size < 0) {
       throw new IllegalArgumentException("negative size: " + size)
     } else { // index > size
-      return format("%s (%s) must not be greater than size (%s)", desc, index, size)
+      format("%s (%s) must not be greater than size (%s)", desc, index, size)
     }
   }
 
@@ -323,7 +323,7 @@ final object Preconditions {
    *     greater than {@code size}, or if {@code end} is less than {@code start}
    *  @throws IllegalArgumentException if {@code size} is negative
    */
-  def checkPositionIndexes(start: Int, end: Int, size: Int) = {
+  def checkPositionIndexes(start: Int, end: Int, size: Int): Unit = {
     if (start < 0 || end < start || end > size) {
       throw new IndexOutOfBoundsException(badPositionIndexes(start, end, size))
     }
@@ -331,13 +331,14 @@ final object Preconditions {
 
   private def badPositionIndexes(start: Int, end: Int, size: Int): String = {
     if (start < 0 || start > size) {
-      return badPositionIndex(start, size, "start index")
+      badPositionIndex(start, size, "start index")
+    } else if (end < 0 || end > size) {
+      badPositionIndex(end, size, "end index")
+    } else if (end < start) {
+      format("end index (%s) must not be less than start index (%s)", end, start)
+    } else {
+      ""
     }
-    if (end < 0 || end > size) {
-      return badPositionIndex(end, size, "end index")
-    }
-    // end < start
-    return format("end index (%s) must not be less than start index (%s)", end, start)
   }
 
   /** Substitutes each {@code %s} in {@code template} with an argument. These
@@ -345,7 +346,7 @@ final object Preconditions {
    *  If there are more arguments than placeholders, the unmatched arguments will
    *  be appended to the end of the formatted message in square braces.
    *
-   *  @param template a non-null string containing 0 or more {@code %s}
+   *  @param templateStr a non-null string containing 0 or more {@code %s}
    *     placeholders.
    *  @param args the arguments to be substituted into the message
    *     template. Arguments are converted to strings using
@@ -359,8 +360,8 @@ final object Preconditions {
     var templateStart = 0
     var i = 0
     var stop = false
-    while (stop == false && i < args.length) {
-      var placeholderStart = template.indexOf("%s", templateStart)
+    while (!stop && i < args.length) {
+      val placeholderStart = template.indexOf("%s", templateStart)
       if (placeholderStart == -1) {
         stop = true
       } else {
@@ -385,6 +386,6 @@ final object Preconditions {
       builder.append(']')
     }
 
-    return builder.toString()
+    builder.toString()
   }
 }

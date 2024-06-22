@@ -2,19 +2,18 @@ package org.feijoas.mango.common.base
 
 import org.feijoas.mango.common.base.Equivalence.asGuavaEquiv
 import org.feijoas.mango.common.base.Equivalence.asMangoEquiv
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.prop.PropertyChecks
-
-import com.google.common.{base => gcm}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers.be
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import com.google.common.base as gcm
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /** Tests for [[Equiv]]
  *
  *  @author Markus Schneider
  *  @since 0.10
  */
-class EquivalenceTest extends FreeSpec with PropertyChecks {
+class EquivalenceTest extends AnyFreeSpec with ScalaCheckPropertyChecks {
 
   "AsMangoEquiv" - {
     "should forward equiv to Guava" in {
@@ -54,10 +53,10 @@ class EquivalenceTest extends FreeSpec with PropertyChecks {
 }
 
 private[mango] object SignumEquiv extends Equiv[Int] {
-  def equiv(x: Int, y: Int) = x.signum == y.signum
+  def equiv(x: Int, y: Int) = x.sign == y.sign
 }
 
 private[mango] object SignumEquivalence extends gcm.Equivalence[Int] {
-  def doEquivalent(x: Int, y: Int) = x.signum == y.signum
+  def doEquivalent(x: Int, y: Int) = x.sign == y.sign
   def doHash(x: Int) = 2 * x
 }

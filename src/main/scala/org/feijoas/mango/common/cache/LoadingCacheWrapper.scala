@@ -22,14 +22,11 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
-import scala.collection.convert.decorateAll.{asJavaIterableConverter, mapAsScalaMapConverter}
+import com.google.common.cache.LoadingCache as GuavaLoadingCache
+
 import scala.collection.immutable
+import scala.jdk.CollectionConverters.{IterableHasAsJava, MapHasAsScala}
 import scala.util.Try
-
-import org.feijoas.mango.common.annotations.Beta
-
-import com.google.common.cache.{LoadingCache => GuavaLoadingCache}
 
 /** An adapter that wraps a Guava-`LoadingCache` in a [[LoadingCache]] and forwards all
  *  method calls to the underlying Guava-`LoadingCache`.
@@ -47,8 +44,8 @@ protected[mango] trait LoadingCacheWrapper[K, V] extends CacheWrapper[K, V] with
   override def get(key: K): Try[V] = Try(cache.get(key))
   override def getUnchecked(key: K): V = cache.getUnchecked(key)
   override def refresh(key: K): Unit = cache.refresh(key)
-  override def getAll(keys: Traversable[K]): Try[immutable.Map[K, V]] = Try {
-    val map = cache.getAll(keys.toIterable.asJava).asScala
+  override def getAll(keys: Iterable[K]): Try[immutable.Map[K, V]] = Try {
+    val map = cache.getAll(keys.asJava).asScala
     // TODO: Change this as soon as we have wrappers for Guavas ImmutableMap
     immutable.Map.empty ++ map
   }

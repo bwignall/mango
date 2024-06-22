@@ -23,9 +23,8 @@
 package org.feijoas.mango.common.collect
 
 import org.feijoas.mango.common.annotations.Beta
+
 import scala.collection.mutable.Builder
-import com.google.common.collect.ImmutableRangeSet
-import org.feijoas.mango.common.collect.immutable.ImmutableRangeSetWrapper
 
 /** A base trait for all `RangeSet`, mutable as well as immutable
  *

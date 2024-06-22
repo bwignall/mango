@@ -22,13 +22,12 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.convert.decorateAll.mapAsScalaMapConverter
-
+import com.google.common.collect as gcc
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.collect.AsOrdered.asOrdered
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 
-import com.google.common.{collect => gcc}
+import scala.jdk.CollectionConverters.MapHasAsScala
 
 /** Implementation trait for [[RangeMap]] that delegates to Guava
  *
@@ -73,10 +72,10 @@ private[mango] trait RangeMapWrapperLike[K, V, O <: Ordering[K], +Repr <: RangeM
   }
 
   override def asMapOfRanges() = {
-    // TODO: Change this as soon as we have wrappers for immutable collectios
-    val gmap = delegate.asMapOfRanges.asScala
+    // TODO: Change this as soon as we have wrappers for immutable collections
+    val gmap = delegate.asMapOfRanges().asScala
     val builder = Map.newBuilder[Range[K, O], V]
     gmap.foreach(kv => builder += ((Range[K, O](kv._1), kv._2)))
-    builder.result
+    builder.result()
   }
 }

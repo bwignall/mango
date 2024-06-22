@@ -22,30 +22,19 @@
  */
 package org.feijoas.mango.common.collect.immutable
 
-import scala.annotation.meta.beanGetter
-import scala.annotation.meta.beanSetter
-import scala.annotation.meta.field
-import scala.annotation.meta.getter
-import scala.annotation.meta.setter
+import com.google.common.collect as gcc
+import org.feijoas.mango.common.collect.{AsOrdered, Range, RangeMapBehaviors, RangeMapWrapperBehaviours}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers.{be, convertToAnyShouldWrapper}
+
 import scala.math.Ordering.Int
-
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.AsOrdered
-import org.feijoas.mango.common.collect.Range
-import org.feijoas.mango.common.collect.RangeMapBehaviors
-import org.feijoas.mango.common.collect.RangeMapWrapperBehaviours
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-
-import com.google.common.{collect => gcc}
 
 /** Tests for [[ImmutableRangeMapWrapperTest]]
  *
  *  @author Markus Schneider
  *  @since 0.9
  */
-class ImmutableRangeMapWrapperTest extends FreeSpec with RangeMapBehaviors with RangeMapWrapperBehaviours {
+class ImmutableRangeMapWrapperTest extends AnyFreeSpec with RangeMapBehaviors with RangeMapWrapperBehaviours {
 
   "A ImmutableRangeMapWrapper" - {
     behave.like(aRangeMapLike(ImmutableRangeMapWrapper.newBuilder[Int, String, Int.type]))

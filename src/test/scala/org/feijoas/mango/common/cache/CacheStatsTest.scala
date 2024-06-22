@@ -24,8 +24,9 @@ package org.feijoas.mango.common.cache
 
 import org.feijoas.mango.common.cache.CacheStats._
 import org.scalacheck.Gen
-import org.scalatest._
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import com.google.common.cache.{CacheStats => GuavaCacheStats}
 
@@ -35,7 +36,7 @@ import com.google.common.cache.{CacheStats => GuavaCacheStats}
  *  @author Markus Schneider
  *  @since 0.7
  */
-class CacheStatsTest extends FlatSpec with GeneratorDrivenPropertyChecks with Matchers {
+class CacheStatsTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 
   behavior of "CacheStats"
 
@@ -66,12 +67,12 @@ class CacheStatsTest extends FlatSpec with GeneratorDrivenPropertyChecks with Ma
       mango.evictionCount should be(guava.evictionCount())
 
       // check methods
-      mango.hitRate should be(guava.hitRate())
-      mango.loadExceptionRate should be(guava.loadExceptionRate())
-      mango.missRate should be(guava.missRate())
+      mango.hitRate() should be(guava.hitRate())
+      mango.loadExceptionRate() should be(guava.loadExceptionRate())
+      mango.missRate() should be(guava.missRate())
       mango.totalLoadTime should be(guava.totalLoadTime())
       mango.requestCount should be(guava.requestCount())
-      mango.averageLoadPenalty should be(guava.averageLoadPenalty())
+      mango.averageLoadPenalty() should be(guava.averageLoadPenalty())
     }
   }
 

@@ -22,18 +22,14 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.math.Ordering.Int
-
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.Bound.FiniteBound
-import org.feijoas.mango.common.collect.Bound.InfiniteBound
-import org.feijoas.mango.common.collect.DiscreteDomain.IntDomain
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.prop.PropertyChecks
-
 import com.google.common.testing.SerializableTester.reserializeAndAssert
+import org.feijoas.mango.common.collect.Bound.{FiniteBound, InfiniteBound}
+import org.feijoas.mango.common.collect.DiscreteDomain.IntDomain
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers.{be, convertToAnyShouldWrapper}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
+import scala.math.Ordering.Int
 
 /**
  * Tests for [[Range]]
@@ -41,7 +37,7 @@ import com.google.common.testing.SerializableTester.reserializeAndAssert
  *  @author Markus Schneider
  *  @since 0.8
  */
-class RangeTest extends FlatSpec with RangeBehaviors {
+class RangeTest extends AnyFlatSpec with RangeBehaviors {
 
   {
     val builder = (start: Int, end: Int) => Range.open(start, end)
@@ -84,7 +80,7 @@ class RangeTest extends FlatSpec with RangeBehaviors {
 
     it should "acccept the same value as lower and upper bound" in {
       val range = builder(3, 3)
-      range.isEmpty should be(false)
+      range.isEmpty() should be(false)
       range.contains(2) should be(false)
       range.contains(3) should be(true)
       range.contains(4) should be(false)
@@ -117,7 +113,7 @@ class RangeTest extends FlatSpec with RangeBehaviors {
 
     it should "acccept the same value as lower and upper bound" in {
       val range = builder(3, 3)
-      range.isEmpty should be(true)
+      range.isEmpty() should be(true)
       range.contains(2) should be(false)
       range.contains(3) should be(false)
       range.contains(4) should be(false)
@@ -134,7 +130,7 @@ class RangeTest extends FlatSpec with RangeBehaviors {
 
     it should "acccept the same value as lower and upper bound" in {
       val range = builder(3, 3)
-      range.isEmpty should be(true)
+      range.isEmpty() should be(true)
       range.contains(2) should be(false)
       range.contains(3) should be(false)
       range.contains(4) should be(false)
@@ -382,22 +378,22 @@ class RangeTest extends FlatSpec with RangeBehaviors {
   }
 }
 
-private[mango] trait RangeBehaviors extends PropertyChecks {
-  this: FlatSpec =>
+private[mango] trait RangeBehaviors extends ScalaCheckPropertyChecks {
+  this: AnyFlatSpec =>
 
-  def allRanges(build: (Int, Int) => Range[Int, Int.type]) = {
+  def allRanges(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = -1
     val end = 5
     val range = build(start, end)
 
     it should "not be empty" in {
-      range.isEmpty should be(false)
+      range.isEmpty() should be(false)
     }
 
     it should "pattern match with 'Range(lower, upper)'" in {
       range match {
-        case Range(lower, upper) => // expected
-        case _                   => fail
+        case Range(_, _) => // expected
+        case _           => fail()
       }
     }
 
@@ -422,7 +418,7 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
   }
 
-  def boundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def boundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = -4
     val end = 7
     val range = build(start, end)
@@ -443,23 +439,23 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
 
     it should "have a lower bound" in {
-      range.hasLowerBound should be(true)
+      range.hasLowerBound() should be(true)
     }
 
     it should "have an upper bound" in {
-      range.hasUpperBound should be(true)
+      range.hasUpperBound() should be(true)
     }
 
     it should "pattern match with 'Range(FiniteBound(start, _), FiniteBound(end, _))'" in {
       range match {
-        case Range(FiniteBound(start, _), FiniteBound(end, _)) => // expected
-        case _                                                 => fail
+        case Range(FiniteBound(_, _), FiniteBound(_, _)) => // expected
+        case _                                           => fail()
       }
     }
 
     it should "be displayed as ?start..end?" in {
       val str = range.toString
-      str.substring(1, str.length - 1) should be(start + ".." + end)
+      str.substring(1, str.length - 1) should be(s"$start..$end")
     }
 
     it should "not acccept invalid inputs" in {
@@ -469,7 +465,7 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
   }
 
-  def leftOpenBoundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def leftOpenBoundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = 5
     val end = 12
     val range = build(start, end)
@@ -483,7 +479,7 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
   }
 
-  def rightOpenBoundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def rightOpenBoundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = 5
     val end = 12
     val range = build(start, end)
@@ -498,7 +494,7 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
   }
 
-  def leftClosedBoundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def leftClosedBoundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = 5
     val end = 12
     val range = build(start, end)
@@ -512,7 +508,7 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
   }
 
-  def rightClosedBoundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def rightClosedBoundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = 5
     val end = 12
     val range = build(start, end)
@@ -526,7 +522,7 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
     }
   }
 
-  def leftUnboundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def leftUnboundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val end = 16
     val range = build(0, end)
 
@@ -545,13 +541,13 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
 
     it should "pattern match with 'Range(InfiniteBound, upper)'" in {
       range match {
-        case Range(InfiniteBound, upper) => // expected
-        case _                           => fail
+        case Range(InfiniteBound, _) => // expected
+        case _                       => fail()
       }
     }
   }
 
-  def rightUnboundedRange(build: (Int, Int) => Range[Int, Int.type]) = {
+  def rightUnboundedRange(build: (Int, Int) => Range[Int, Int.type]): Unit = {
     val start = -7
     val range = build(start, 0)
 
@@ -570,14 +566,14 @@ private[mango] trait RangeBehaviors extends PropertyChecks {
 
     it should "pattern match with 'Range(FiniteBound(start, _), InfiniteBound)'" in {
       range match {
-        case Range(lower, InfiniteBound) => // expected
-        case _                           => fail
+        case Range(_, InfiniteBound) => // expected
+        case _                       => fail()
       }
     }
   }
 }
 
-final private[mango] object UnboundedDomain extends DiscreteDomain[Int] {
+private[mango] object UnboundedDomain extends DiscreteDomain[Int] {
   override def next(value: Int): Option[Int] = IntDomain.next(value)
   override def previous(value: Int): Option[Int] = IntDomain.previous(value)
   override def distance(start: Int, end: Int): Long = IntDomain.distance(start, end)

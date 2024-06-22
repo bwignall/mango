@@ -22,14 +22,10 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
-import org.feijoas.mango.common.convert.AsScala
+import com.google.common.cache.RemovalNotification as GuavaRemovalNotification
 import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.cache.RemovalCause._
-
-import com.google.common.cache.{RemovalNotification => GuavaRemovalNotification}
-import com.google.common.cache.{RemovalCause => GuavaRemovalCause}
-import org.feijoas.mango.common.cache.RemovalCause._
+import org.feijoas.mango.common.cache.RemovalCause.*
+import org.feijoas.mango.common.convert.AsScala
 
 /** A notification of the removal of a single entry. The key and/or value may be
  *  `None` if the corresponding key/value was already garbage collected.

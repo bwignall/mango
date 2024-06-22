@@ -22,20 +22,20 @@
  */
 package org.feijoas.mango.common.base
 
-import org.feijoas.mango.common.base.Optional._
-import org.scalatest._
-import org.scalatest.prop.PropertyChecks
-
-import com.google.common.base.{Optional => GuavaOptional}
+import org.feijoas.mango.common.base.Optional.*
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import com.google.common.base.Optional as GuavaOptional
 import com.google.common.testing.SerializableTester
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /**
- * Tests for [[Optionals]]
+ * Tests for [[Optional]]
  *
  *  @author Markus Schneider
  *  @since 0.7
  */
-class OptionalTest extends FlatSpec with Matchers with PropertyChecks {
+class OptionalTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
   behavior of "implicits"
 
@@ -70,12 +70,12 @@ class OptionalTest extends FlatSpec with Matchers with PropertyChecks {
   it should "be nullsafe" in {
     intercept[NullPointerException] {
       val option: Option[Any] = null
-      val optional: GuavaOptional[Any] = option.asJava
+      val _: GuavaOptional[Any] = option.asJava
     }
 
     intercept[NullPointerException] {
       val optional: GuavaOptional[Any] = null
-      val option: Option[Any] = optional.asScala
+      val _: Option[Any] = optional.asScala
     }
   }
 

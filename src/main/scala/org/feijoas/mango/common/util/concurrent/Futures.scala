@@ -22,19 +22,15 @@
  */
 package org.feijoas.mango.common.util.concurrent
 
+import com.google.common.util.concurrent.{FutureCallback, Futures as GuavaFutures, ListenableFuture}
+import org.feijoas.mango.common.base.AsGuavaFunction
+import org.feijoas.mango.common.base.Preconditions.checkNotNull
+import org.feijoas.mango.common.convert.*
+
 import java.util.concurrent.{Executor, TimeUnit}
-import scala.concurrent.{Await, CanAwait, ExecutionContext, Future, TimeoutException}
+import scala.concurrent.*
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.{Failure, Success, Try}
-import com.google.common.util.concurrent.{AbstractFuture, FutureCallback, Futures => GuavaFutures, ListenableFuture}
-import com.google.common.base.{Function => GuavaFunction}
-import concurrent.{ExecutionException, TimeoutException}
-import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert._
-import org.feijoas.mango.common.base.Functions._
-import scala.concurrent.Promise
-import com.google.common.util.concurrent.MoreExecutors
-import java.util.concurrent.TimeoutException
 
 /**
  * Utility functions for the work with `Future[T]` and Guava `FutureCallback[T]`,
@@ -58,7 +54,7 @@ import java.util.concurrent.TimeoutException
  *  @author Markus Schneider
  *  @since 0.7
  */
-final object Futures {
+object Futures {
 
   /**
    * Adds an `asJava` method that wraps a Scala function `Try[T] => U` in a
@@ -81,8 +77,8 @@ final object Futures {
   private[mango] def asGuavaFutureCallback[T, U](c: Try[T] => U): FutureCallback[T] = {
     new FutureCallback[T] {
       checkNotNull(c)
-      override def onSuccess(result: T) = c(Success(result))
-      override def onFailure(t: Throwable) = c(Failure(t))
+      override def onSuccess(result: T): Unit = { c(Success(result)); () }
+      override def onFailure(t: Throwable): Unit = { c(Failure(t)); () }
     }
   }
 
@@ -115,7 +111,7 @@ final object Futures {
    *  The returned Scala `Future[T]` forwards all method calls to the provided
    *  Guava `ListenableFuture[T]`.
    *
-   *  @param cache the Guava `ListenableFuture[T]` to wrap in a Scala `Future[T]`
+   *  @param future the Guava `ListenableFuture[T]` to wrap in a Scala `Future[T]`
    *  @return An object with an `asScala` method that returns a Scala `Future[T]`
    *   view of the argument
    */
@@ -158,24 +154,36 @@ private[mango] case class AsGuavaFuture[T](delegate: Future[T]) extends Listenab
 @SerialVersionUID(1L)
 private[mango] case class AsMangoFuture[T](delegate: ListenableFuture[T]) extends Future[T] {
   checkNotNull(delegate)
-  import org.feijoas.mango.common.util.concurrent.Futures.asGuavaFutureCallbackConverter
 
   override def onComplete[U](callback: Try[T] => U)(implicit ec: ExecutionContext): Unit = {
-    GuavaFutures.addCallback(delegate, checkNotNull(callback).asJava)
+    val checked_callback = checkNotNull(callback)
+    GuavaFutures.addCallback(
+      delegate,
+      new FutureCallback[T] {
+        override def onSuccess(result: T): Unit = {
+          checked_callback(Success(result)); ()
+        }
+
+        override def onFailure(t: Throwable): Unit = {
+          checked_callback(Failure(t)); ()
+        }
+      },
+      ec.execute(_)
+    )
   }
 
-  override def isCompleted: Boolean = delegate.isDone()
+  override def isCompleted: Boolean = delegate.isDone
 
-  override def value: Option[Try[T]] = isCompleted match {
-    case false => None
-    case true  => Some(Try(delegate.get()))
+  override def value: Option[Try[T]] = if (isCompleted) {
+    Some(Try(delegate.get()))
+  } else {
+    None
   }
 
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
   override def ready(atMost: Duration)(implicit permit: CanAwait): this.type = {
     checkNotNull(atMost)
-    import Duration.Undefined
     try {
       atMost match {
         case Duration.Inf      => delegate.get()
@@ -204,7 +212,7 @@ private[mango] case class AsMangoFuture[T](delegate: ListenableFuture[T]) extend
 
   def transform[S](f: Try[T] => Try[S])(implicit executor: ExecutionContext): Future[S] = {
     val fnc = (t: T) => f(Try(t)).get
-    val lf: ListenableFuture[S] = GuavaFutures.transform(delegate, fnc.asJava)
+    val lf: ListenableFuture[S] = GuavaFutures.transform(delegate, AsGuavaFunction(fnc), executor.execute _)
     Futures.asScalaFutureConverter(lf).asScala
   }
 }

@@ -22,32 +22,23 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.annotation.meta.beanGetter
-import scala.annotation.meta.beanSetter
-import scala.annotation.meta.field
-import scala.annotation.meta.getter
-import scala.annotation.meta.setter
+import org.feijoas.mango.common.collect.BoundType.{Closed, Open}
+import org.mockito.Mockito.when
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers.{be, convertToAnyShouldWrapper, not}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
 import scala.collection.mutable.Builder
 import scala.math.Ordering.Int
-
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.BoundType.Closed
-import org.feijoas.mango.common.collect.BoundType.Open
-import org.mockito.Mockito.when
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-import org.scalatest.Matchers.not
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
+import org.scalatestplus.mockito.MockitoSugar
 
 /**
  * Behavior which all [[RangeSet]] have in common
  */
-private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with MockitoSugar {
-  this: FreeSpec =>
+private[mango] trait RangeSetBehaviors extends AnyFreeSpec with ScalaCheckPropertyChecks with MockitoSugar {
+  this: AnyFreeSpec =>
 
-  def mutableRangeSet(newBuilder: => Builder[Range[Int, Int.type], mutable.RangeSet[Int, Int.type]]) = {
+  def mutableRangeSet(newBuilder: => Builder[Range[Int, Int.type], mutable.RangeSet[Int, Int.type]]): Unit = {
 
     val MIN_BOUND = -1
     val MAX_BOUND = 1
@@ -73,7 +64,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         }
       }
     }
-    val QUERY_RANGES = queryBuilder.result
+    val QUERY_RANGES = queryBuilder.result()
 
     /*
      * #complement
@@ -82,19 +73,19 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet contains a single range" - {
         "the #complement should contain Range.all - the containing range" in {
           for (range <- QUERY_RANGES) {
-            val rangeSet = newBuilder.result
+            val rangeSet = newBuilder.result()
             rangeSet.add(range)
-            val complement = newBuilder.result
-            complement.add(Range.all[Int, Int.type])
+            val complement = newBuilder.result()
+            complement.add(Range.all[Int, Int.type]())
             complement.remove(range)
-            rangeSet.complement should be(complement)
+            rangeSet.complement() should be(complement)
           }
         }
       }
     }
     "connected ranges should be coalesced" - {
       "given the RangeSet is empty" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         "the #coalesced should pass" in {
           testCoalesced(rangeSet)
         }
@@ -102,7 +93,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
     }
     "should enclose a range if one of the single ranges encloses the range" - {
       "given the RangeSet is empty" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         "it should not enclose any range" in {
           QUERY_RANGES.foreach { range => rangeSet.encloses(range) should be(false) }
         }
@@ -110,19 +101,19 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet contains a single range" - {
         "it should only enclose that range" in {
           for (range <- QUERY_RANGES) {
-            val rangeSet = newBuilder.result
+            val rangeSet = newBuilder.result()
             rangeSet.add(range)
 
             // test range Set
             QUERY_RANGES.foreach { queryRange =>
-              val shouldEnclose = rangeSet.asRanges.find(_.encloses(queryRange)).isDefined
+              val shouldEnclose = rangeSet.asRanges().exists(_.encloses(queryRange))
               rangeSet.encloses(queryRange) should be(shouldEnclose)
             }
 
             // test complement
-            val complement = rangeSet.complement
+            val complement = rangeSet.complement()
             QUERY_RANGES.foreach { queryRange =>
-              val shouldEnclose = complement.asRanges.find(_.encloses(queryRange)).isDefined
+              val shouldEnclose = complement.asRanges().exists(_.encloses(queryRange))
               complement.encloses(queryRange) should be(shouldEnclose)
             }
           }
@@ -132,20 +123,20 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         "it should only enclose both ranges" in {
           for (range1 <- QUERY_RANGES) {
             for (range2 <- QUERY_RANGES) {
-              val rangeSet = newBuilder.result
+              val rangeSet = newBuilder.result()
               rangeSet.add(range1)
               rangeSet.add(range2)
 
               // test range Set
               QUERY_RANGES.foreach { queryRange =>
-                val shouldEnclose = rangeSet.asRanges.find(_.encloses(queryRange)).isDefined
+                val shouldEnclose = rangeSet.asRanges().exists(_.encloses(queryRange))
                 rangeSet.encloses(queryRange) should be(shouldEnclose)
               }
 
               // test complement
-              val complement = rangeSet.complement
+              val complement = rangeSet.complement()
               QUERY_RANGES.foreach { queryRange =>
-                val shouldEnclose = complement.asRanges.find(_.encloses(queryRange)).isDefined
+                val shouldEnclose = complement.asRanges().exists(_.encloses(queryRange))
                 complement.encloses(queryRange) should be(shouldEnclose)
               }
             }
@@ -155,287 +146,287 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
     }
     "should merge overlapping ranges" - {
       "if [1,4] and (2,6) are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 4))
         rangeSet.add(Range.open(2, 6))
         "the range set should contain [1,6)" in {
-          rangeSet.asRanges should be(Set(Range.closedOpen(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closedOpen(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.atLeast(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.atLeast(6)))
         }
       }
       "if [1,4] and [1,6] are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 4))
         rangeSet.add(Range.closed(1, 6))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
       "if [3,6] and [1,6] are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.add(Range.closed(1, 6))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
       "if [3,4] and [1,6] are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 4))
         rangeSet.add(Range.closed(1, 6))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
       "if [1,3),[4,6) and [3,4) are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closedOpen(1, 3))
         rangeSet.add(Range.closedOpen(4, 6))
         rangeSet.add(Range.closedOpen(3, 4))
         "the range set should contain [1,6)" in {
-          rangeSet.asRanges should be(Set(Range.closedOpen(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closedOpen(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.atLeast(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.atLeast(6)))
         }
       }
       "if [1,3),[4,6) and [2,5) are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closedOpen(1, 3))
         rangeSet.add(Range.closedOpen(4, 6))
         rangeSet.add(Range.closedOpen(2, 5))
         "the range set should contain [1,6)" in {
-          rangeSet.asRanges should be(Set(Range.closedOpen(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closedOpen(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.atLeast(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.atLeast(6)))
         }
       }
     }
     "should merge connected ranges" - {
       "if [1,4] and (4,6) are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 4))
         rangeSet.add(Range.open(4, 6))
         "the range set should contain [1,6)" in {
-          rangeSet.asRanges should be(Set(Range.closedOpen(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closedOpen(1, 6)))
         }
         "and the complement should contain {(-inf,1), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.atLeast(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.atLeast(6)))
         }
       }
     }
     "should ignore a smaller range with no sharing bound" - {
       "if [1,6] and (2,4) are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 6))
         rangeSet.add(Range.open(2, 4))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
     }
     "should ignore a smaller range with a lower sharing bound" - {
       "if [1,6] and [1,4] are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 6))
         rangeSet.add(Range.closed(1, 4))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
     }
     "should ignore a smaller range with a lower sharing bound" - {
       "if [1,6] and [3,6] are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 6))
         rangeSet.add(Range.closed(3, 6))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
     }
     "should ignore a duplicate" - {
       "if [1,6] and [1,6] are added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 6))
         rangeSet.add(Range.closed(1, 6))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
     }
     "removing an empty range should have no effect" - {
       "if the set contains [1,6] and [3,3) is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(1, 6))
         rangeSet.remove(Range.closedOpen(3, 3))
         "the range set should contain [1,6]" in {
-          rangeSet.asRanges should be(Set(Range.closed(1, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(1, 6)))
         }
         "and the complement should contain {(-inf,1), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(1), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(1), Range.greaterThan(6)))
         }
       }
     }
     "should implement #remove" - {
       "if the set contains [3,5] and [3,5) is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 5))
         rangeSet.remove(Range.closedOpen(3, 5))
         "the range set should contain [5]" in {
-          rangeSet.asRanges should be(Set(Range.singleton(5)))
+          rangeSet.asRanges() should be(Set(Range.singleton(5)))
         }
         "and the complement should contain {(-inf,5), (5,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(5), Range.greaterThan(5)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(5), Range.greaterThan(5)))
         }
       }
       "if the set contains [3,5] and (3,5] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 5))
         rangeSet.remove(Range.openClosed(3, 5))
         "the range set should contain [3]" in {
-          rangeSet.asRanges should be(Set(Range.singleton(3)))
+          rangeSet.asRanges() should be(Set(Range.singleton(3)))
         }
         "and the complement should contain {(-inf,3), (3,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(3), Range.greaterThan(3)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(3), Range.greaterThan(3)))
         }
       }
       "if the set contains (-inf,6] and [3,4) is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.atMost(6))
         rangeSet.remove(Range.closedOpen(3, 4))
         "the range set should contain {(-inf, 3), [3,6]}" in {
-          rangeSet.asRanges should be(Set(Range.lessThan(3), Range.closed(4, 6)))
+          rangeSet.asRanges() should be(Set(Range.lessThan(3), Range.closed(4, 6)))
         }
         "and the complement should contain {[3,4), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.closedOpen(3, 4), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.closedOpen(3, 4), Range.greaterThan(6)))
         }
       }
       "if the set contains [3,6] and [1,3) is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closedOpen(1, 3))
         "the range set should contain {[3,6]}" in {
-          rangeSet.asRanges should be(Set(Range.closed(3, 6)))
+          rangeSet.asRanges() should be(Set(Range.closed(3, 6)))
         }
         "and the complement should contain {(-inf,3), (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(3), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(3), Range.greaterThan(6)))
         }
       }
       "if the set contains [3,6] and [1,3] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closed(1, 3))
         "the range set should contain {(3,6]}" in {
-          rangeSet.asRanges should be(Set(Range.openClosed(3, 6)))
+          rangeSet.asRanges() should be(Set(Range.openClosed(3, 6)))
         }
         "and the complement should contain {(-inf,3], (6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.atMost(3), Range.greaterThan(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.atMost(3), Range.greaterThan(6)))
         }
       }
       "if the set contains [3,6] and [6,9] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closed(6, 9))
         "the range set should contain {[3,6)}" in {
-          rangeSet.asRanges should be(Set(Range.closedOpen(3, 6)))
+          rangeSet.asRanges() should be(Set(Range.closedOpen(3, 6)))
         }
         "and the complement should contain {(-inf,3), [6,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.lessThan(3), Range.atLeast(6)))
+          rangeSet.complement().asRanges() should be(Set(Range.lessThan(3), Range.atLeast(6)))
         }
       }
       "if the set contains [3,6] and [3,6] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closed(3, 6))
         "the range set should be empty" in {
           rangeSet.isEmpty should be(true)
-          rangeSet.asRanges should be(Set())
+          rangeSet.asRanges() should be(Set())
         }
         "and the complement should be {(-inf,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.all[Int, Int.type]))
+          rangeSet.complement().asRanges() should be(Set(Range.all[Int, Int.type]()))
         }
       }
       "if the set contains [3,6] and [2,6] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closed(2, 6))
         "the range set should be empty" in {
           rangeSet.isEmpty should be(true)
-          rangeSet.asRanges should be(Set())
+          rangeSet.asRanges() should be(Set())
         }
         "and the complement should be {(-inf,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.all[Int, Int.type]))
+          rangeSet.complement().asRanges() should be(Set(Range.all[Int, Int.type]()))
         }
       }
       "if the set contains [3,6] and [3,7] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closed(3, 7))
         "the range set should be empty" in {
           rangeSet.isEmpty should be(true)
-          rangeSet.asRanges should be(Set())
+          rangeSet.asRanges() should be(Set())
         }
         "and the complement should be {(-inf,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.all[Int, Int.type]))
+          rangeSet.complement().asRanges() should be(Set(Range.all[Int, Int.type]()))
         }
       }
       "if the set contains [3,6] and [2,7] is removed" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.closed(3, 6))
         rangeSet.remove(Range.closed(2, 7))
         "the range set should be empty" in {
           rangeSet.isEmpty should be(true)
-          rangeSet.asRanges should be(Set())
+          rangeSet.asRanges() should be(Set())
         }
         "and the complement should be {(-inf,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.all[Int, Int.type]))
+          rangeSet.complement().asRanges() should be(Set(Range.all[Int, Int.type]()))
         }
       }
     }
 
     "should not contain empty ranges" - {
       "given the RangeSet is empty" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         "all ranges must be non-empty" in {
-          rangeSet.asRanges.foreach { range => range.isEmpty should be(false) }
+          rangeSet.asRanges().foreach { range => range.isEmpty() should be(false) }
         }
       }
       "given an empty range is added" - {
-        val rangeSet = newBuilder.result
+        val rangeSet = newBuilder.result()
         rangeSet.add(Range.openClosed(3, 3))
         "all ranges must be non-empty" in {
-          rangeSet.asRanges.foreach { range => range.isEmpty should be(false) }
+          rangeSet.asRanges().foreach { range => range.isEmpty() should be(false) }
         }
         "the range set must be empty" in {
           rangeSet.isEmpty should be(true)
         }
         "the complement must contain (-inf,inf)" in {
-          rangeSet.complement.asRanges should be(Set(Range.all[Int, Int.type]))
+          rangeSet.complement().asRanges() should be(Set(Range.all[Int, Int.type]()))
         }
       }
     }
@@ -443,15 +434,15 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
   }
 
   private def testCoalesced[T, O <: Ordering[T]](rangeSet: RangeSet[T, O]): Unit = {
-    val asRanges = rangeSet.asRanges
-    asRanges.drop(1).zip(asRanges.dropRight(1)).foreach {
-      case (a: Range[T, O], b: Range[T, O]) => { a.isConnected(b) should be(false) }
+    val asRanges = rangeSet.asRanges()
+    asRanges.drop(1).zip(asRanges.dropRight(1)).foreach { case (a: Range[T, O], b: Range[T, O]) =>
+      a.isConnected(b) should be(false)
     }
   }
 
-  def rangeSet(newBuilder: => Builder[Range[Int, Int.type], RangeSet[Int, Int.type]]) = {
+  def rangeSet(newBuilder: => Builder[Range[Int, Int.type], RangeSet[Int, Int.type]]): Unit = {
     val build: Iterable[Range[Int, Int.type]] => RangeSet[Int, Int.type] = { ranges: Iterable[Range[Int, Int.type]] =>
-      (newBuilder ++= ranges).result
+      (newBuilder ++= ranges).result()
     }
 
     /*
@@ -515,12 +506,12 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
      */
     "should implement #isEmpty" - {
       "given the RangeSet is empty" - {
-        val rangeSet = build(Set())
+        val _ = build(Set())
         "when #isEmpty is called should return true" in {
           build(Set()).isEmpty should be(true)
         }
         "when #isEmpty is called on the Set returned by #asRanges should be true" in {
-          build(Set()).asRanges.isEmpty should be(true)
+          build(Set()).asRanges().isEmpty should be(true)
         }
       }
     }
@@ -664,8 +655,8 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "when #complement is called it should return a RangeSet with (-inf, inf)" in {
-          val expected = build(Set(Range.all[Int, Int.type]))
-          val complement = rangeSet.complement
+          val expected = build(Set(Range.all[Int, Int.type]()))
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -677,7 +668,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.closedOpen(1, 5)))
         "when #complement is called it should return a RangeSet with {(-inf, 1), [5,inf)}" in {
           val expected = build(Set(Range.lessThan(1), Range.atLeast(5)))
-          val complement = rangeSet.complement
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -689,7 +680,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.greaterThan(2)))
         "when #complement is called it should return a RangeSet with {(-inf,2]}" in {
           val expected = build(Set(Range.atMost(2)))
-          val complement = rangeSet.complement
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -701,7 +692,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.atMost(3)))
         "when #complement is called it should return a RangeSet with {(3,inf)}" in {
           val expected = build(Set(Range.greaterThan(3)))
-          val complement = rangeSet.complement
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -713,7 +704,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
         "when #complement is called it should return a RangeSet with {(-inf,1),[3,5),(8,inf)}" in {
           val expected = build(Set(Range.lessThan(1), Range.closedOpen(3, 5), Range.greaterThan(8)))
-          val complement = rangeSet.complement
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -725,7 +716,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.greaterThan(6), Range.closedOpen(1, 3)))
         "when #complement is called it should return a RangeSet with {(-inf,1),[3,6]}" in {
           val expected = build(Set(Range.lessThan(1), Range.closed(3, 6)))
-          val complement = rangeSet.complement
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -737,7 +728,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.atMost(0), Range.closedOpen(2, 5)))
         "when #complement is called it should return a RangeSet with {(0,2),[5,inf)}" in {
           val expected = build(Set(Range.open(0, 2), Range.atLeast(5)))
-          val complement = rangeSet.complement
+          val complement = rangeSet.complement()
           complement should be(expected)
 
           forAll { i: Int =>
@@ -754,43 +745,43 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "#asRanges should return an empty Set" in {
-          rangeSet.asRanges should be(Set())
+          rangeSet.asRanges() should be(Set())
         }
       }
       "given the RangeSet contains the Range [1,5)" - {
         val rangeSet = build(Set(Range.closedOpen(1, 5)))
         "#asRanges should return a Set with [1,5)" in {
-          rangeSet.asRanges should be(Set(Range.closedOpen(1, 5)))
+          rangeSet.asRanges() should be(Set(Range.closedOpen(1, 5)))
         }
       }
       "given the RangeSet contains the Range (2,inf)" - {
         val rangeSet = build(Set(Range.greaterThan(2)))
         "#asRanges should return a Set with (2,inf)" in {
-          rangeSet.asRanges should be(Set(Range.greaterThan(2)))
+          rangeSet.asRanges() should be(Set(Range.greaterThan(2)))
         }
       }
       "given the RangeSet contains the Range (-inf,3]" - {
         val rangeSet = build(Set(Range.atMost(3)))
         "#asRanges should return a Set with (-inf,3]" in {
-          rangeSet.asRanges should be(Set(Range.atMost(3)))
+          rangeSet.asRanges() should be(Set(Range.atMost(3)))
         }
       }
       "given the RangeSet contains the Ranges {[5,8],[1,3)}" - {
         val rangeSet = build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
         "#asRanges should return a Set with {[1,3),[5,8]} in order" in {
-          rangeSet.asRanges.toList should be(List(Range.closedOpen(1, 3), Range.closed(5, 8)))
+          rangeSet.asRanges().toList should be(List(Range.closedOpen(1, 3), Range.closed(5, 8)))
         }
       }
       "given the RangeSet contains the Ranges {(6,inf),[1,3)}" - {
         val rangeSet = build(Set(Range.greaterThan(6), Range.closedOpen(1, 3)))
         "#asRanges should return a Set with {(6,inf),[1,3)}" in {
-          rangeSet.asRanges should be(Set(Range.greaterThan(6), Range.closedOpen(1, 3)))
+          rangeSet.asRanges() should be(Set(Range.greaterThan(6), Range.closedOpen(1, 3)))
         }
       }
       "given the RangeSet contains the Ranges {(-inf,0],[2,5)}" - {
         val rangeSet = build(Set(Range.atMost(0), Range.closedOpen(2, 5)))
         "#asRanges should return a Set with {(-inf,0],[2,5)}" in {
-          rangeSet.asRanges should be(Set(Range.atMost(0), Range.closedOpen(2, 5)))
+          rangeSet.asRanges() should be(Set(Range.atMost(0), Range.closedOpen(2, 5)))
         }
       }
     }
@@ -888,43 +879,43 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
       "given the RangeSet is empty" - {
         val rangeSet = build(Set())
         "#span should return no range" in {
-          rangeSet.span should be(None)
+          rangeSet.span() should be(None)
         }
       }
       "given the RangeSet contains the Range [1,5)" - {
         val rangeSet = build(Set(Range.closedOpen(1, 5)))
         "#span should return [1,5)" in {
-          rangeSet.span should be(Some(Range.closedOpen(1, 5)))
+          rangeSet.span() should be(Some(Range.closedOpen(1, 5)))
         }
       }
       "given the RangeSet contains the Range (2,inf)" - {
         val rangeSet = build(Set(Range.greaterThan(2)))
         "#span should return (2,inf)" in {
-          rangeSet.span should be(Some(Range.greaterThan(2)))
+          rangeSet.span() should be(Some(Range.greaterThan(2)))
         }
       }
       "given the RangeSet contains the Range (-inf,3]" - {
         val rangeSet = build(Set(Range.atMost(3)))
         "#span should return (-inf,3]" in {
-          rangeSet.span should be(Some(Range.atMost(3)))
+          rangeSet.span() should be(Some(Range.atMost(3)))
         }
       }
       "given the RangeSet contains the Ranges {[5,8],[1,3)}" - {
         val rangeSet = build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
         "#span should return [1,8]" in {
-          rangeSet.span should be(Some(Range.closed(1, 8)))
+          rangeSet.span() should be(Some(Range.closed(1, 8)))
         }
       }
       "given the RangeSet contains the Ranges {(6,inf),[1,3)}" - {
         val rangeSet = build(Set(Range.greaterThan(6), Range.closedOpen(1, 3)))
         "#span should return [1,inf)" in {
-          rangeSet.span should be(Some(Range.atLeast(1)))
+          rangeSet.span() should be(Some(Range.atLeast(1)))
         }
       }
       "given the RangeSet contains the Ranges {(-inf,0],[2,5)}" - {
         val rangeSet = build(Set(Range.atMost(0), Range.closedOpen(2, 5)))
         "#span should return [-inf,5)" in {
-          rangeSet.span should be(Some(Range.lessThan(5)))
+          rangeSet.span() should be(Some(Range.lessThan(5)))
         }
       }
     }
@@ -1020,12 +1011,12 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set())
         "if the other RangeSet is empty it should be equal" in {
           val mocked = mock[RangeSet[Int, Int.type]]
-          when(mocked.asRanges).thenReturn(Set[Range[Int, Int.type]]())
+          when(mocked.asRanges()).thenReturn(Set[Range[Int, Int.type]]())
           rangeSet should be(mocked)
         }
         "if the other RangeSet contains the ranges {[1,8],[1,3]} it should not be equal" in {
           val mocked = mock[RangeSet[Int, Int.type]]
-          when(mocked.asRanges).thenReturn(Set(Range.closed(1, 8), Range.closed(1, 3)))
+          when(mocked.asRanges()).thenReturn(Set(Range.closed(1, 8), Range.closed(1, 3)))
           rangeSet should not be mocked
         }
       }
@@ -1033,12 +1024,12 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         val rangeSet = build(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
         "if the other RangeSet contains the ranges {[5,8],[1,3)} it should be equal" in {
           val mocked = mock[RangeSet[Int, Int.type]]
-          when(mocked.asRanges).thenReturn(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
+          when(mocked.asRanges()).thenReturn(Set(Range.closed(5, 8), Range.closedOpen(1, 3)))
           rangeSet should be(mocked)
         }
         "if the other RangeSet contains the ranges {[1,8],[1,3]} it should not be equal" in {
           val mocked = mock[RangeSet[Int, Int.type]]
-          when(mocked.asRanges).thenReturn(Set(Range.closed(1, 8), Range.closed(1, 3)))
+          when(mocked.asRanges()).thenReturn(Set(Range.closed(1, 8), Range.closed(1, 3)))
           rangeSet should not be mocked
         }
       }
@@ -1060,12 +1051,12 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
     }
   }
 
-  def rangeSetWithBuilder(newBuilder: => Builder[Range[Int, Int.type], RangeSet[Int, Int.type]]) = {
+  def rangeSetWithBuilder(newBuilder: => Builder[Range[Int, Int.type], RangeSet[Int, Int.type]]): Unit = {
     "should implement newBuilder" - {
       "given the builder is empty" - {
         val builder = newBuilder
         "#result should return an empty RangeSet" in {
-          builder.result.isEmpty should be(true)
+          builder.result().isEmpty should be(true)
         }
       }
       "when values are aded to the builder" - {
@@ -1073,7 +1064,7 @@ private[mango] trait RangeSetBehaviors extends FreeSpec with PropertyChecks with
         builder += Range.open(4, 7)
         builder += Range.open(8, 9)
         "#result should return a RangeSet with these values" in {
-          builder.result.asRanges should be(Set(Range.open(4, 7), Range.open(8, 9)))
+          builder.result().asRanges() should be(Set(Range.open(4, 7), Range.open(8, 9)))
         }
       }
     }

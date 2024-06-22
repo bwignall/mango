@@ -74,7 +74,7 @@ final private[mango] object ImmutableRangeSetWrapper extends RangeSetFactory[Imm
    */
   def newBuilder[C, O <: Ordering[C]](implicit ord: O) = new Builder[Range[C, O], ImmutableRangeSetWrapper[C, O]]() {
     var builder = ImmutableRangeSet.builder[AsOrdered[C]]()
-    override def +=(range: Range[C, O]): this.type = {
+    override def addOne(range: Range[C, O]): this.type = {
       builder.add(range.asJava)
       this
     }

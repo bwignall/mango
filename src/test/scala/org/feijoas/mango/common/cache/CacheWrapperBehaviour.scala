@@ -22,23 +22,17 @@
  */
 package org.feijoas.mango.common.cache
 
-import java.util.concurrent.{Callable => Callable, ConcurrentHashMap, ConcurrentMap, ExecutionException}
-
-import scala.annotation.meta.{beanGetter, beanSetter, field, getter, setter}
-import scala.collection.convert.WrapAsJava.mapAsJavaMap
-import scala.collection.convert.WrapAsScala.asScalaIterator
-
-import org.feijoas.mango.common.annotations.Beta
-import org.junit.Assert.assertSame
-import org.mockito.Matchers._
-import org.mockito.ArgumentMatchers._
+import java.util.concurrent.{Callable, ConcurrentHashMap, ConcurrentMap}
+import org.mockito.ArgumentMatchers.*
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatcher
-import org.mockito.Mockito._
-import org.scalatest._
-
-import com.google.common.cache.{Cache => GuavaCache, CacheStats => GuavaCacheStats}
+import org.mockito.Mockito.*
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import com.google.common.cache.{Cache as GuavaCache, CacheStats as GuavaCacheStats}
 import com.google.common.collect.ImmutableMap
+
+import scala.jdk.CollectionConverters.{IteratorHasAsScala, MapHasAsJava}
 
 /**
  * Shared tests for all CacheWrapper
@@ -46,9 +40,9 @@ import com.google.common.collect.ImmutableMap
  *  @author Markus Schneider
  *  @since 0.7
  */
-trait CacheWrapperBehaviour extends Matchers { this: FlatSpec =>
+trait CacheWrapperBehaviour extends Matchers { this: AnyFlatSpec =>
 
-  def forwardingWrapper(mockedFixture: => (GuavaCache[String, Int], Cache[String, Int])) = {
+  def forwardingWrapper(mockedFixture: => (GuavaCache[String, Int], Cache[String, Int])): Unit = {
 
     behavior of "CacheWrapper"
 
@@ -100,34 +94,34 @@ trait CacheWrapperBehaviour extends Matchers { this: FlatSpec =>
 
     it should "forward #invalidateAll to the underlying LoadingCache" in {
       val (wrapped, cache) = mockedFixture
-      cache.invalidateAll
+      cache.invalidateAll()
       verify(wrapped).invalidateAll()
     }
 
     it should "forward #size to the underlying LoadingCache" in {
       val (wrapped, cache) = mockedFixture
       when(wrapped.size()).thenReturn(7)
-      cache.size should be(7)
+      cache.size() should be(7)
       verify(wrapped).size()
     }
 
     it should "forward #stats to the underlying LoadingCache" in {
       val (wrapped, cache) = mockedFixture
       when(wrapped.stats()).thenReturn(new GuavaCacheStats(1, 2, 4, 6, 8, 16))
-      cache.stats should be(CacheStats(1, 2, 4, 6, 8, 16))
+      cache.stats() should be(CacheStats(1, 2, 4, 6, 8, 16))
       verify(wrapped).stats()
     }
 
     it should "forward #asMap to the underlying LoadingCache" in {
       val (wrapped, cache) = mockedFixture
       when(wrapped.asMap()).thenReturn(jConcurrentMap("c" -> 3, "d" -> 7))
-      cache.asMap should be(Map("c" -> 3, "d" -> 7))
+      cache.asMap() should be(Map("c" -> 3, "d" -> 7))
       verify(wrapped).asMap()
     }
 
     it should "forward #cleanUp to the underlying LoadingCache" in {
       val (wrapped, cache) = mockedFixture
-      cache.cleanUp
+      cache.cleanUp()
       verify(wrapped).cleanUp()
     }
   }
@@ -136,17 +130,17 @@ trait CacheWrapperBehaviour extends Matchers { this: FlatSpec =>
    * creates a Mockito `ArgumentMatcher` which checks that the `Iterable` to match
    *  has the provided elements
    */
-  def anyIterableWith[T](elements: Any*) = argThat(new ArgumentMatcher[java.lang.Iterable[T]] {
-    val expected = List(elements.seq: _*)
-    override def matches(arg: java.lang.Iterable[T]) = arg match {
-      case it: java.lang.Iterable[_] => expected.sameElements(it.iterator().toList)
-      case _                         => false
+  def anyIterableWith[T](elements: Any*): java.lang.Iterable[T] = argThat(new ArgumentMatcher[java.lang.Iterable[T]] {
+    val expected: List[Any] = List(elements: _*)
+    override def matches(arg: java.lang.Iterable[T]): Boolean = arg match {
+      case jlit: java.lang.Iterable[_] => expected == jlit.iterator.asScala.toList
+      case _                           => false
     }
   })
 
   /** creates a Guava ImmutableMap with elems */
   def jImmutableMap[K, V](elems: (K, V)*): ImmutableMap[K, V] = {
-    val map: java.util.Map[K, V] = Map(elems: _*)
+    val map: java.util.Map[K, V] = Map(elems: _*).asJava
     ImmutableMap.copyOf(map)
   }
 

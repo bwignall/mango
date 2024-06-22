@@ -22,41 +22,33 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.annotation.meta.beanGetter
-import scala.annotation.meta.beanSetter
-import scala.annotation.meta.field
-import scala.annotation.meta.getter
-import scala.annotation.meta.setter
-import scala.math.Ordering.Int
-
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.AsOrdered.asOrdered
+import com.google.common.collect.RangeSet as GuavaRangeSet
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
 import org.mockito.Mockito.verify
-import org.scalatest.FreeSpec
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
-import com.google.common.collect.{RangeSet => GuavaRangeSet}
+import scala.math.Ordering.Int
 
 /**
- * Behavior which all [[RangeSetWrappers]] have in common
+ * Behavior which all [[RangeSetWrapper]]s have in common
  */
-private[mango] trait RangeSetWrapperBehaviours extends FreeSpec with PropertyChecks with MockitoSugar {
-  this: FreeSpec =>
+private[mango] trait RangeSetWrapperBehaviours extends AnyFreeSpec with ScalaCheckPropertyChecks with MockitoSugar {
+  this: AnyFreeSpec =>
 
   def immutableWrapper[Repr <: RangeSetWrapperLike[Int, Int.type, Repr] with RangeSet[Int, Int.type]](
-    constructor: (GuavaRangeSet[AsOrdered[Int]]) => Repr
-  ) = {
+    constructor: GuavaRangeSet[AsOrdered[Int]] => Repr
+  ): Unit = {
     val mocked = mock[GuavaRangeSet[AsOrdered[Int]]]
     val withMock = constructor(mocked)
     "it should forward all immutable methods to guava " - {
       "should forward #asRanges" in {
-        withMock.asRanges
+        withMock.asRanges()
         verify(mocked).asRanges()
       }
       "should forward #complement" in {
-        withMock.complement
+        withMock.complement()
         verify(mocked).complement()
       }
       "should forward #contains" in {
@@ -73,14 +65,14 @@ private[mango] trait RangeSetWrapperBehaviours extends FreeSpec with PropertyChe
       }
       "should forward #isEmpt" in {
         withMock.isEmpty
-        verify(mocked).isEmpty()
+        verify(mocked).isEmpty
       }
       "should forward #rangeContaining" in {
         withMock.rangeContaining(5)
         verify(mocked).rangeContaining(5)
       }
       "should forward #span" in {
-        withMock.span
+        withMock.span()
         verify(mocked).span()
       }
       "should forward #subRangeSet" in {
@@ -91,8 +83,8 @@ private[mango] trait RangeSetWrapperBehaviours extends FreeSpec with PropertyChe
   }
 
   def mutableWrapper[Repr <: mutable.RangeSetWrapperLike[Int, Int.type, Repr] with mutable.RangeSet[Int, Int.type]](
-    constructor: (GuavaRangeSet[AsOrdered[Int]]) => Repr
-  ) = {
+    constructor: GuavaRangeSet[AsOrdered[Int]] => Repr
+  ): Unit = {
     // forward all methods like immutable RangeSetWrapperLike
     immutableWrapper(constructor)
 
@@ -151,8 +143,8 @@ private[mango] trait RangeSetWrapperBehaviours extends FreeSpec with PropertyChe
       }
       "should forward #clear" in {
         val (mocked, withMock) = fixture
-        withMock.clear
-        verify(mocked).clear
+        withMock.clear()
+        verify(mocked).clear()
       }
     }
   }

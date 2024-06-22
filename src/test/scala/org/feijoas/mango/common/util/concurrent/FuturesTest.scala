@@ -23,17 +23,22 @@
 package org.feijoas.mango.common.util.concurrent
 
 import java.util.concurrent.{Callable, CountDownLatch, Executors, TimeUnit}
-import scala.concurrent._
+import scala.concurrent.*
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.MILLISECONDS
 import scala.util.{Failure, Success, Try}
-import org.feijoas.mango.common.util.concurrent.Futures._
-import org.junit.Assert.assertEquals
-import org.scalatest._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.PropertyChecks
-import com.google.common.util.concurrent.{ListenableFuture, ListenableFutureTask}
-import com.google.common.util.concurrent.{Futures => GuavaFutures}
+import org.feijoas.mango.common.util.concurrent.Futures.*
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.mockito.MockitoSugar
+import com.google.common.util.concurrent.{
+  FutureCallback,
+  Futures as GuavaFutures,
+  ListenableFuture,
+  ListenableFutureTask
+}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
 import scala.concurrent.duration.Duration
 
 /**
@@ -42,19 +47,19 @@ import scala.concurrent.duration.Duration
  *  @author Markus Schneider
  *  @since 0.7
  */
-class FuturesTest extends FlatSpec with Matchers with PropertyChecks with MockitoSugar {
+class FuturesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks with MockitoSugar {
 
   behavior of "ListenableFuture wrapper"
 
   it should "should throw a timeout exception if time expires on a call on get" in {
-    val scalaFuture: Future[Int] = Future { Thread.sleep(1000); fail }
+    val scalaFuture: Future[Int] = Future { Thread.sleep(1000); fail() }
     val listFut: ListenableFuture[Int] = scalaFuture.asJava
 
     try {
       listFut.get(100, TimeUnit.MILLISECONDS)
-      fail
+      fail()
     } catch {
-      case expected: TimeoutException => // latch is still on hold
+      case _: TimeoutException => // latch is still on hold
     }
   }
 
@@ -68,18 +73,30 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
   it should "call onSucces if it succeeds" in {
     val finished = new CountDownLatch(1)
     val start = new CountDownLatch(1)
-    val scalaFuture = Future { start.await; 5 }
+    val scalaFuture = Future { start.await(); 5 }
     val listFut: ListenableFuture[Int] = scalaFuture.asJava
 
     val callback: Try[Int] => Any = {
-      case Success(_) => finished.countDown
-      case _          => fail
+      case Success(_) => finished.countDown()
+      case _          => fail()
     }
 
-    GuavaFutures.addCallback(listFut, callback.asJava)
+    GuavaFutures.addCallback(
+      listFut,
+      new FutureCallback[Int] {
+        override def onSuccess(result: Int): Unit = {
+          callback(Success(result)); ()
+        }
+
+        override def onFailure(t: Throwable): Unit = {
+          callback(Failure(t)); ()
+        }
+      },
+      Executors.newFixedThreadPool(10).execute(_)
+    )
 
     // start future
-    start.countDown
+    start.countDown()
 
     // check if callback was called
     finished.await(100, TimeUnit.MILLISECONDS)
@@ -91,16 +108,16 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
   it should "call onFailure if it fails" in {
     val finished = new CountDownLatch(1)
     val start = new CountDownLatch(1)
-    val scalaFuture: Future[Int] = Future { start.await; fail }
+    val scalaFuture: Future[Int] = Future { start.await(); fail() }
     val listFut: ListenableFuture[Int] = scalaFuture.asJava
 
     val callback: Try[Int] => Any = {
-      case Failure(_) => finished.countDown
-      case _          => fail
+      case Failure(_) => finished.countDown()
+      case _          => fail()
     }
 
-    GuavaFutures.addCallback(listFut, callback.asJava)
-    start.countDown
+    GuavaFutures.addCallback(listFut, callback.asJava, Executors.newFixedThreadPool(10).execute(_))
+    start.countDown()
 
     // check if callback was called
     finished.await(100, TimeUnit.MILLISECONDS)
@@ -110,7 +127,7 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
   it should "return the correct Option[Success] if the calculation succeeds" in {
     val latch = new CountDownLatch(1)
-    val delegate = createFuture(1, latch, false)
+    val delegate = createFuture(1, latch, throwException = false)
     val future: Future[Int] = delegate.asScala
 
     execute(delegate)
@@ -126,7 +143,7 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
   it should "return the correct Option[Failure] if the calculation fails" in {
     val latch = new CountDownLatch(1)
-    val delegate = createFuture(1, latch, true)
+    val delegate = createFuture(1, latch, throwException = true)
     val future: Future[Int] = delegate.asScala
 
     execute(delegate)
@@ -139,14 +156,14 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
     try {
       Await.result(future, Duration(100, MILLISECONDS)) should be(Some(Failure))
     } catch {
-      case e: Exception => e.getCause() should be(calculationException)
+      case e: Exception => e.getCause should be(calculationException)
     }
   }
 
   behavior of "ListenableFuture wrapper if a callback is registered"
 
   it should "call onSuccess if successful" in {
-    val delegate = createFuture(1, new CountDownLatch(0), false)
+    val delegate = createFuture(1, new CountDownLatch(0), throwException = false)
     val future: Future[Int] = delegate.asScala
 
     // we use this latch to wait until the successCallback
@@ -156,11 +173,14 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
     val completeCallback: Try[Int] => Any = {
       case Success(v) => successCallback(v)
-      case Failure(v) => fail()
+      case Failure(_) => fail()
     }
 
-    future.onSuccess(successCallback)
-    future.onFailure { case _ => fail() }
+    future.onComplete {
+      case Success(_) => successLatch.countDown()
+      case Failure(_) => fail()
+    }
+
     future.onComplete(completeCallback)
 
     // wait until the future is ready
@@ -169,11 +189,11 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
     // check number of invocations
     successLatch.await(100, TimeUnit.MILLISECONDS)
-    successLatch.getCount() should be(0)
+    successLatch.getCount should be(0)
   }
 
   it should "call onFailure if failed" in {
-    val delegate = createFuture(1, new CountDownLatch(0), true)
+    val delegate = createFuture(1, new CountDownLatch(0), throwException = true)
     val future: Future[Int] = delegate.asScala
 
     // we use this latch to wait until the successCallback
@@ -181,12 +201,15 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
     val failureLatch = new CountDownLatch(2)
     val failureCallback: PartialFunction[Any, Unit] = { case _ => failureLatch.countDown() }
     val completeCallback: Try[Int] => Any = {
-      case Success(v) => fail()
+      case Success(_) => fail()
       case Failure(v) => failureCallback(v)
     }
 
-    future.onSuccess { case _ => fail() }
-    future.onFailure(failureCallback)
+    future.onComplete {
+      case Success(_) => fail()
+      case Failure(_) => failureLatch.countDown()
+    }
+
     future.onComplete(completeCallback)
 
     // wait until the future is ready
@@ -195,18 +218,18 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
     // check number of invocations
     failureLatch.await(100, TimeUnit.MILLISECONDS)
-    failureLatch.getCount() should be(0)
+    failureLatch.getCount should be(0)
   }
 
   behavior of "ListenableFuture wrapper if we are waiting until it's ready"
 
   it should "call wait until computation is finished" in {
     val latch = new CountDownLatch(1)
-    val delegate = createFuture(1, latch, false)
+    val delegate = createFuture(1, latch, throwException = false)
     val future: Future[Int] = delegate.asScala
 
     execute(delegate)
-    delegate.isDone() should be(false)
+    delegate.isDone should be(false)
     future.isCompleted should be(false)
 
     // finish calculation
@@ -214,43 +237,45 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
     // wait and check result
     Await.ready(future, Duration(100, MILLISECONDS))
-    delegate.isDone() should be(true)
+    delegate.isDone should be(true)
     future.isCompleted should be(true)
     future.value should be(Some(Success(1)))
 
     // repeat
-    delegate.isDone() should be(true)
+    delegate.isDone should be(true)
     future.isCompleted should be(true)
     future.value should be(Some(Success(1)))
   }
 
   it should "throw an exception if the computation takes too long" in {
     val latch = new CountDownLatch(1)
-    val delegate = createFuture(1, latch, false)
+    val delegate = createFuture(1, latch, throwException = false)
     val future: Future[Int] = delegate.asScala
 
     execute(delegate)
-    delegate.isDone() should be(false)
+    delegate.isDone should be(false)
     future.isCompleted should be(false)
 
     // calculation will need 5 mins but we wait only 100 ms
     try {
       Await.ready(future, Duration(100, MILLISECONDS))
-      fail
+      fail()
     } catch {
-      case e: TimeoutException => // expected
+      case _: TimeoutException => // expected
     }
-    delegate.isDone() should be(false)
+    delegate.isDone should be(false)
     future.isCompleted should be(false)
   }
 
+  val calculationException = new Exception("FutureTest-Exception")
+
   it should "Await.ready(future,..) must not throw an exception if the Future does" in {
     val latch = new CountDownLatch(1)
-    val delegate = createFuture(1, latch, true)
+    val delegate = createFuture(1, latch, throwException = true)
     val future: Future[Int] = delegate.asScala
 
     execute(delegate)
-    delegate.isDone() should be(false)
+    delegate.isDone should be(false)
     future.isCompleted should be(false)
 
     // finish calculation
@@ -258,24 +283,22 @@ class FuturesTest extends FlatSpec with Matchers with PropertyChecks with Mockit
 
     // wait and check result
     Await.ready(future, Duration(100, MILLISECONDS))
-    delegate.isDone() should be(true)
+    delegate.isDone should be(true)
     future.isCompleted should be(true)
     // Some(Failure(ExecutionException)))
-    future.value.get.failed.get.getCause() should be(calculationException)
+    future.value.get.failed.get.getCause should be(calculationException)
   }
 
-  val calculationException = new Exception("FutureTest-Exception");
+  def execute(command: Runnable): Unit = Executors.newFixedThreadPool(10).execute(command)
 
-  def execute(command: Runnable) = Executors.newFixedThreadPool(10).execute(command)
-
-  def createFuture[T](value: T, latch: CountDownLatch, throwException: Boolean) = {
+  def createFuture[T](value: T, latch: CountDownLatch, throwException: Boolean): ListenableFutureTask[T] = {
     ListenableFutureTask.create(new Callable[T]() {
       override def call(): T = {
-        latch.await(5000, TimeUnit.MILLISECONDS);
+        latch.await(5000, TimeUnit.MILLISECONDS)
         if (throwException) {
-          throw calculationException;
+          throw calculationException
         }
-        return value
+        value
       }
     })
   }

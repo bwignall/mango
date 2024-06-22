@@ -22,16 +22,14 @@
  */
 package org.feijoas.mango.common.cache
 
-import java.util.{Map => JMap}
-import java.lang.{Iterable => JIterable}
-
-import scala.collection.convert.decorateAll.{iterableAsScalaIterableConverter, mapAsJavaMapConverter}
-
-import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.util.concurrent.Futures._
-
-import com.google.common.cache.{CacheLoader => GuavaCacheLoader}
+import com.google.common.cache.CacheLoader as GuavaCacheLoader
 import com.google.common.util.concurrent.ListenableFuture
+import org.feijoas.mango.common.base.Preconditions.checkNotNull
+import org.feijoas.mango.common.util.concurrent.Futures.*
+
+import java.lang.Iterable as JIterable
+import java.util.Map as JMap
+import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsJava}
 
 /** An adapter that wraps a Mango-[[CacheLoader]] in a Guava-`CacheLoader` and forwards all
  *  method calls to the underlying Mango-CacheLoader.
@@ -54,7 +52,7 @@ private[mango] case class CacheLoaderWrapper[K, V](private val delegate: CacheLo
   }
 
   override def loadAll(keys: JIterable[_ <: K]): JMap[K, V] =
-    delegate.loadAll(checkNotNull(keys.asScala)) match {
+    delegate.loadAll(checkNotNull(keys).asScala) match {
       case null      => null
       case _ @result => result.asJava
     }

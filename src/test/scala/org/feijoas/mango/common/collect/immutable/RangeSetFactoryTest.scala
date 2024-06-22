@@ -22,26 +22,18 @@
  */
 package org.feijoas.mango.common.collect.immutable
 
-import scala.annotation.meta.beanGetter
-import scala.annotation.meta.beanSetter
-import scala.annotation.meta.field
-import scala.annotation.meta.getter
-import scala.annotation.meta.setter
-import scala.math.Ordering.Int
+import org.feijoas.mango.common.collect.{Range, RangeSetBehaviors}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers.{be, convertToAnyShouldWrapper}
 
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect.Range
-import org.feijoas.mango.common.collect.RangeSetBehaviors
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
+import scala.math.Ordering.Int
 
 /** Tests for [[RangeSetFactoryTest]]
  *
  *  @author Markus Schneider
  *  @since 0.8
  */
-class RangeSetFactoryTest extends FreeSpec with RangeSetBehaviors {
+class RangeSetFactoryTest extends AnyFreeSpec with RangeSetBehaviors {
 
   "A (immutable) RangeSetFactory" - {
     "it should not create a copy if RangeSet(same type of immutable range set) is called" in {

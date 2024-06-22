@@ -101,7 +101,7 @@ final case class BloomFilter[T] private (private val delegate: GuavaBloomFilter[
   def expectedFpp(): Double = delegate.expectedFpp()
 
   /**
-   * Equivalent to `#mightContain`; provided only to satisfy the {@link Predicate} interface.
+   * Equivalent to `#mightContain`; provided only to satisfy the {@link com.google.common.base.Predicate} interface.
    *  When using a reference of type {@code BloomFilter}, always invoke {@link #mightContain}
    *  directly instead.
    */
@@ -117,7 +117,7 @@ final case class BloomFilter[T] private (private val delegate: GuavaBloomFilter[
  *  [[Funnel]] for `T` (called type class) must be in implicit scope (recommended)
  *  or passed explicitly as a parameter.
  */
-final object BloomFilter {
+object BloomFilter {
 
   /**
    * Creates a {@code Builder} of a `BloomFilter[T]`, with the expected number

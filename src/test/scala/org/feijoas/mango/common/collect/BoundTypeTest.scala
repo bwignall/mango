@@ -26,19 +26,18 @@ import org.feijoas.mango.common.collect.BoundType.Closed
 import org.feijoas.mango.common.collect.BoundType.Open
 import org.feijoas.mango.common.collect.BoundType.asGuavaBoundType
 import org.feijoas.mango.common.collect.BoundType.asMangoBoundType
-import org.scalatest.FunSuite
-import org.scalatest.Matchers.be
-import org.scalatest.Matchers.convertToAnyShouldWrapper
-
-import com.google.common.collect.{BoundType => GuavaBoundType}
+import org.scalatest.matchers.should.Matchers.be
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import com.google.common.collect.BoundType as GuavaBoundType
 import com.google.common.testing.SerializableTester
+import org.scalatest.funsuite.AnyFunSuite
 
 /** Tests for [[BoundType]]
  *
  *  @author Markus Schneider
  *  @since 0.8
  */
-class BoundTypeTest extends FunSuite {
+class BoundTypeTest extends AnyFunSuite {
 
   test("convert from Guava to Mango") {
     val gOpen: GuavaBoundType = GuavaBoundType.OPEN
@@ -65,12 +64,12 @@ class BoundTypeTest extends FunSuite {
   test("throws exeption if attemp to convert null") {
     intercept[NullPointerException] {
       val mBT: BoundType = null
-      val gBT: GuavaBoundType = mBT.asJava
+      val _: GuavaBoundType = mBT.asJava
     }
 
     intercept[NullPointerException] {
       val gBT: GuavaBoundType = null
-      val mBT: BoundType = gBT.asScala
+      val _: BoundType = gBT.asScala
     }
   }
 

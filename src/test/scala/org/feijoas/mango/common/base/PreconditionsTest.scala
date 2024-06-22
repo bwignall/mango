@@ -30,48 +30,55 @@ import org.feijoas.mango.common.base.Preconditions.{
   checkPositionIndexes,
   checkState
 }
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
- * Tests for [[Precondition]]
+ * Tests for [[Preconditions]]
  *
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class PreconditionsTest extends FlatSpec with Matchers {
+class PreconditionsTest extends AnyFlatSpec with Matchers {
+
+  val IGNORE_ME: Any = new Object() {
+    override def toString: String = {
+      fail()
+    }
+  }
 
   "checkArgument called with true" should "success" in {
-    checkArgument(true)
+    checkArgument(expression = true)
   }
 
   "checkArgument called with false" should "fail" in {
-    an[IllegalArgumentException] should be thrownBy checkArgument(false)
+    an[IllegalArgumentException] should be thrownBy checkArgument(expression = false)
   }
 
   "checkArgument called with true" should "ignore the second arg" in {
-    checkArgument(true, IGNORE_ME)
+    checkArgument(expression = true, IGNORE_ME)
   }
 
   "checkArgument" should "put the msg into exception" in {
     (the[IllegalArgumentException] thrownBy {
-      checkArgument(false, new Message())
+      checkArgument(expression = false, new Message())
     } should have).message("A message")
   }
 
   "checkArgument" should "put 'null' into exception if called with null" in {
     (the[IllegalArgumentException] thrownBy {
-      checkArgument(false, null)
+      checkArgument(expression = false, null)
     } should have).message("null")
   }
 
   "checkArgument called with true" should "ignore the third arg" in {
-    checkArgument(true, "%s", IGNORE_ME)
+    checkArgument(expression = true, "%s", IGNORE_ME)
   }
 
   "checkArgument" should "format message" in {
     val format = "I ate %s pies."
     (the[IllegalArgumentException] thrownBy {
-      checkArgument(false, format, 5)
+      checkArgument(expression = false, format, 5)
     } should have).message("I ate 5 pies.")
   }
 
@@ -84,33 +91,33 @@ class PreconditionsTest extends FlatSpec with Matchers {
   }
 
   "checkState called with true" should "ignore the second arg" in {
-    checkState(true, IGNORE_ME)
+    checkState(expression = true, IGNORE_ME)
   }
 
   "checkState" should "put the msg into exception" in {
     (the[IllegalStateException] thrownBy {
-      checkState(false, new Message())
+      checkState(expression = false, new Message())
     } should have).message("A message")
   }
 
   "checkState" should "put 'null' into exception if called with null" in {
     (the[IllegalStateException] thrownBy {
-      checkState(false, null)
+      checkState(expression = false, null)
     } should have).message("null")
   }
 
   "checkState called with true" should "ignore the third arg" in {
-    checkState(true, "%s", IGNORE_ME)
+    checkState(expression = true, "%s", IGNORE_ME)
   }
 
   "checkState" should "format message" in {
     val format = "I ate %s pies."
     (the[IllegalStateException] thrownBy {
-      checkState(false, format, 5)
+      checkState(expression = false, format, 5)
     } should have).message("I ate 5 pies.")
   }
 
-  val NON_NULL_STRING = "foo";
+  val NON_NULL_STRING = "foo"
 
   "checkNotNull" should "return non-null string" in {
     checkNotNull(NON_NULL_STRING) should equal(NON_NULL_STRING)
@@ -240,25 +247,18 @@ class PreconditionsTest extends FlatSpec with Matchers {
     val value: AnyVal = 1
     val ref: AnyRef = new Object
     // this must compile
-    checkArgument(true, "", value, ref, value)
-    checkArgument(true, "", ref, ref, value)
+    checkArgument(expression = true, "", value, ref, value)
+    checkArgument(expression = true, "", ref, ref, value)
     checkNotNull(new Object, "", value, ref, value)
     checkNotNull(new Object, "", ref, ref, value)
     checkState(true, "", value, ref, value)
   }
 
-  val IGNORE_ME = new Object() {
-    override def toString(): String = {
-      fail()
-      return null;
-    }
-  };
-
   class Message(var invoked: Boolean = false) {
-    override def toString(): String = {
+    override def toString: String = {
       invoked should be(false)
-      invoked = true;
-      return "A message";
+      invoked = true
+      "A message"
     }
   }
 }

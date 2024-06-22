@@ -22,11 +22,12 @@
  */
 package org.feijoas.mango.common.base
 
-import org.feijoas.mango.common.base.Predicates._
-import org.scalatest._
-import org.scalatest.prop.PropertyChecks
-import com.google.common.base.{Predicates => GuavaPredicates}
-import com.google.common.base.{Predicate => GuavaPredicate}
+import org.feijoas.mango.common.base.Predicates.{alwaysFalse, *}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import com.google.common.base.Predicates as GuavaPredicates
+import com.google.common.base.Predicate as GuavaPredicate
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 /**
  * Tests for [[Predicates]]
@@ -34,11 +35,15 @@ import com.google.common.base.{Predicate => GuavaPredicate}
  *  @author Markus Schneider
  *  @since 0.7 (copied from guava-libraries)
  */
-class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
+class PredicatesTest extends AnyFlatSpec with Matchers with ScalaCheckPropertyChecks {
 
-  val isEven = (n: Int) => n % 2 == 0
-  val isOdd = (n: Int) => n % 2 != 0
-  val neverReach = (n: Any) => { fail("should never reach this code"); false }
+  val isEven: Int => Boolean = (n: Int) => n % 2 == 0
+  val isOdd: Int => Boolean = (n: Int) => n % 2 != 0
+  val neverReach: Any => Boolean = { (_: Any) =>
+    {
+      fail("should never reach this code")
+    }
+  }
 
   behavior of "Predicates"
 
@@ -58,11 +63,15 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
   }
 
   "not alwaysTrue" should "be the same instance as alwaysFalse" in {
-    (Predicates.not(alwaysTrue) should be).theSameInstanceAs(alwaysFalse)
+    val lhs: Any => Boolean = Predicates.not(alwaysTrue)
+    val rhs: Any => Boolean = alwaysFalse
+    (lhs should be).theSameInstanceAs(rhs)
   }
 
   "not alwaysFalse" should "be the same instance as alwaysTrue" in {
-    (Predicates.not(alwaysFalse) should be).theSameInstanceAs(alwaysTrue)
+    val lhs: Any => Boolean = Predicates.not(alwaysFalse)
+    val rhs: Any => Boolean = alwaysTrue
+    (lhs should be).theSameInstanceAs(rhs)
   }
 
   "double neg. with not" should "return the orig instance" in {
@@ -97,20 +106,20 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     forAll { (n: Int) => and(List(alwaysFalse, neverReach))(n) should be(false) }
   }
 
-  "and" should "denfensifly copy mutable Seq" in {
+  "and" should "defensively copy mutable Seq" in {
     val array = Array[Any => Boolean](alwaysFalse)
-    val predicate = and(array)
+    val predicate = and(array.toIndexedSeq)
     predicate(1) should be(false)
     array(0) = alwaysTrue
     predicate(1) should be(false)
   }
 
-  "and" should "not denfensifly copy immutable Seq" in {
+  "and" should "not defensively copy immutable Seq" in {
     val list = List[Any => Boolean](alwaysFalse)
     val predicate = and(list)
     predicate match {
-      case a: AndPredicate[Any] => (a.px should be).theSameInstanceAs(list)
-      case _                    => fail("expected an AndPredicate")
+      case ap: AndPredicate[Any] => (ap.px should be).theSameInstanceAs(list)
+      case _                     => fail("expected an AndPredicate")
     }
   }
 
@@ -142,20 +151,20 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     forAll { (n: Int) => or(List(alwaysTrue, neverReach))(n) should be(true) }
   }
 
-  "or" should "denfensifly copy mutable Seq" in {
+  "or" should "defensively copy mutable Seq" in {
     val array = Array[Any => Boolean](alwaysFalse)
-    val predicate = or(array)
+    val predicate = or(array.toIndexedSeq)
     predicate(1) should be(false)
     array(0) = alwaysTrue
     predicate(1) should be(false)
   }
 
-  "or" should "not denfensifly copy immutable Seq" in {
+  "or" should "not defensively copy immutable Seq" in {
     val list = List[Any => Boolean](alwaysFalse)
     val predicate = or(list)
     predicate match {
-      case a: OrPredicate[Any] => (a.px should be).theSameInstanceAs(list)
-      case _                   => fail("expected an orPredicate")
+      case opa: OrPredicate[Any] => (opa.px should be).theSameInstanceAs(list)
+      case _                     => fail("expected an orPredicate")
     }
   }
 
@@ -184,20 +193,20 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     forAll { (n: Int) => xor(List(isEven, isOdd))(n) should be(true) }
   }
 
-  "xor" should "denfensifly copy mutable Seq" in {
+  "xor" should "defensively copy mutable Seq" in {
     val array = Array[Any => Boolean](alwaysFalse)
-    val predicate = xor(array)
+    val predicate = xor(array.toIndexedSeq)
     predicate(1) should be(false)
     array(0) = alwaysTrue
     predicate(1) should be(false)
   }
 
-  "xor" should "not denfensifly copy immutable Seq" in {
+  "xor" should "not defensively copy immutable Seq" in {
     val list = List[Any => Boolean](alwaysFalse)
     val predicate = xor(list)
     predicate match {
-      case a: XorPredicate[Any] => (a.px should be).theSameInstanceAs(list)
-      case _                    => fail("expected an xorPredicate")
+      case xop: XorPredicate[Any] => (xop.px should be).theSameInstanceAs(list)
+      case _                      => fail("expected an xorPredicate")
     }
   }
 
@@ -218,17 +227,17 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     forAll { (n: AnyVal) => equalTo(n).hashCode should be(equalTo(n).hashCode) }
   }
 
-  "assignableFrom(classOf[Int])" should "be true for Class[Int]" in {
-    val isInt = assignableFrom(classOf[Int])
+  "subtypeOf(classOf[Int])" should "be true for Class[Int]" in {
+    val isInt = subtypeOf(classOf[Int])
     forAll { (n: Int) => isInt(n.getClass) should be(true) }
     isInt("".getClass) should be(false)
     isInt(null) should be(false)
   }
 
-  "assignableFrom " should "work against traits" in {
-    val isAss = assignableFrom(classOf[Traversable[_]])
-    isAss(classOf[List[_]]) should be(true)
-    isAss(classOf[Map[_, _]]) should be(true)
+  "subtypeOf" should "work against traits" in {
+    val isAss = subtypeOf(classOf[Iterable[?]])
+    isAss(classOf[List[?]]) should be(true)
+    isAss(classOf[Map[?, ?]]) should be(true)
   }
 
   "isNull" should "return true only for null" in {
@@ -255,39 +264,41 @@ class PredicatesTest extends FlatSpec with Matchers with PropertyChecks {
     isFoobar("Foobarx") should be(false)
   }
 
-  "boolean operators" should "not copute hashCodes per-instance" in {
+  "boolean operators" should "not compute hashCodes per-instance" in {
     val p1 = isNull
     val p2 = isOdd
 
-    Predicates.not(p1).hashCode should be(Predicates.not(p1).hashCode)
-    and(p1, p2).hashCode should be(and(p1, p2).hashCode)
-    or(p1, p2).hashCode should be(or(p1, p2).hashCode)
-    xor(p1, p2).hashCode should be(xor(p1, p2).hashCode)
+    val lhs1: Any => Boolean = Predicates.not(p1)
+    lhs1.hashCode() should be(lhs1.hashCode())
+    and(p1, p2).hashCode() should be(and(p1, p2).hashCode())
+    or(p1, p2).hashCode() should be(or(p1, p2).hashCode())
+    xor(p1, p2).hashCode() should be(xor(p1, p2).hashCode())
 
     // While not a contractual requirement, we'd like the hash codes for ands
     // & ors of the same predicates to not collide.
-    and(p1, p2).hashCode should not be (or(p1, p2).hashCode)
-    and(p1, p2).hashCode should not be (xor(p1, p2).hashCode)
+    and(p1, p2).hashCode should not be or(p1, p2).hashCode
+    and(p1, p2).hashCode should not be xor(p1, p2).hashCode
   }
 
   "boolean operators" should "be equal if args are equal" in {
     val p1 = isNull
     val p2 = isOdd
 
-    Predicates.not(p1) should be(Predicates.not(p1))
+    val lhs1: Any => Boolean = Predicates.not(p1)
+    lhs1 should be(Predicates.not(p1))
     and(p1, p2) should be(and(p1, p2))
     or(p1, p2) should be(or(p1, p2))
     xor(p1, p2) should be(xor(p1, p2))
 
-    and(p1, p2) should not be (or(p1, p2))
-    and(p1, p2) should not be (xor(p1, p2))
+    and(p1, p2) should not be or(p1, p2)
+    and(p1, p2) should not be xor(p1, p2)
   }
 
   "Predicates" should "convert a Guava Predicate[T] to a Scala function T => Boolean" in {
-    val pred: Any => Boolean = GuavaPredicates.alwaysTrue().asScala
+    val _: Any => Boolean = GuavaPredicates.alwaysTrue().asScala
   }
 
   "Predicates" should "convert a Scala function T => Boolean to a Guava Predicate[T]" in {
-    val pred: GuavaPredicate[Any] = { (arg: Any) => true }.asJava
+    val _: GuavaPredicate[Any] = { (_: Any) => true }.asJava
   }
 }

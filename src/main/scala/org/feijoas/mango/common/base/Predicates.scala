@@ -49,14 +49,14 @@ import com.google.common.base.{Predicate => GuavaPredicate}
  *  @author Markus Schneider
  *  @since 0.7
  */
-final object Predicates {
+object Predicates {
 
   /**
    * Returns a predicate that always evaluates to `false`.
    */
   case object alwaysFalse extends (Any => Boolean) {
     override def apply(ref: Any) = false
-    override def toString = "alwaysFalse"
+    override def toString: String = "alwaysFalse"
   }
 
   /**
@@ -64,7 +64,7 @@ final object Predicates {
    */
   case object alwaysTrue extends (Any => Boolean) {
     override def apply(ref: Any) = true
-    override def toString = "alwaysTrue"
+    override def toString: String = "alwaysTrue"
   }
 
   /**
@@ -72,8 +72,8 @@ final object Predicates {
    *  being tested is not `null`.
    */
   case object notNull extends (Any => Boolean) {
-    override def apply(ref: Any) = ref != null
-    override def toString = "notNull"
+    override def apply(ref: Any): Boolean = ref != null
+    override def toString: String = "notNull"
   }
 
   /**
@@ -81,18 +81,18 @@ final object Predicates {
    *  being tested is `null`.
    */
   case object isNull extends (Any => Boolean) {
-    override def apply(ref: Any) = ref == null
-    override def toString = "isNull"
+    override def apply(ref: Any): Boolean = ref == null
+    override def toString: String = "isNull"
   }
 
   /**
    * Returns a predicate that evaluates to `true` if the object reference
    *  being tested is `null`.
    */
-  private[mango] case class NotPredicate[T](val predicate: T => Boolean) extends (T => Boolean) {
+  private[mango] case class NotPredicate[T](predicate: T => Boolean) extends (T => Boolean) {
     checkNotNull(predicate)
-    override def apply(arg: T) = !predicate(arg)
-    override def toString = "Not(" + predicate.toString + ")"
+    override def apply(arg: T): Boolean = !predicate(arg)
+    override def toString: String = "Not(" + predicate.toString + ")"
   }
 
   /**
@@ -104,11 +104,11 @@ final object Predicates {
    *  components} is empty, the returned predicate will always evaluate to {@code
    *  true}.
    */
-  private[mango] case class AndPredicate[T](px: Seq[(T => Boolean)]) extends (T => Boolean) {
+  private[mango] case class AndPredicate[T](px: Seq[T => Boolean]) extends (T => Boolean) {
     checkNotNull(px)
-    override def apply(arg: T) = px.indexWhere(f => !f(arg)) == -1
-    override def toString = px.mkString("And(", ",", ")")
-    override def hashCode = px.hashCode() + 0x12472c2c
+    override def apply(arg: T): Boolean = px.indexWhere(f => !f(arg)) == -1
+    override def toString: String = px.mkString("And(", ",", ")")
+    override def hashCode: Int = px.hashCode() + 0x12472c2c
   }
 
   /**
@@ -120,11 +120,11 @@ final object Predicates {
    *  components} is empty, the returned predicate will always evaluate to {@code
    *  false}.
    */
-  private[mango] case class OrPredicate[T](px: immutable.Seq[(T => Boolean)]) extends (T => Boolean) {
+  private[mango] case class OrPredicate[T](px: immutable.Seq[T => Boolean]) extends (T => Boolean) {
     checkNotNull(px)
-    override def apply(arg: T) = px.indexWhere(f => f(arg)) != -1
-    override def toString = px.mkString("Or(", ",", ")")
-    override def hashCode = px.hashCode() + 0x053c91cf
+    override def apply(arg: T): Boolean = px.indexWhere(f => f(arg)) != -1
+    override def toString: String = px.mkString("Or(", ",", ")")
+    override def hashCode: Int = px.hashCode() + 0x053c91cf
   }
 
   /**
@@ -134,18 +134,18 @@ final object Predicates {
    *  If {@code components} is empty, the returned predicate will always evaluate
    *  to {@code false}.
    */
-  private[mango] case class XorPredicate[T](px: Seq[(T => Boolean)]) extends (T => Boolean) {
+  private[mango] case class XorPredicate[T](px: Seq[T => Boolean]) extends (T => Boolean) {
     checkNotNull(px)
     private val xor = px.reduceLeft[T => Boolean]((acc, fnc) => (arg: T) => fnc(arg) != acc(arg))
-    override def apply(arg: T) = xor(arg)
-    override def toString = px.mkString("Xor(", ",", ")")
-    override def hashCode = px.hashCode + 0x75bcf4d
+    override def apply(arg: T): Boolean = xor(arg)
+    override def toString: String = px.mkString("Xor(", ",", ")")
+    override def hashCode: Int = px.hashCode + 0x75bcf4d
   }
 
   private[mango] case class InstanceOfPredicate(clazz: Class[_]) extends (Any => Boolean) {
     checkNotNull(clazz)
-    override def apply(arg: Any) = arg != null && arg.getClass == clazz
-    override def toString = "InstanceOf(" + clazz + ")"
+    override def apply(arg: Any): Boolean = arg != null && arg.getClass == clazz
+    override def toString: String = "InstanceOf(" + clazz + ")"
   }
 
   /**
@@ -153,8 +153,8 @@ final object Predicates {
    *  tested {@code equals()} the given target or both are null.
    */
   private[mango] case class EqualToPredicate[T](@Nullable target: T) extends (T => Boolean) {
-    override def apply(arg: T) = target == arg
-    override def toString = "IsEqualTo(" + target + ")"
+    override def apply(arg: T): Boolean = target == arg
+    override def toString: String = "IsEqualTo(" + target + ")"
   }
 
   /**
@@ -165,8 +165,8 @@ final object Predicates {
    */
   private[mango] case class ContainsPatternPredicate(pattern: Pattern) extends (String => Boolean) {
     checkNotNull(pattern)
-    override def apply(arg: String) = pattern.matcher(arg).find()
-    override def toString = "ContainsPattern(" + pattern + ")"
+    override def apply(arg: String): Boolean = pattern.matcher(arg).find()
+    override def toString: String = "ContainsPattern(" + pattern + ")"
   }
 
   /**
@@ -189,7 +189,7 @@ final object Predicates {
    *  components} is empty, the returned predicate will always evaluate to {@code
    *  true}.
    */
-  def and[T](predicates: Seq[(T => Boolean)]): T => Boolean = {
+  def and[T](predicates: Seq[T => Boolean]): T => Boolean = {
     checkNotNull(predicates)
     if (predicates.isEmpty)
       return alwaysFalse
@@ -212,7 +212,7 @@ final object Predicates {
   def and[T](fst: T => Boolean, rest: (T => Boolean)*): T => Boolean = {
     checkNotNull(fst)
     checkNotNull(rest)
-    val seq: Seq[(T => Boolean)] = fst +: rest
+    val seq: Seq[T => Boolean] = fst +: rest
     and(seq)
   }
 
@@ -248,7 +248,7 @@ final object Predicates {
   def or[T](fst: T => Boolean, rest: (T => Boolean)*): T => Boolean = {
     checkNotNull(fst)
     checkNotNull(rest)
-    val seq: Seq[(T => Boolean)] = fst +: rest
+    val seq: Seq[T => Boolean] = fst +: rest
     or(seq)
   }
 
@@ -280,7 +280,7 @@ final object Predicates {
   def xor[T](fst: T => Boolean, rest: (T => Boolean)*): T => Boolean = {
     checkNotNull(fst)
     checkNotNull(rest)
-    val seq: Seq[(T => Boolean)] = fst +: rest
+    val seq: Seq[T => Boolean] = fst +: rest
     xor(seq)
   }
 
@@ -288,7 +288,7 @@ final object Predicates {
    * Returns a predicate that evaluates to {@code true} if the object being
    *  tested {@code equals()} the given target or both are null.
    */
-  def equalTo[T](target: T): (T => Boolean) = EqualToPredicate(target)
+  def equalTo[T](target: T): T => Boolean = EqualToPredicate(target)
 
   /**
    * Returns a predicate that evaluates to {@code true} if the class being
@@ -298,7 +298,7 @@ final object Predicates {
    * @deprecated Use the correctly-named method {@link #subtypeOf} instead.
    * @since 10.0
    */
-  @Deprecated
+  @deprecated("Use the correctly-named method {@link #subtypeOf} instead.", "10.0")
   def assignableFrom(clazz: Class[_]): Class[_] => Boolean = subtypeOf(clazz)
 
   /**
@@ -321,7 +321,7 @@ final object Predicates {
    *
    *  The test used is equivalent to `coll.contains(arg)`
    *
-   *  @param target the collection that may contain the function input
+   *  @param coll the collection that may contain the function input
    */
   def in[T](coll: Seq[T]): T => Boolean = {
     checkNotNull(coll)
@@ -347,7 +347,7 @@ final object Predicates {
    *  regular expression pattern. The test used is equivalent to
    *  {@code pattern.matcher(arg).find()}
    */
-  def containsPattern(pattern: Pattern): (String => Boolean) = ContainsPatternPredicate(pattern)
+  def containsPattern(pattern: Pattern): String => Boolean = ContainsPatternPredicate(pattern)
 
   /**
    * Adds an `asJava` method that wraps a Scala function `T => Boolean` in

@@ -22,16 +22,12 @@
  */
 package org.feijoas.mango.common.collect.mutable
 
-import scala.collection.mutable.Builder
-
+import com.google.common.collect as gcc
 import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.collect
-import org.feijoas.mango.common.collect.AsOrdered
-import org.feijoas.mango.common.collect.Range
 import org.feijoas.mango.common.collect.Range.asGuavaRangeConverter
-import org.feijoas.mango.common.collect.RangeMapFactory
+import org.feijoas.mango.common.collect.{AsOrdered, Range, RangeMapFactory}
 
-import com.google.common.{collect => gcc}
+import scala.collection.mutable
 
 /** An mutable implementation of RangeMap that delegates to Guava TreeRangeMap
  *
@@ -46,7 +42,8 @@ private[mango] class TreeRangeMapWrapper[K, V, O <: Ordering[K]] private (guava:
 
   override def delegate = guava
   override def factory = TreeRangeMapWrapper(_)(ordering)
-  override def newBuilder = TreeRangeMapWrapper.newBuilder(ordering)
+  override def newBuilder: mutable.Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]] =
+    TreeRangeMapWrapper.newBuilder(ordering)
 }
 
 /** Factory for TreeRangeMapWrapper
@@ -59,10 +56,12 @@ final private[mango] object TreeRangeMapWrapper extends RangeMapFactory[TreeRang
 
   /** Returns a new builder for [[RangeMap]].
    */
-  def newBuilder[K, V, O <: Ordering[K]](implicit ord: O) =
-    new Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]]() {
+  def newBuilder[K, V, O <: Ordering[K]](implicit
+    ord: O
+  ): mutable.Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]] =
+    new mutable.Builder[(Range[K, O], V), TreeRangeMapWrapper[K, V, O]]() {
       val builder = gcc.TreeRangeMap.create[AsOrdered[K], V]()
-      override def +=(entry: (Range[K, O], V)): this.type = {
+      override def addOne(entry: (Range[K, O], V)): this.type = {
         builder.put(entry._1.asJava, entry._2)
         this
       }

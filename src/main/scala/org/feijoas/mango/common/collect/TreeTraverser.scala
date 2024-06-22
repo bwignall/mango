@@ -22,15 +22,12 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.convert.decorateAsJava.asJavaIterableConverter
-import scala.collection.convert.decorateAsScala.iterableAsScalaIterableConverter
-
+import com.google.common.collect as cgcc
 import org.feijoas.mango.common.annotations.Beta
 import org.feijoas.mango.common.base.Preconditions.checkNotNull
-import org.feijoas.mango.common.convert.AsJava
-import org.feijoas.mango.common.convert.AsScala
+import org.feijoas.mango.common.convert.{AsJava, AsScala}
 
-import com.google.common.{collect => cgcc}
+import scala.jdk.CollectionConverters.{IterableHasAsJava, IterableHasAsScala}
 
 /**
  * Views elements of a type {@code T} as nodes in a tree, and provides methods to traverse the trees
@@ -161,5 +158,5 @@ private[mango] case class AsMangoTreeTraverser[T](delegate: cgcc.TreeTraverser[T
     extends TreeTraverser[T]
     with Serializable {
   checkNotNull(delegate)
-  final override def children = (root: T) => delegate.children(root).asScala
+  final override def children: T => Iterable[T] = { root: T => delegate.children(root).asScala }
 }

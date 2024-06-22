@@ -22,9 +22,9 @@
  */
 package org.feijoas.mango.common.collect
 
-import scala.collection.generic.HasNewBuilder
-
 import org.feijoas.mango.common.annotations.Beta
+
+import scala.collection.mutable
 
 /** Implementation trait for [[RangeMap]]
  *
@@ -64,9 +64,7 @@ import org.feijoas.mango.common.annotations.Beta
  *  @tparam Repr the type of the map itself.
  */
 @Beta
-trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] with RangeMap[K, V, O]]
-    extends HasNewBuilder[(Range[K, O], V), Repr] {
-  self =>
+trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] with RangeMap[K, V, O]] {
 
   /** Returns the value associated with the specified key in a `Some`, or `None` if there is no
    *  such value.
@@ -109,13 +107,13 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
 
   /** Returns `true` if this range map contains no ranges.
    */
-  def isEmpty: Boolean = asMapOfRanges.isEmpty
+  def isEmpty: Boolean = asMapOfRanges().isEmpty
 
   /** Returns `true` if `obj` is another [[RangeMap]] that has an equivalent
    *  `#asMapOfRanges()`.
    */
   override def equals(obj: Any): Boolean = obj match {
-    case other: RangeMap[_, _, _] => asMapOfRanges == other.asMapOfRanges
+    case other: RangeMap[_, _, _] => asMapOfRanges() == other.asMapOfRanges()
     case _                        => false
   }
 
@@ -125,5 +123,7 @@ trait RangeMapLike[K, V, O <: Ordering[K], +Repr <: RangeMapLike[K, V, O, Repr] 
 
   /** Returns a readable string representation of this range map.
    */
-  override def toString(): String = asMapOfRanges().toString
+  override def toString: String = asMapOfRanges().toString()
+
+  def newBuilder: mutable.Builder[(Range[K, O], V), Repr]
 }

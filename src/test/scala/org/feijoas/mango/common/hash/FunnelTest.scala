@@ -22,21 +22,12 @@
  */
 package org.feijoas.mango.common.hash
 
-import org.feijoas.mango.common.annotations.Beta
-import org.feijoas.mango.common.hash.Funnel.{
-  asGuavaFunnel,
-  asScalaFunnel,
-  byteArrayFunnel,
-  intFunnel,
-  longFunnel,
-  stringFunnel
-}
+import org.feijoas.mango.common.hash.Funnel.{asGuavaFunnel, asScalaFunnel, byteArrayFunnel, intFunnel, longFunnel}
 import org.mockito.Mockito.verify
-import org.scalatest.{FlatSpec, PrivateMethodTester}
-import org.scalatest.matchers._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
-import org.scalatest.Matchers._
+import org.scalatest.PrivateMethodTester
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatest.matchers.should.Matchers._
 
 import com.google.common.hash.{Funnel => GuavaFunnel, Funnels => GuavaFunnels, PrimitiveSink}
 
@@ -46,17 +37,17 @@ import com.google.common.hash.{Funnel => GuavaFunnel, Funnels => GuavaFunnels, P
  *  @author Markus Schneider
  *  @since 0.6 (copied from guava-libraries)
  */
-class FunnelTest extends FlatSpec with PrivateMethodTester with MockitoSugar {
+class FunnelTest extends AnyFlatSpec with PrivateMethodTester with MockitoSugar {
 
   it should "convert from Guava to Mango" in {
     val guava: GuavaFunnel[Integer] = GuavaFunnels.integerFunnel
-    val mango: Funnel[Integer] = guava.asScala
+    val _: Funnel[Integer] = guava.asScala
     // enough if the compiler does not complain
   }
 
   it should "convert from Mango to Guava" in {
     val mango: Funnel[Int] = implicitly[Funnel[Int]]
-    val guava: GuavaFunnel[Int] = mango.asJava
+    val _: GuavaFunnel[Int] = mango.asJava
     // enough if the compiler does not complain
   }
 

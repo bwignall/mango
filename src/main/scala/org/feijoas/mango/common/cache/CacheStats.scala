@@ -22,13 +22,10 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.math.max
-
+import com.google.common.base.MoreObjects
+import com.google.common.cache.CacheStats as GuavaCacheStats
 import org.feijoas.mango.common.base.Preconditions.checkArgument
 import org.feijoas.mango.common.convert.AsScala
-
-import com.google.common.base.MoreObjects
-import com.google.common.cache.{CacheStats => GuavaCacheStats}
 
 /**
  * Statistics about the performance of a [[Cache]]. Instances of this class are immutable.
@@ -140,8 +137,8 @@ case class CacheStats(
    *  concurrent misses for the same key will result in a single load operation.
    */
   def missRate(): Double = requestCount match {
-    case 0        => 0
-    case _ @count => missCount.toDouble / requestCount
+    case 0     => 0
+    case count => missCount.toDouble / count
   }
 
   /**
@@ -176,7 +173,7 @@ case class CacheStats(
    *  rounded up to zero.
    */
   def -(other: CacheStats): CacheStats = {
-    import scala.math._
+    import scala.math.*
     CacheStats(
       max(0, hitCount - other.hitCount),
       max(0, missCount - other.missCount),

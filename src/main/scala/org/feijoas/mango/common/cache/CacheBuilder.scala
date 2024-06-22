@@ -22,16 +22,13 @@
  */
 package org.feijoas.mango.common.cache
 
-import scala.concurrent.duration._
-import com.google.common.cache.{CacheBuilder => GuavaCacheBuilder}
+import com.google.common.cache.CacheBuilder as GuavaCacheBuilder
+import org.feijoas.mango.common.base.Preconditions.*
 import org.feijoas.mango.common.base.Ticker
-import org.feijoas.mango.common.base.Preconditions._
-import org.feijoas.mango.common.cache._
-import org.feijoas.mango.common.cache.CacheWrapper._
-import org.feijoas.mango.common.cache.CacheLoaderWrapper._
-import org.feijoas.mango.common.cache.LoadingCacheWrapper._
-import org.feijoas.mango.common.cache.Weigher._
-import org.feijoas.mango.common.cache.RemovalListener._
+import org.feijoas.mango.common.cache.RemovalListener.*
+import org.feijoas.mango.common.cache.Weigher.*
+
+import scala.concurrent.duration.*
 
 /** A builder of [[LoadingCache]] and [[Cache]] instances having any combination of the
  *  following features:
@@ -470,9 +467,8 @@ final case class CacheBuilder[-K, -V] private (
    *
    *  <p>The primary intent of this method is to facilitate testing of caches which have been
    *  configured with `expireAfterWrite` or `expireAfterAccess`.
-   *
-   *  @throws IllegalStateException if a ticker was already set
    */
+  @throws[IllegalStateException]
   def ticker(ticker: Ticker): CacheBuilder[K, V] = {
     checkNotNull(ticker)
     checkState(withTicker == None)
